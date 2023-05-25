@@ -1,0 +1,1 @@
+docker run --name my-pgadmin -p 80:80 -e 'PGADMIN_DEFAULT_EMAIL=user@example.com' -e 'PGADMIN_DEFAULT_PASSWORD=SuperSecret' -d dpage/pgadmin4
