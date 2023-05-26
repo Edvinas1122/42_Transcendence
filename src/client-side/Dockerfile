@@ -17,6 +17,8 @@ COPY app/tsconfig.json ./
 # Copy the rest of the application
 COPY app/ ./
 
+RUN mkdir components/
+
 # Build the Next.js app
 RUN npm run build
 

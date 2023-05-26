@@ -2,24 +2,24 @@ version: '3.9'
 
 services:
 
-  # db:
-  #   image: postgres
-  #   restart: always
-  #   environment:
-  #     POSTGRES_PASSWORD: example
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
 
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   restart: always
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-  #     PGADMIN_DEFAULT_PASSWORD: admin
-  #   ports:
-  #     - 8085:8080
-  #   depends_on:
-  #     - db
-  #   volumes:
-  #     - pgadmin_data:/var/lib/pgadmin
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - 8080:80
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
   next-app:
     build: 
@@ -29,6 +29,7 @@ services:
       - 3030:3030
     volumes:
       - ./src/client-side/app/app:/app/app
+      - ./src/client-side/app/components:/app/components
 
   nest-app:
     build: 
