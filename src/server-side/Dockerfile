@@ -18,6 +18,8 @@ RUN mkdir src
 
 # Copy the rest of the application
 COPY app/ ./
+RUN npm install --save @nestjs/typeorm typeorm pg
+
 
 # Expose the port that the application will run on
 EXPOSE 3000

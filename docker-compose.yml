@@ -5,15 +5,14 @@ services:
   db:
     image: postgres
     restart: always
-    environment:
-      POSTGRES_PASSWORD: example
+    env_file:
+      - .env
 
   pgadmin:
     image: dpage/pgadmin4
     restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-      PGADMIN_DEFAULT_PASSWORD: admin
+    env_file:
+      - .env
     ports:
       - 8080:80
     depends_on:
@@ -25,6 +24,8 @@ services:
     build: 
       context: src/client-side/
       # dockerfile: Dockerfile.next
+    env_file:
+      - .env
     ports:
       - 3030:3030
     volumes:
@@ -35,10 +36,14 @@ services:
     build: 
       context: src/server-side/
       # dockerfile: Dockerfile.nest
+    env_file:
+      - .env
     ports:
       - 3000:3000
     volumes:
       - ./src/server-side/app/src:/app/src
+    depends_on:
+      - db
 
 volumes:
   pgadmin_data:

@@ -1,14 +1,14 @@
 "use client"; // This is a client component 👈🏽
 
 import { useState, useEffect } from 'react';
- 
+
 function Profile() {
-  const [data, setData] = useState<any[]>([]);
-  const [isLoading, setLoading] = useState(false);
- 
+	const [data, setData] = useState<any[]>([]);
+	const [isLoading, setLoading] = useState(false);
+		
 	useEffect(() => {
 		setLoading(true);
-		fetch('http://127.0.0.1:3000/users', {method: "GET"})
+		fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/users/all`, {method: "GET"})
 		.then((res) => {
 			console.log('Response object:', res);
 			console.log('Response status:', res.status);
