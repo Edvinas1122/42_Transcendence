@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
  
 function Profile() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<any[]>([]);
   const [isLoading, setLoading] = useState(false);
  
 	useEffect(() => {

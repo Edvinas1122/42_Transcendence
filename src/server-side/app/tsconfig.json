@@ -17,8 +17,11 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
-  }
-  // "include": [
-  //   "/app/src/**/*.ts"
-  // ]
+    // "paths": {
+    //   "@nestjs/*": ["node_modules/@nestjs/*"]
+    // }
+  },
+  "include": [
+    "/app/src/**/*.ts"
+  ]
 }
