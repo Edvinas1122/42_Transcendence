@@ -17,8 +17,9 @@ COPY app/tsconfig.json ./
 RUN mkdir src
 
 # Copy the rest of the application
-COPY app/ ./
 RUN npm install --save @nestjs/typeorm typeorm pg
+RUN npm install passport passport-42
+COPY app/ ./
 
 
 # Expose the port that the application will run on
