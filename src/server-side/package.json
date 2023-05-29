@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@nestjs/typeorm": "^9.0.1",
+    "passport": "^0.6.0",
+    "passport-42": "^1.2.6",
     "typeorm": "^0.3.16"
   }
 }
