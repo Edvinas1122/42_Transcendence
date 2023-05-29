@@ -1,6 +1,4 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { User } from '../ormEntities/user.entity';
 import { UsersService } from './users.service';
 import { UseGuards } from '@nestjs/common';
@@ -19,8 +17,8 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
-  @Get('dummy')
   @UseGuards(JwtAuthGuard)
+  @Get('dummy')
   findAllDummy() {
     return [
       { id: 1, name: 'Dummy User 1', email: 'dummy1@email.com' },
