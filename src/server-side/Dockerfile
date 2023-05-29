@@ -18,7 +18,8 @@ RUN mkdir src
 
 # Copy the rest of the application
 RUN npm install --save @nestjs/typeorm typeorm pg
-RUN npm install passport passport-42
+RUN npm install @nestjs/passport passport passport-42
+RUN npm install passport-jwt @nestjs/jwt
 COPY app/ ./
 
 

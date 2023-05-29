@@ -2,20 +2,25 @@ import { Controller, Get, Post, Body } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../ormEntities/user.entity';
+import { UsersService } from './users.service';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly usersService: UsersService,
+    // @InjectRepository(User)
+    // private readonly userRepository: Repository<User>,
   ) {}
 
   @Get('all')
   async findAllUsers(): Promise<User[]> {
-    return await this.userRepository.find();
+    return await this.usersService.findAll();
   }
 
   @Get('dummy')
+  @UseGuards(JwtAuthGuard)
   findAllDummy() {
     return [
       { id: 1, name: 'Dummy User 1', email: 'dummy1@email.com' },
@@ -25,7 +30,11 @@ export class UsersController {
   }
 
   @Post()
-  async createUser(@Body() user: User): Promise<User> {
-    return await this.userRepository.save(user);
+  async createUser(@Body() user: User): Promise<User | null>
+  {
+    const resultUser = await this.usersService.create(user);
+    if (resultUser)
+      return resultUser;
+    return user;
   }
 }
