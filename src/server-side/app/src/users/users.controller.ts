@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body } from '@nestjs/common';
 import { User } from '../ormEntities/user.entity';
 import { UsersService } from './users.service';
 import { UseGuards } from '@nestjs/common';
@@ -8,14 +8,20 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    // @InjectRepository(User)
-    // private readonly userRepository: Repository<User>,
   ) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('all')
-  async findAllUsers(): Promise<User[]> {
+  async findAllUsers(@Req() req: Request): Promise<User[]> {
+    console.log(req['user']['name']);
     return await this.usersService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async findCurrentUser(@Req() req: Request): Promise<User> {
+    const currentUser = req['user']['name'];
+    return await this.usersService.findOne(currentUser);
   }
 
   @UseGuards(JwtAuthGuard)

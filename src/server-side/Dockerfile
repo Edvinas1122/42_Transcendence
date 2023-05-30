@@ -13,6 +13,7 @@ RUN npm install
 # Copy tsconfig.json
 COPY app/tsconfig.json ./
 
+
 # Create /app/src directory
 RUN mkdir src
 

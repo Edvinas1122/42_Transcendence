@@ -1,17 +1,16 @@
 import Image from 'next/image'
 // import MyComponent from '../components/myComponent'
-import Profile from '../components/myComponent'
-import CookieTestButton, {OAuthCallback} from '../components/auth'
+import UserProfile from '../components/Profiles'
+import AutoAuthGarant from '../components/auth/auth'
 
 
 export default function Home() {
 	return (
 		// <h1>Page</h1>
-		// <MyComponent />
 		<div>
-			<Profile />
+			<AutoAuthGarant />
+			<UserProfile />
 			{/* <OAuthCallback /> */}
-			<CookieTestButton />
 			{/* <Image
 				src="/images/profile.jpg"
 				alt="Picture of the author"

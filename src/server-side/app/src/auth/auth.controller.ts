@@ -29,11 +29,11 @@ export class AuthController
 	@UseGuards(FourtyTwoGuard)
 	async redirect(@Req() req: Request, @Res() res: Response): Promise<any>
 	{
-		const accessToken = await this.authService.generateToken({test: "test"});
+		const username = req['user']['profile']['username']; // kinda weird
+		const accessToken = await this.authService.generateToken({owner: username});
 		// const tokenRetrieveCode = this.tokenStore.storeTokenLink(accessToken, 10);
 
 		res.cookie('access_token', accessToken, { maxAge: 900000, httpOnly: false, secure: false });
 		return res.redirect('http://localhost:3030/');
-		// return res.redirect('http://localhost:3030/' + '?retrieveToken=' + tokenRetrieveCode);
 	}
 }
