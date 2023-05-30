@@ -17,8 +17,11 @@ const OAuthCallback: React.FC = () => {
 		})
 		.then(res => res.json())
 		.then(data => {
-		  // Handle your token here...
-		  console.log(data.token);
+			// Handle your token here...
+
+			// Save the token to local storage
+			localStorage.setItem('accessToken', data.token);
+			console.log(data.token);
 		})
 		.catch(err => console.error(err)); // Always add error handling
 	  }

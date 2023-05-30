@@ -8,7 +8,14 @@ function Profile() {
 		
 	useEffect(() => {
 		setLoading(true);
-		fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/users/all`, {method: "GET"})
+		fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/users/all`,
+			{
+				method: "GET",
+				headers: {
+					'Content-Type': 'application/json',
+					'Autorization': 'Bearer ' + localStorage.getItem('accessToken'),
+				}
+			})
 		.then((res) => {
 			console.log('Response object:', res);
 			console.log('Response status:', res.status);
