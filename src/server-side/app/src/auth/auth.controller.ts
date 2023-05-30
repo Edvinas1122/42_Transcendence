@@ -32,7 +32,8 @@ export class AuthController
 		const accessToken = await this.authService.generateToken({test: "test"});
 		const tokenRetrieveCode = this.tokenStore.storeTokenLink(accessToken, 10);
 
-		res.cookie('access_token', accessToken, { maxAge: 900000, httpOnly: true, secure: false });
-		return res.redirect('http://localhost:3030/' + '?retrieveToken=' + tokenRetrieveCode);
+		res.cookie('access_token', accessToken, { maxAge: 900000, httpOnly: false, secure: false });
+		return res.redirect('http://localhost:3030/');
+		// return res.redirect('http://localhost:3030/' + '?retrieveToken=' + tokenRetrieveCode);
 	}
 }

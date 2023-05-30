@@ -18,6 +18,7 @@ COPY app/tsconfig.json ./
 
 # Build the Next.js app
 RUN npm run build
+RUN npm install js-cookie
 # Copy the rest of the application
 COPY app/ ./
 
