@@ -34,6 +34,8 @@ function Profile() {
             .catch((error) => {
                 console.error(error);
                 setLoading(false);
+				const url = process.env.NEXT_PUBLIC_INTRA_LINL;
+				window.open(url, '_self');
             });
     }, []);
 

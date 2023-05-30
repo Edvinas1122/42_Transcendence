@@ -32,11 +32,8 @@ const CookieTestButton: React.FC = () => {
   
 	  if (cookieExists) {
 		console.log('Cookie exists!');
-		const url = process.env.NEXT_PUBLIC_INTRA_LINL;
-		window.open(url, '_self');
 	  } else {
 		console.log('Cookie does not exist.');
-  
 		const url = process.env.NEXT_PUBLIC_INTRA_LINL;
 		window.open(url, '_self');
 	  }

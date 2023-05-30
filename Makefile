@@ -7,6 +7,9 @@ shell_back:
 shell_front:
 	docker-compose exec next-app bash
 
+wipe_db:
+	docker volume rm 42_transcendence_pgadmin_data
+
 stop:
 	docker-compose down
 

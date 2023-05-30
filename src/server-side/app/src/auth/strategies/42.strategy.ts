@@ -26,8 +26,7 @@ export class FourtyTwoStrategy extends PassportStrategy(Strategy, '42') {
 				image,
 			},
 		};
-		console.log(as_json['image']['link']);
-		this.usersService.create2(profile); // I hate it, it breaks sence, because every OAuth2 strategy gonna implament this method
+		this.usersService.createFrom42(as_json); // I hate it, it breaks sence, because every OAuth2 strategy gonna implament this method
 		done(null, user);
 		return { id, username, photos };
 	}

@@ -10,7 +10,7 @@ export default function Home() {
 		// <MyComponent />
 		<div>
 			<Profile />
-			<OAuthCallback />
+			{/* <OAuthCallback /> */}
 			<CookieTestButton />
 			{/* <Image
 				src="/images/profile.jpg"

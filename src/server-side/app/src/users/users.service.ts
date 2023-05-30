@@ -30,12 +30,16 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  async create2({ id, username, photos }): Promise<User | null>
+  async createFrom42(info: JSON): Promise<User | null>
   {
     const newUser = new User();
-    newUser.name = username;
-    console.log(photos);
-    const resultUser = await this.findOne(username);
+    newUser.name = info['login'];
+    newUser.FullName = info['displayname'];
+    newUser.avatar = info['image']['versions']['small'];
+    newUser.ImageLinks = info['image']['versions'];
+    newUser.OriginJson = info;
+
+    const resultUser = await this.findOne(newUser.name);
     if (resultUser)
       return null;
     return await this.userRepository.save(newUser);
