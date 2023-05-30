@@ -21,6 +21,7 @@ RUN npm install --save @nestjs/typeorm typeorm pg
 RUN npm install @nestjs/passport passport passport-42
 RUN npm install passport-jwt @nestjs/jwt
 RUN npm install cookie-parser
+RUN npm install axios
 COPY app/ ./
 
 

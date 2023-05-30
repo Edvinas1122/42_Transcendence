@@ -12,6 +12,7 @@ export class UsersController {
     // private readonly userRepository: Repository<User>,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('all')
   async findAllUsers(): Promise<User[]> {
     return await this.usersService.findAll();

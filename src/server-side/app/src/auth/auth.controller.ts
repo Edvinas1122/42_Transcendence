@@ -2,22 +2,27 @@ import { Controller, Get, Query, Post, Body, UseGuards, Req, Res } from '@nestjs
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { FourtyTwoGuard } from './guards/42.guard';
-// import { CookiesService } from '@nestjs/cookies';
+import { Inject } from '@nestjs/common';
+import { TmpTokenStore } from './tmpTokenStore.service';
+
 
 @Controller('auth')
-export class AuthController {
-	constructor(private readonly authService: AuthService) {}
+export class AuthController
+{
+	constructor(private readonly authService: AuthService,
+				@Inject(TmpTokenStore) private tokenStore: TmpTokenStore) {}
 
 	@Get('/')
 	getHello(): string {
 		return 'Hello World!';
 	}
 
-	@Get('/login')
-	@UseGuards(FourtyTwoGuard)
-	async loginWith42()
+	@Get('/token')
+	// @UseGuards(FourtyTwoGuard)
+	async loginWith42(@Query('tmp_id') code: string): Promise<any>
 	{
-		return {access_token: await this.authService.generateToken({test: "test"})};
+		const token = this.tokenStore.retrieveTokenLink(code);
+		return {token};
 	}
 
 	@Get('/redirect')
@@ -25,11 +30,9 @@ export class AuthController {
 	async redirect(@Req() req: Request, @Res() res: Response): Promise<any>
 	{
 		const accessToken = await this.authService.generateToken({test: "test"});
+		const tokenRetrieveCode = this.tokenStore.storeTokenLink(accessToken, 10);
 
-		console.log("here we are");
 		res.cookie('access_token', accessToken, { maxAge: 900000, httpOnly: true, secure: false });
-		// return res.redirect('http://localhost:3000/users/dummy');
-		res.send({access_token: accessToken});
-		// return {access_token: accessToken};
+		return res.redirect('http://localhost:3030/' + '?retrieveToken=' + tokenRetrieveCode);
 	}
 }

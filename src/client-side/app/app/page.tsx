@@ -1,6 +1,8 @@
 import Image from 'next/image'
 // import MyComponent from '../components/myComponent'
 import Profile from '../components/myComponent'
+import CookieTestButton, {OAuthCallback} from '../components/auth'
+
 
 export default function Home() {
 	return (
@@ -8,6 +10,8 @@ export default function Home() {
 		// <MyComponent />
 		<div>
 			<Profile />
+			<OAuthCallback />
+			<CookieTestButton />
 			{/* <Image
 				src="/images/profile.jpg"
 				alt="Picture of the author"

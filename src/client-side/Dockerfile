@@ -14,13 +14,13 @@ RUN npm install
 # Copy tsconfig.json
 COPY app/tsconfig.json ./
 
-# Copy the rest of the application
-COPY app/ ./
-
 # RUN mkdir components/
 
 # Build the Next.js app
 RUN npm run build
+# Copy the rest of the application
+COPY app/ ./
+
 
 
 # Expose the port that the Next.js app will run on
