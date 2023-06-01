@@ -23,6 +23,9 @@ RUN npm install @nestjs/passport passport passport-42
 RUN npm install passport-jwt @nestjs/jwt
 # also not needed anymore kinda 
 RUN npm install cookie-parser 
+
+RUN npm i --save @nestjs/websockets @nestjs/platform-socket.io
+
 # RUN npm install axios // not needed anymore now
 COPY app/ ./
 
