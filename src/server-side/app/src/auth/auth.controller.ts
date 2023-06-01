@@ -30,8 +30,9 @@ export class AuthController
 	// @Redirect('http://localhost:3030/', 302)
 	async redirect(@Req() req: Request, @Res() res: Response): Promise<any>
 	{
-		const username = req['user']['profile']['username']; // kinda weird
-		const accessToken = await this.authService.generateToken({owner: username});
+		const username = req['user']['profile']['username'];
+		const id = req['user']['profile']['id'];
+		const accessToken = await this.authService.generateToken({id: id, owner: username});
 		// const tokenRetrieveCode = this.tokenStore.storeTokenLink(accessToken, 10);
 
 		res.cookie('access_token', accessToken, { maxAge: 900000, httpOnly: false, secure: false });

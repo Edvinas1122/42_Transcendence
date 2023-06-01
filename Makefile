@@ -22,3 +22,6 @@ clear:
 wipe_js:
 	rm src/server-side/app/src/*.js
 	rm src/server-side/app/src/**/*.js
+
+dummy_data:
+	bash ./src/data-base/fillDummyData.sh

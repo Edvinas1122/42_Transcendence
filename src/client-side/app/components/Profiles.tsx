@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import fetchWithToken from './auth/fetchWithToken';
+import sendFriendRequest from './profiles/relationships';
 
-function Profile() {
+function AllUsers() {
     const [data, setData] = useState<any[]>([]);
     const [isLoading, setLoading] = useState(true);
 
@@ -29,6 +30,7 @@ function Profile() {
                     <h1>{item.name}</h1>
                     <p>{item.FullName}</p>
                     <img src={item.avatar} alt={`${item.name} avatar`} />
+                    <button onClick={() => sendFriendRequest(item.id)}>Send Friend Request</button>
                 </div>
             ))}
         </div>
@@ -68,3 +70,4 @@ function UserProfile() {
 }
 
 export default UserProfile;
+export { AllUsers };

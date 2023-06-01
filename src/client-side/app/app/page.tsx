@@ -1,6 +1,6 @@
 import Image from 'next/image'
 // import MyComponent from '../components/myComponent'
-import UserProfile from '../components/Profiles'
+import UserProfile, { AllUsers } from '../components/Profiles'
 import AutoAuthGarant from '../components/auth/auth'
 
 
@@ -10,13 +10,7 @@ export default function Home() {
 		<div>
 			<AutoAuthGarant />
 			<UserProfile />
-			{/* <OAuthCallback /> */}
-			{/* <Image
-				src="/images/profile.jpg"
-				alt="Picture of the author"
-				width={500}
-				height={500}
-			/> */}
+			<AllUsers/>
 		</div>
 	)
 }

@@ -23,7 +23,7 @@ export class UsersService {
     if (!user.name) {
       throw new Error('User name is required');
     }
-    const resultUser = await this.findOne(user.name);
+    let resultUser = await this.findOne(user.name);
     if (resultUser) {
       return null;
     }
@@ -32,16 +32,19 @@ export class UsersService {
 
   async createFrom42(info: JSON): Promise<User | null>
   {
-    const newUser = new User();
-    newUser.name = info['login'];
-    newUser.FullName = info['displayname'];
-    newUser.avatar = info['image']['versions']['small'];
-    newUser.ImageLinks = info['image']['versions'];
-    newUser.OriginJson = info;
+    let user = await this.findOne(info['login']);
 
-    const resultUser = await this.findOne(newUser.name);
-    if (resultUser)
-      return null;
-    return await this.userRepository.save(newUser);
+    if (!user) {
+      user = new User();
+      user.name = info['login'];
+      user.FullName = info['displayname'];
+      user.avatar = info['image']['versions']['small'];
+      user.ImageLinks = info['image']['versions'];
+      user.OriginJson = info;
+      
+      user = await this.userRepository.save(user);
+    }
+  
+    return user;
   }
 }

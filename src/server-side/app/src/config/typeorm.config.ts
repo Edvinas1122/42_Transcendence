@@ -1,4 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { User } from '../users/entities/user.entity';
+import { Relationship } from '../users/profile-management/entities/relationship.entity';
+
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
 	type: 'postgres',
@@ -7,6 +10,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
 	username: process.env.POSTGRES_USER || 'postgres',
 	password: process.env.POSTGRES_PASSWORD || 'example',
 	database: process.env.POSTGRES_DB || 'transcendence',
-	entities: [__dirname + '/../ormEntities/*.entity{.ts,.js}'],
+	entities: [User, Relationship],
 	synchronize: true
 };

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Relationship } from '../profile-management/entities/relationship.entity';
 
 @Entity()
 export class User {
@@ -20,11 +21,9 @@ export class User {
   @Column("json", { nullable: true })
   OriginJson: any;
 
-  @Column("json", { nullable: true })
-  Friends: any;
+  @OneToMany(() => Relationship, relationship => relationship.user1)
+  relationshipsInitiated: Relationship[];
 
-  @Column("json", { nullable: true })
-  Games: any;
-
-  // Other columns...
+  @OneToMany(() => Relationship, relationship => relationship.user2)
+  relationshipsReceived: Relationship[];
 }

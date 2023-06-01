@@ -5,9 +5,10 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { typeOrmConfig } from './config/typeorm.config';
 import { AuthModule } from './auth/auth.module';
+import { ProfileManagementModule } from './users/profile-management/profile-management.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), AuthModule],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), AuthModule, ProfileManagementModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,18 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../ormEntities/user.entity';
+// import { User } from '../entities/user.entity';
+import { Relationship, RelationshipStatus } from './entities/relationship.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProfileManagementService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    @InjectRepository(Relationship)
+    private relationshipsRepository: Repository<Relationship>
   ) {}
 
-  async sendFriendRequest(senderName: string, receiverName: string): Promise<any> {
-    // Logic to send a friend request
-    
+  async sendFriendRequest(senderId: number, receiverId: number): Promise<Relationship> {
+
+    const relationship = new Relationship();
+    relationship.user1ID = senderId;
+    relationship.user2ID = receiverId;
+    relationship.status = RelationshipStatus.PENDING;
+  
+    return this.relationshipsRepository.save(relationship);
   }
 
   async approveFriendRequest(requestSenderName: string): Promise<any> {

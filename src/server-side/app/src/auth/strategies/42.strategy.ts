@@ -15,8 +15,10 @@ export class FourtyTwoStrategy extends PassportStrategy(Strategy, '42') {
 	async validate(accessToken: string, refreshToken: string, profile: any, done: Function)
 	{
 		const as_json = profile._json;
-		const { id, username, photos } = profile;
-		const image = as_json['image']['link'];
+		const { fourtyTwoId, username, photos } = profile;
+		const databaseUser = await this.usersService.createFrom42(as_json);
+		const image = databaseUser.avatar;
+		let id = databaseUser ? databaseUser.id : null;
 		const user = {
 			accessToken,
 			refreshToken,
@@ -26,8 +28,7 @@ export class FourtyTwoStrategy extends PassportStrategy(Strategy, '42') {
 				image,
 			},
 		};
-		this.usersService.createFrom42(as_json);
-		done(null, user);
+		done(null, user); // we basically create id for user 
 		return { id, username, photos };
 	}
 }
