@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Post, Body, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, UseGuards, Req, Res, Redirect } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { FourtyTwoGuard } from './guards/42.guard';
@@ -27,6 +27,7 @@ export class AuthController
 
 	@Get('/redirect')
 	@UseGuards(FourtyTwoGuard)
+	// @Redirect('http://localhost:3030/', 302)
 	async redirect(@Req() req: Request, @Res() res: Response): Promise<any>
 	{
 		const username = req['user']['profile']['username']; // kinda weird

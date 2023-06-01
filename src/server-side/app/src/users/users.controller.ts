@@ -1,5 +1,5 @@
 import { Controller, Get, Req, Post, Body } from '@nestjs/common';
-import { User } from '../ormEntities/user.entity';
+import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';

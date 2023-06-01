@@ -1,0 +1,6 @@
+{
+	"friends": ["name1", "name2", "name3"],
+	"pending": ["name4", "name5"],
+	"requested": ["name6", "name7"],
+	"blocked": ["name8", "name9"]
+}
