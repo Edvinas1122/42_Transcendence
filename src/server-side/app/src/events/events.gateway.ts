@@ -1,6 +1,7 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
+import { WSMessage, SystemMessage, SystemEvent } from './events.types';
 
 const corsWSConfig = { cors: {
     origin: process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL,
@@ -22,12 +23,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const userId = decodedToken['id'];
       console.log(`Client connected: ${userId}`);
       
-      client.emit('events', 'Hello world!');
+      client.emit('events', SystemMessage(SystemEvent.SUCCESS, 'Connected to server'));
       this.addToMap(userId, client);
       // this.userSocketMap.set(userId, client);
     } catch (error) {
       console.log('Invalid token, disconnecting client...');
-      client.emit('events', 'invalid token');
+      client.emit('events', SystemMessage(SystemEvent.ERROR, 'Invalid token, disconnecting client...'));
       client.disconnect();
     }
   }
@@ -51,11 +52,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  public sendToUser(userId: number, message: string): void {
+  public sendToUser(userId: number, message: WSMessage): void {
     const sockets = this.userSocketMap.get(userId);
     if (sockets) {
       sockets.forEach(socket => {
-        socket.emit('notification', message);
+        socket.emit('events', message);
       });
     }
   }

@@ -3,11 +3,19 @@
 import React, { useEffect } from 'react';
 import socketIOClient from "socket.io-client";
 import Cookies from 'js-cookie';
+import { rules as defaultRules } from './notifications.config';
+// import { WSMessage } from './message.type';
 
 const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL + "/events";  // Replace with your server URL
 
-const NotificationComponent: React.FC = () => {
+type Rule = {
+  match: (message: any) => boolean;
+  action: (message: any) => void;
+};
+
+const NotificationComponent: React.FC<{rules?: Rule[]}> = ({rules = defaultRules})=> {
   const token: string | undefined = Cookies.get('access_token');
+
   useEffect(() => {
     const socket = socketIOClient(SOCKET_SERVER_URL, { query: { token } });
 
@@ -16,16 +24,28 @@ const NotificationComponent: React.FC = () => {
       console.log('Connected to the server');
     });
 
-    // Event listener for "events" (or whatever event name your server is sending the 'Hello world!' message with)
-    socket.on("events", (message) => {
-      console.log("Received message: ", message);
-    });
+    // // Event listener for "events" event
+    // socket.on("events", (message: WSMessage) => {
+    //   console.log("Received message: ", message);
+    // });
 
     // Event listener for "notification" event
-    socket.on("notification", (data) => {
-      console.log("Received notification: ", data);
-      // Process the data as needed. 
-      // For instance, you could show a browser notification or update state.
+    socket.on("events", (message: WSMessage) => {
+      for (const rule of rules) {
+        if (rule.match(message)) {
+          const info = message.info;
+          if (typeof info !== 'string') {
+            for (const handler of rule.handlers) {
+              if (handler.match(info)) {
+                console.log("WS Received message");
+                handler.action(message);
+                break;
+              }
+            }
+          }
+          break;
+        }
+      }
     });
 
     // Cleanup function to remove event listener when component unmounts

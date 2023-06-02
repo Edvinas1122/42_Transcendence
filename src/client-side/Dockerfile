@@ -9,17 +9,17 @@ COPY app/package*.json ./
 
 # Install dependencies
 RUN mkdir app/
-RUN npm install
 
 # Copy tsconfig.json
 COPY app/tsconfig.json ./
 
-# RUN mkdir components/
+
+RUN npm install js-cookie
+RUN npm install socket.io-client bufferutil utf-8-validate
+RUN npm install
 
 # Build the Next.js app
 RUN npm run build
-RUN npm install js-cookie
-RUN npm install socket.io-client
 # Copy the rest of the application
 COPY app/ ./
 
