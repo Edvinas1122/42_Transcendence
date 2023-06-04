@@ -1,5 +1,7 @@
 import { WSMessage } from '../message.type';
-import { NotificationInfo, NotificationDisplay } from '../notifications/notifications';
+import {  NotificationDisplay, NotificationInfo } from '../../notifications/notifications.popup';
+import { getLastFriendRequests } from '../../profiles/relationships';
+import { useNotifications } from '@/components/Notifications';
 
 const image = "/logo_sample.svg";
 
@@ -11,12 +13,14 @@ export const RelationshipHandler = async (message: WSMessage) => {
 	console.log(info.image);
 	if (message.info.event === 'PENDING') {
 		info.message = "New friend request!";
-		NotificationDisplay(info);
+		info.body = "From: " + await getLastFriendRequests();
 	}
 	else if (message.info.event === 'APPROVED')
 	{
 		info.message = "Friend request accepted!";
 	}
-	if (info.message !== "")
+	if (info.message !== "") {
 		NotificationDisplay(info);
+		useNotifications();
+	}
 }

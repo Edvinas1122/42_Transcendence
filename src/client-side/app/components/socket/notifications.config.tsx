@@ -1,7 +1,7 @@
 import { WSMessage, NotificationInfo } from "./message.type";
 import { RelationshipHandler } from "./handlers/Relationship.handler";
 
-interface Rule {
+export interface Rule {
 	match: (message: WSMessage) => boolean;
 	handlers: Handler[];
 }

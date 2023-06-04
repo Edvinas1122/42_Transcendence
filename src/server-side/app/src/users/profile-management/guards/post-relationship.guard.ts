@@ -13,21 +13,21 @@ export class FriendApproveGuard implements CanActivate {
     context: ExecutionContext,
   ): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-	const requestSenderId = request['user']['id'];
+	// const requestSenderId = request['user']['id'];
 	const requestReceiverId = request.body['receiverId'];
 
-    const requestSender = await this.userService.findOne(requestSenderId);
+    // const requestSender = await this.userService.findOne(requestSenderId);
     const requestReceiver = await this.userService.findOne(requestReceiverId);
 
-    if (!requestSender || !requestReceiver) {
+    if (!requestReceiver) {
       throw new NotFoundException('User not found');
     }
 
-    const friendRequest = await this.profileManagementService.getPendingFriendRequest(requestSender.id, requestReceiver.id);
+    // const friendRequest = await this.profileManagementService.getPendingFriendRequest(requestSender.id, requestReceiver.id);
 
-    if (!friendRequest) {
-      throw new NotFoundException('Friend request not found');
-    }
+    // if (!friendRequest) {
+    //   throw new NotFoundException('Friend request not found');
+    // }
 
     return true;
   }
@@ -44,13 +44,14 @@ export class FriendRequestGuard implements CanActivate {
     context: ExecutionContext,
   ): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-	const requestSenderId = request['user']['id'];
+    // console.log(request as string);
+	// const requestSenderId = request['user']['id'];
 	const requestReceiverId = request.body['receiverId'];
 
-    const requestSender = await this.userService.findOne(requestSenderId);
+    // const requestSender = await this.userService.findOne(requestSenderId);
     const requestReceiver = await this.userService.findOne(requestReceiverId);
 
-    if (!requestSender || !requestReceiver) {
+    if (!requestReceiver) {
       throw new NotFoundException('User not found');
     }
 

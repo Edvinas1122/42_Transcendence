@@ -16,10 +16,27 @@ export class ProfileManagementController {
 		}
 
 		@UseGuards(JwtAuthGuard)
-		// @UseGuards(FriendApproveGuard)
-		@Post('send-friend-request')
+		@UseGuards(FriendApproveGuard)
+		@Post('approve-friend-request')
 		async approveFriendRequest(@Req() req: Request, @Body('receiverId') receiverId: number) {
 			const currentUserId = req['user']['id'];
 			return this.profileManagementService.approveFriendRequest(currentUserId, receiverId);
 		}
+
+		@UseGuards(JwtAuthGuard)
+		@Get('get-all-pending-friend-request')
+		async getPendingFriendRequest(@Req() req: Request) {
+			const currentUserId = req['user']['id'];
+			return this.profileManagementService.getUsersSentRequestTo(currentUserId);
+		}
+
+		// @UseGuards(JwtAuthGuard)
+		@Get('get-last-pending-friend-request')
+		async getLastPendingFriendRequest(@Req() req: Request) {
+			// const currentUserId = req['user']['id'];
+			const currentUserId = 1;
+			return this.profileManagementService.getLastPendingFriendRequest(currentUserId);
+		}
+
+
 }

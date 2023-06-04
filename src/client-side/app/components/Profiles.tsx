@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react';
 import fetchWithToken from './auth/fetchWithToken';
 import sendFriendRequest from './profiles/relationships';
+import User from './porfiles/user.types'
 
 function AllUsers() {
-    const [data, setData] = useState<any[]>([]);
+    const [data, setData] = useState<User[]>([]);
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchWithToken('/users/all')
+            .then(response => response.json())
             .then((data) => {
                 setData(data);
                 setLoading(false);
@@ -37,12 +39,13 @@ function AllUsers() {
     );
 }
 
-function UserProfile() {
-    const [data, setData] = useState<any>();
+const UserProfile = () => {
+    const [data, setData] = useState<User | null>(null);
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchWithToken('/users/me')
+            .then(response => response.json())
             .then((data) => {
                 setData(data);
                 setLoading(false);
@@ -52,10 +55,6 @@ function UserProfile() {
                 setLoading(false);
             });
     }, []);
-
-    if (isLoading) return <p>Loading...</p>;
-    if (!data) return <p>No profile data</p>;
-
 
     if (isLoading) return <p>Loading...</p>;
     if (!data) return <p>No profile data</p>;

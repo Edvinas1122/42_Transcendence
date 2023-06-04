@@ -34,7 +34,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('events')
-  handleEvent(client: Socket, payload: any): string {
+  SubscribtionToEvent(client: Socket, payload: any): string {
+    return 'Hello world!';
+  }
+
+  @SubscribeMessage('messages')
+  SubscribtionToMessages(client: Socket, payload: any): string {
+    return 'Hello world!';
+  }
+
+  @SubscribeMessage('game')
+  SubscribtionToGame(client: Socket, payload: any): string {
     return 'Hello world!';
   }
 

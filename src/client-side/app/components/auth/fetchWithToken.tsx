@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-const fetchWithToken = async (service: string, requestOptions = {}): Promise<any> => {
+const fetchWithToken = async (service: string, requestOptions = {}): Promise<Response> => {
     const token: string | undefined = Cookies.get('access_token');
 
     if (!token) {
@@ -15,8 +15,11 @@ const fetchWithToken = async (service: string, requestOptions = {}): Promise<any
         }
     });
 
-    const data = await response.json();
-    return data;
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response;
 };
 
 export default fetchWithToken;

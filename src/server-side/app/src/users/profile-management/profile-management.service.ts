@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // import { User } from '../entities/user.entity';
 import { Relationship, RelationshipStatus } from './entities/relationship.entity';
+import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { EventsGateway } from '../../events/events.gateway';
 import { RelationshipNotificationMessage } from './utils/messages.types';
@@ -43,16 +44,30 @@ export class ProfileManagementService {
     });
   }
 
-  async getAllPendingRequests(userId: number): Promise<Relationship[]> {
-    return this.relationshipsRepository.find({
-      where: [
-        { user1ID: userId, status: RelationshipStatus.PENDING },
-        { user2ID: userId, status: RelationshipStatus.PENDING }
-      ]
+  
+  async getUsersSentRequestTo(receiverId: number): Promise<User[]> {
+    const relationships = await this.relationshipsRepository.find({
+      where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
+      relations: ["user1"]
     });
+    
+    // Extract users from the relationships
+    const users = relationships.map(rel => rel.user1);
+    
+    return users;
   }
 
+  async getLastPendingFriendRequest( receiverId: number): Promise<User> {
+    const relationship = await this.relationshipsRepository.findOne({
+      where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
+      relations: ["user1"]
+    });
 
+    const user = relationship.user1;
+
+    return user;
+  }
+  
   async approveFriendRequest(requestSenderId: number, requestReceiverId: number): Promise<Relationship> {
     const friendRequest = await this.relationshipsRepository.findOne({ 
       where: { 

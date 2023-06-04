@@ -3,17 +3,11 @@
 import React, { useEffect } from 'react';
 import socketIOClient from "socket.io-client";
 import Cookies from 'js-cookie';
-import { rules as defaultRules } from './notifications.config';
-// import { WSMessage } from './message.type';
+import { rules as defaultRules, Rule } from './notifications.config';
 
 const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL + "/events";  // Replace with your server URL
 
-type Rule = {
-  match: (message: any) => boolean;
-  action: (message: any) => void;
-};
-
-const NotificationComponent: React.FC<{rules?: Rule[]}> = ({rules = defaultRules})=> {
+const SocketComponent: React.FC<{rules?: Rule[]}> = ({rules = defaultRules})=> {
   const token: string | undefined = Cookies.get('access_token');
 
   useEffect(() => {
@@ -24,12 +18,7 @@ const NotificationComponent: React.FC<{rules?: Rule[]}> = ({rules = defaultRules
       console.log('Connected to the server');
     });
 
-    // // Event listener for "events" event
-    // socket.on("events", (message: WSMessage) => {
-    //   console.log("Received message: ", message);
-    // });
 
-    // Event listener for "notification" event
     socket.on("events", (message: WSMessage) => {
       for (const rule of rules) {
         if (rule.match(message)) {
@@ -50,7 +39,7 @@ const NotificationComponent: React.FC<{rules?: Rule[]}> = ({rules = defaultRules
 
     // Cleanup function to remove event listener when component unmounts
     return () => {
-      socket.off("notification");
+      // socket.off("notification");
       socket.off("events");
       socket.off('connect');
     };
@@ -63,4 +52,4 @@ const NotificationComponent: React.FC<{rules?: Rule[]}> = ({rules = defaultRules
   );
 }
 
-export default NotificationComponent;
+export default SocketComponent;

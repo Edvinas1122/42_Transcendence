@@ -2,7 +2,8 @@ import Image from 'next/image'
 // import MyComponent from '../components/myComponent'
 import UserProfile, { AllUsers } from '../components/Profiles'
 import AutoAuthGarant from '../components/auth/auth'
-import NotificationComponent from '@/components/socket/notifications'
+import { SocketProvider } from '@/components/socket/socket'
+import Notifications from '@/components/notifications/notifications'
 
 export default function Home() {
 	return (
@@ -10,8 +11,10 @@ export default function Home() {
 		<div>
 			<AutoAuthGarant />
 			<UserProfile />
-			<AllUsers/>
-			<NotificationComponent />
+			<AllUsers />
+			<SocketProvider>
+				<Notifications />
+			</SocketProvider>
 		</div>
 	)
 }
