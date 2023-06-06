@@ -4,14 +4,16 @@ import UserProfile, { AllUsers } from '../components/Profiles'
 import AutoAuthGarant from '../components/auth/auth'
 import { SocketProvider } from '@/components/socket/socket'
 import Notifications from '@/components/notifications/notifications'
+import FriendsMenu from '@/components/friends/FriendsMenu'
 
 export default function Home() {
 	return (
 		// <h1>Page</h1>
 		<div>
 			<AutoAuthGarant />
-			<UserProfile />
-			<AllUsers />
+			{/* <UserProfile /> */}
+			<FriendsMenu />
+			{/* <AllUsers /> */}
 			<SocketProvider>
 				<Notifications />
 			</SocketProvider>
