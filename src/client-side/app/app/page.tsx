@@ -4,6 +4,7 @@ import UserProfile, { AllUsers } from '../components/Profiles'
 import AutoAuthGarant from '../components/auth/auth'
 import { SocketProvider } from '@/components/socket/socket'
 import Notifications from '@/components/notifications/notifications'
+import Chat, { CreateChat } from '@/components/chat/Chat'
 
 export default function Home() {
 	return (
@@ -15,6 +16,8 @@ export default function Home() {
 			<SocketProvider>
 				<Notifications />
 			</SocketProvider>
+			<Chat />
+			<CreateChat />
 		</div>
 	)
 }

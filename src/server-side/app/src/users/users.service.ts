@@ -40,7 +40,7 @@ export class UsersService {
       user.FullName = info['displayname'];
       user.avatar = info['image']['versions']['small'];
       user.ImageLinks = info['image']['versions'];
-      user.OriginJson = info;
+      // user.OriginJson = info;
       
       user = await this.userRepository.save(user);
     }
