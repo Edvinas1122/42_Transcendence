@@ -17,16 +17,16 @@ export class ChatController {
 		return await this.chatService.getAllChats();
 	}
 
-	// @Get('available')
-	// async findAvailableChats(@Req() req: Request): Promise<Chat[]> {
-	// 	console.log("requesting for all charts" + req['user']['id']);
-	// 	const UserId = req['user']['id'];
-	// 	const chats = await this.chatService.getUserChats(UserId);
-	// 	// const chats = await this.chatService.getChat(1);
-	// 	console.log(chats);
-	// 	return chats;
-	// 	// return await this.chatService.getAllChats();
-	// }
+	@Get('available')
+	async findAvailableChats(@Req() req: Request): Promise<Chat[]> {
+		console.log("requesting for all charts" + req['user']['id']);
+		const UserId = req['user']['id'];
+		const chats = await this.chatService.getUserChats(UserId);
+		// const chats = await this.chatService.getChat(1);
+		console.log(chats);
+		return chats;
+		// return await this.chatService.getAllChats();
+	}
 
 	// @Get('Group')
 	// async findGroupChats(@Req() req: Request): Promise<Chat[]> {

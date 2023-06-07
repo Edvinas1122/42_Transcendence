@@ -25,17 +25,25 @@ export class RolesController {
 		return await this.roleService.getUserRoles(userId);
 	}
 
-	@Post('chats/:chatId/:role')
-	async addRelativeToChat(@Param('chatId') chatId: number, @Param('role') role: RoleType, @Body('userId') userId: number): Promise<boolean> {
-		const chat = await this.chatSerice.getChat(chatId);
-		const user = await this.userService.getUser(userId);
-		return await this.roleService.addRelativeToChat(role, chat, user);
-	}
+	// @Post('chats/:chatId/:role')
+	// async addRelativeToChat(@Param('chatId') chatId: number, @Param('role') role: RoleType, @Body('userId') userId: number): Promise<boolean> {
+	// 	const chat = await this.chatSerice.getChat(chatId);
+	// 	const user = await this.userService.getUser(userId);
+	// 	return await this.roleService.addRelativeToChat(role, chat, user);
+	// }
 
-	@Post('chats/:chatId/:role/invite')
-	async acceptInvite(@Param('chatId') chatId: number, @Param('roleID') roleID: number): Promise<boolean> {
+	@Post('chats/:chatId/invite')
+	async acceptInvite(@Param('chatId') chatId: number): Promise<boolean> {
 		const chat = await this.chatSerice.getChat(chatId);
-		return await this.roleService.editRole(chat, roleID, RoleType.Participant);
+		const user = await this.userService.getUser(1);
+		if (!chat || !user) {
+			return false;
+		}
+		const role = await this.roleService.getRole(chat.id, user.id);
+		if (!role || role.type !== RoleType.Invited) {
+			return false;
+		}
+		return await this.roleService.editRole(role, RoleType.Participant);
 	}
 
 	@Delete('chats/:chatId/:role/:userId')
