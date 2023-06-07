@@ -17,30 +17,30 @@ export class ChatController {
 		return await this.chatService.getAllChats();
 	}
 
-	@Get('available')
-	async findAvailableChats(@Req() req: Request): Promise<Chat[]> {
-		console.log("requesting for all charts" + req['user']['id']);
-		const UserId = req['user']['id'];
-		const chats = await this.chatService.getUserChats(UserId);
-		// const chats = await this.chatService.getChat(1);
-		console.log(chats);
-		return chats;
-		// return await this.chatService.getAllChats();
-	}
+	// @Get('available')
+	// async findAvailableChats(@Req() req: Request): Promise<Chat[]> {
+	// 	console.log("requesting for all charts" + req['user']['id']);
+	// 	const UserId = req['user']['id'];
+	// 	const chats = await this.chatService.getUserChats(UserId);
+	// 	// const chats = await this.chatService.getChat(1);
+	// 	console.log(chats);
+	// 	return chats;
+	// 	// return await this.chatService.getAllChats();
+	// }
 
-	@Get('Group')
-	async findGroupChats(@Req() req: Request): Promise<Chat[]> {
-		const UserId = req['user']['id'];
-		const chats = await this.chatService.getUserGroupChats(UserId);
-		return chats;
-	}
+	// @Get('Group')
+	// async findGroupChats(@Req() req: Request): Promise<Chat[]> {
+	// 	const UserId = req['user']['id'];
+	// 	const chats = await this.chatService.getUserGroupChats(UserId);
+	// 	return chats;
+	// }
 
-	@Get('Personal')
-	async findPersonalChats(@Req() req: Request): Promise<Chat[]> {
-		const UserId = req['user']['id'];
-		const chats = await this.chatService.getUserPersonalChats(UserId);
-		return chats;
-	}
+	// @Get('Personal')
+	// async findPersonalChats(@Req() req: Request): Promise<Chat[]> {
+	// 	const UserId = req['user']['id'];
+	// 	const chats = await this.chatService.getUserPersonalChats(UserId);
+	// 	return chats;
+	// }
 
 	@Get('dummy')
 	async findAllDummy(): Promise<Chat[]> {
@@ -69,7 +69,7 @@ export class ChatController {
 		// Check if the ID arrays are defined. If not, initialize them as empty arrays.
 		createChatDto.ownerID = userId;
 		createChatDto.participantsID = createChatDto.participantsID ? [...createChatDto.participantsID, userId] : [userId];
-		const resultChat = await this.chatService.createChat(createChatDto);
+		const resultChat = await this.chatService.createGroupChat(createChatDto);
 		if (resultChat)
 			return resultChat;
 		return null;

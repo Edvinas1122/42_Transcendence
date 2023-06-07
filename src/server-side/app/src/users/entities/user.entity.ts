@@ -2,11 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany } from 't
 import { Relationship } from '../profile-management/entities/relationship.entity';
 import { Chat } from '../../chat/entities/chat.entity';
 import { Message } from '../../chat/entities/message.entity';
-import { Participant } from '../../chat/entities/participants.entity';
-import { Admin } from '../../chat/entities/admin.entity';
-import { Blocked } from '../../chat/entities/blocked.entity';
-import { Muted } from '../../chat/entities/muted.entity';
-import { Invited } from '../../chat/entities/invited.entity';
+import { Role } from '../../chat/entities/role.entity';
 
 @Entity()
 export class User {
@@ -37,23 +33,12 @@ export class User {
 	@OneToMany(() => Chat, chat => chat.owner)
 	chatsOwned: Chat[];
 
-	@OneToMany(() => Participant, participant => participant.user)
-	participatingInChats: Participant[];
-
-	@ManyToMany(() => Chat, chat => chat.mutedUsers)
-	chatsMuted: Chat[];
-
-	@ManyToMany(() => Chat, chat => chat.blockedUsers)
-	chatsBlocked: Chat[];
-
-	@ManyToMany(() => Chat, chat => chat.invitedUsers)
-	chatsInvited: Chat[];
+	@OneToMany(() => Role, role => role.user)
+	roles: Role[];
 
 	@OneToMany(() => Message, message => message.sender)
 	messagesSent: Message[];
 
-	@OneToMany(() => Admin, admin => admin.user)
-	chatsAdmin: Admin[];
 
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
 	createdAt: Date;

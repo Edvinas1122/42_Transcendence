@@ -1,77 +1,83 @@
-import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 import { User } from '../users/entities/user.entity';
 import { Chat } from './entities/chat.entity';
-import { Participant } from './entities/participants.entity';
-import { Invited } from './entities/invited.entity';
-import { Blocked } from './entities/blocked.entity';
-import { Muted } from './entities/muted.entity';
-import { Admin } from './entities/admin.entity';
-import { In } from 'typeorm';
-
+import { RoleType, Role } from './entities/role.entity';
+import { Repository, In } from 'typeorm';
+// import { UsersService } from '../users/users.service';
 
 
 @Injectable()
 export class RoleService {
 	constructor(
-		@InjectRepository(Participant)
-		private participantRepository: Repository<Participant>,
-		@InjectRepository(Invited)
-		private invitedRepository: Repository<Invited>,
-		@InjectRepository(Blocked)
-		private blockedRepository: Repository<Blocked>,
-		@InjectRepository(Muted)
-		private mutedRepository: Repository<Muted>,
-		@InjectRepository(Admin)
-		private adminRepository: Repository<Admin>
+		@InjectRepository(Role)
+		private roleRepository: Repository<Role>,
+		// @InjectRepository(UsersService)
+		// private usersService: UsersService,
 	) {}
 
-	async getChatParticipants(chat: Chat): Promise<User[]> {
-		const participants = await this.participantRepository.find({
-		where: { chat: chat },
+	async getChatRelatives(role: RoleType, chat: Chat): Promise<User[]> {
+		const relatives = await this.roleRepository.find({
+		where: { chat: chat, type: role },
 		relations: ['user'],
 		});
-		return participants.map(participant => participant.user);
+		return relatives.map(relative => relative.user);
 	}
 
-	async getChatParticipantsForUser(userId: number): Promise<Participant[]> {
-		const participants = await this.participantRepository.find({
-				where: { user: { id: userId } as User },
-				relations: ['chat'],
-			});
-		return participants;
+	async getUserRoles(userId: number): Promise<Role[]> {
+		const roles = await this.roleRepository.find({
+		where: { user: { id: userId } as User },
+		relations: ['chat'],
+		});
+		return roles;
 	}
 
-	async addChatParticipant(chat: Chat, userId: number): Promise<boolean> {
+	async addRelativeToChat(role: RoleType, chat: Chat, user: User): Promise<boolean> {
 		try {
-			const participant = new Participant();
-			participant.user = { id: userId } as User;
-			participant.chat = chat;
+			const newRole = new Role();
+			newRole.type = role;
+			newRole.user = user;
+			newRole.chat = chat;
 
-			await this.participantRepository.save(participant);
+			await this.roleRepository.save(newRole);
 			return true;
 		} catch (error) {
 			console.error(error);
-			return false;
+		return false;
 		}
 	}
 
-	async removeChatParticipant(chat: Chat, userId: number): Promise<void> {
-		await this.participantRepository.delete({ chat: chat, user: { id: userId } as User });
-	}
-
-	async removeChatParticipants(chat: Chat, userIds: number[]): Promise<void> {
-		await this.participantRepository.delete({
-			chat: chat,
-			user: In(userIds),
+	async removeChatRelative(chat: Chat, userId: number): Promise<boolean> {
+		await this.roleRepository.delete({
+		chat: chat,
+		user: { id: userId } as User,
 		});
+		return true;
 	}
 
-	async isChatParticipant(chat: Chat, userId: number): Promise<boolean> {
-		const participant = await this.participantRepository.findOne({
-				where: { chat: chat, user: { id: userId } as User },
-			});
-		return !!participant;
+	async removeChatRelatives(chat: Chat, userIds: number[]): Promise<boolean> {
+		await this.roleRepository.delete({
+		chat: chat,
+		user: In(userIds),
+		});
+		return true;
+	}
+
+	async isChatRelative(chat: Chat, userId: number): Promise<boolean> {
+		const relative = await this.roleRepository.findOne({
+		where: { chat: chat, user: { id: userId } as User },
+		});
+		return !!relative;
+	}
+
+	async editRole(chat: Chat, userId: number, role: RoleType): Promise<boolean> {
+		const relative = await this.roleRepository.findOne({
+			where: { chat: chat, user: { id: userId } as User },
+		});
+		relative.type = role;
+		await this.roleRepository.save(relative);
+		return true;
 	}
 }
+
+export { RoleType } from './entities/role.entity';

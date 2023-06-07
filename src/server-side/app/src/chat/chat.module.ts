@@ -8,19 +8,15 @@ import { ChatService } from './chat.service';
 import { EventsGateway } from '../events/events.gateway';
 import { ChatController } from './chat.controller';
 import { RoleService } from './role.service';
-import { Participant } from './entities/participants.entity';
 import { MessagesController } from './message.controller';
 import { RolesController } from './roles.controller';
-import { Admin } from './entities/admin.entity';
-import { Invited } from './entities/invited.entity';
-import { Blocked } from './entities/blocked.entity';
-import { Muted } from './entities/muted.entity';
+import { Role } from './entities/role.entity';
+import { UsersService } from '../users/users.service';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Chat, Message, User,
-				Participant, Admin, Invited, Blocked, Muted])],
+	imports: [TypeOrmModule.forFeature([Chat, Message, User, Role])],
 	controllers: [ChatController, MessagesController, RolesController],
-	providers: [ChatService, RoleService , MessageService, EventsGateway],
+	providers: [ChatService, RoleService , MessageService, UsersService, EventsGateway],
 	exports: [ChatService, MessageService, RoleService],
 })
 export class ChatModule {}

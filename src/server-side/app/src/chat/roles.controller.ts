@@ -1,44 +1,58 @@
 import { Controller, Get, Post, Delete, Param, Body } from '@nestjs/common';
-import { RoleService } from './role.service';
+import { RoleService, RoleType } from './role.service';
 import { Chat } from './entities/chat.entity';
 import { User } from '../users/entities/user.entity';
+import { ChatService } from './chat.service';
+import { UsersService } from '../users/users.service';
 
 @Controller('roles')
 export class RolesController {
-	constructor(private readonly roleService: RoleService) {}
+	constructor(
+		private readonly roleService: RoleService,
+		private readonly chatSerice: ChatService,
+		private readonly userService: UsersService,
+		) {}
 
-	@Get('chats/:chatId/participants')
-	async getChatParticipants(@Param('chatId') chatId: number): Promise<User[]> {
+	@Get('chats/:chatId/:role')
+	async getChatRelatives(@Param('chatId') chatId: number, @Param('role') role: RoleType): Promise<User[]> {
 		const chat = new Chat();
 		chat.id = chatId;
-		return await this.roleService.getChatParticipants(chat);
+		return await this.roleService.getChatRelatives(role, chat);
 	}
 
-	@Get('users/:userId/participants')
-	async getChatParticipantsForUser(@Param('userId') userId: number): Promise<Chat[]> {
-		const participants = await this.roleService.getChatParticipantsForUser(userId);
-		return participants.map(participant => participant.chat);
+	@Get('users/:userId')
+	async getUserRoles(@Param('userId') userId: number): Promise<any[]> {
+		return await this.roleService.getUserRoles(userId);
 	}
 
-	// @Post('chats/participants')
-	@Post('chats/:chatId/participants')
-	async addChatParticipant(@Param('chatId') chatId: number, @Body() body): Promise<boolean> {
-		const chat = new Chat();
-		chat.id = chatId;
-		return await this.roleService.addChatParticipant(chat, body.userId);
+	@Post('chats/:chatId/:role')
+	async addRelativeToChat(@Param('chatId') chatId: number, @Param('role') role: RoleType, @Body('userId') userId: number): Promise<boolean> {
+		const chat = await this.chatSerice.getChat(chatId);
+		const user = await this.userService.getUser(userId);
+		return await this.roleService.addRelativeToChat(role, chat, user);
 	}
 
-	@Delete('chats/:chatId/participants/:userId')
-	async removeChatParticipant(@Param('chatId') chatId: number, @Param('userId') userId: number): Promise<void> {
-		const chat = new Chat();
-		chat.id = chatId;
-		await this.roleService.removeChatParticipant(chat, userId);
+	@Post('chats/:chatId/:role/invite')
+	async acceptInvite(@Param('chatId') chatId: number, @Param('roleID') roleID: number): Promise<boolean> {
+		const chat = await this.chatSerice.getChat(chatId);
+		return await this.roleService.editRole(chat, roleID, RoleType.Participant);
 	}
 
-	@Delete('chats/:chatId/participants')
-	async removeChatParticipants(@Param('chatId') chatId: number, @Body() body): Promise<void> {
-		const chat = new Chat();
-		chat.id = chatId;
-		await this.roleService.removeChatParticipants(chat, body.userIds);
+	@Delete('chats/:chatId/:role/:userId')
+	async removeChatRelative(@Param('chatId') chatId: number, @Param('userId') userId: number): Promise<boolean> {
+		const chat = await this.chatSerice.getChat(chatId);
+		return await this.roleService.removeChatRelative(chat, userId);
+	}
+
+	@Delete('chats/:chatId/:role')
+	async removeChatRelatives(@Param('chatId') chatId: number, @Body('userIds') userIds: number[]): Promise<void> {
+		const chat = await this.chatSerice.getChat(chatId);
+		await this.roleService.removeChatRelatives(chat, userIds);
+	}
+
+	@Get('chats/:chatId/:role/:userId')
+	async isChatRelative(@Param('chatId') chatId: number, @Param('role') role: RoleType, @Param('userId') userId: number): Promise<boolean> {
+		const chat = await this.chatSerice.getChat(chatId);
+		return await this.roleService.isChatRelative(chat, userId);
 	}
 }

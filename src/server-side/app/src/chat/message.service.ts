@@ -1,25 +1,26 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Chat } from './entities/chat.entity';
 import { Message } from './entities/message.entity';
 import { User } from '../users/entities/user.entity';
-import { Participant } from './entities/participants.entity';
+import { ChatService } from './chat.service';
+
 
 @Injectable()
 export class MessageService {
 	constructor(
-		@InjectRepository(Chat)
-		private chatRepository: Repository<Chat>,
+		// @InjectRepository(Chat)
+		// private chatRepository: Repository<Chat>,
 		@InjectRepository(Message)
 		private messagesRepository: Repository<Message>,
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
+		private chatService: ChatService,
 	) {}
 
 	async getChatMessages(chatId: number): Promise<Message[]> {
 		console.log('getChatMessages');
-		const chat = await this.chatRepository.findOne({where: { id: chatId }});
+		const chat = await this.chatService.getChat(chatId);
 		console.log(chat);
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
@@ -31,7 +32,7 @@ export class MessageService {
 	}
 
 	async sendMessageToChat(content: string, senderId: number, chatId: number): Promise<Message> {
-		const chat = await this.chatRepository.findOne({where: { id: chatId }});
+		const chat = await this.chatService.getChat(chatId);
 		const sender = await this.usersRepository.findOne({where: { id: senderId }});
 
 		if (!chat || !sender) {
@@ -50,26 +51,11 @@ export class MessageService {
 		}
 	
 		// Try to find an existing personal chat between the sender and recipient
-		let chat = await this.chatRepository.findOne({
-		  where: { owner: sender, participants: [recipient], personal: true },
-		});
+		let chat = await this.chatService.findPersonalChat(sender, recipient);
 	
 		// If no such chat exists, create a new one
 		if (!chat) {
-			const newChat = new Chat();
-			newChat.owner = sender;
-			newChat.name = `${sender.name}-${recipient.name}`;
-			newChat.private = true;
-			newChat.personal = true;
-			
-			// Set participants of the chat
-			const participant1 = new Participant();
-			participant1.user = sender;
-			const participant2 = new Participant();
-			participant2.user = recipient;
-			newChat.participants = [participant1, participant2];
-	
-			chat = await this.chatRepository.save(newChat);
+			chat = await this.chatService.createPersonalChat(sender, recipient);
 		}
 	
 		// Now we have a chat, either found or newly created, so we can send the message

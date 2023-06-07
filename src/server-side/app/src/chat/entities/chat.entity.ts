@@ -1,11 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToMany, ManyToOne, OneToMany, JoinTable } from 'typeorm';
 import { Message } from './message.entity';
 import { User } from '../../users/entities/user.entity';
-import { Participant } from './participants.entity';
-import { Invited } from './invited.entity';
-import { Blocked } from './blocked.entity';
-import { Muted } from './muted.entity';
-import { Admin } from './admin.entity';
+import { Role } from './role.entity';
+// import { Participant } from './participants.entity';
+// import { Invited } from './invited.entity';
+// import { Blocked } from './blocked.entity';
+// import { Muted } from './muted.entity';
+// import { Admin } from './admin.entity';
 
 @Entity('chat')
 export class Chat {
@@ -34,20 +35,23 @@ export class Chat {
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
 	createdAt: Date;
 
-	@OneToMany(() => Participant, participant => participant.chat)
-	participants: Participant[];
+	@OneToMany(() => Role, role => role.chat)
+	roles: Role[];
 
-	@OneToMany(() => Invited, invited => invited.chat)
-	invitedUsers: Invited[];
+	// @OneToMany(() => Participant, participant => participant.chat)
+	// participants: Participant[];
 
-	@OneToMany(() => Blocked, blocked => blocked.chat)
-	blockedUsers: Blocked[];
+	// @OneToMany(() => Invited, invited => invited.chat)
+	// invitedUsers: Invited[];
 
-	@OneToMany(() => Muted, muted => muted.chat)
-	mutedUsers: Muted[];
+	// @OneToMany(() => Blocked, blocked => blocked.chat)
+	// blockedUsers: Blocked[];
 
-	@OneToMany(() => Admin, admin => admin.chat)
-	admins: Admin[];
+	// @OneToMany(() => Muted, muted => muted.chat)
+	// mutedUsers: Muted[];
+
+	// @OneToMany(() => Admin, admin => admin.chat)
+	// admins: Admin[];
 
 	@Column({ nullable: true })
 	deletedAt: Date;
