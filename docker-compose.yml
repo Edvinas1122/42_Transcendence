@@ -31,6 +31,7 @@ services:
     volumes:
       - ./src/client-side/app/app:/app/app
       - ./src/client-side/app/components:/app/components
+      - ./src/client-side/app/pages:/app/pages
 
   nest-app:
     build: 

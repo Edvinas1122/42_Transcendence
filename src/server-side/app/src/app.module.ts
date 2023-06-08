@@ -6,7 +6,8 @@ import { UsersModule } from './users/users.module';
 import { typeOrmConfig } from './config/typeorm.config';
 import { AuthModule } from './auth/auth.module';
 import { ProfileManagementModule } from './users/profile-management/profile-management.module';
-import { EventsGateway } from './events/events.gateway';
+// import { EventsGateway } from './events/events.gateway';
+import { EventsModule } from './events/events.module';
 import { ChatModule } from './chat/chat.module';
 
 @Module({
@@ -14,7 +15,7 @@ import { ChatModule } from './chat/chat.module';
 		TypeOrmModule.forRoot(typeOrmConfig),
 		AuthModule,
 		ProfileManagementModule,
-		EventsGateway,
+		EventsModule,
 		ChatModule,
 	],
 	controllers: [AppController],

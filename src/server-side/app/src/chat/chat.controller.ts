@@ -1,15 +1,18 @@
-import { Controller, Get, Req, Post, Body, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body, NotFoundException, Inject } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { Chat } from './entities/chat.entity';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateChatDto, ChatIdDto, UpdateChatDto, UserChatActionDto } from './dtos/chat.dtos'; // import DTOs
+import { EventService } from '../events/sse.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('chat')
 export class ChatController {
 	constructor(
 		private readonly chatService: ChatService,
+		@Inject(EventService)
+		private readonly eventService: EventService,
 	) {}
 
 	@Get('all')
@@ -71,7 +74,10 @@ export class ChatController {
 		createChatDto.participantsID = createChatDto.participantsID ? [...createChatDto.participantsID, userId] : [userId];
 		const resultChat = await this.chatService.createGroupChat(createChatDto);
 		if (resultChat)
+		{
+			this.eventService.sendEventToUser(userId.toString(), {type: 'chat', data: resultChat});
 			return resultChat;
+		}
 		return null;
 	}
 

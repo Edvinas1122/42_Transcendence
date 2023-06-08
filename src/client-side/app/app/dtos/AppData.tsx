@@ -1,13 +1,4 @@
-interface User {
-	_id: string;
-	name: string;
-	avatar: string;
-	Online: boolean;
-	Ingame: boolean;
-	MachHistory: MachHistory[];
-	Achievements: Achievement[];
-	friend?: boolean;
-}
+"use client";
 
 interface MachHistory {
 	_id: string;
@@ -25,6 +16,26 @@ interface Achievement {
 	achievedOn: Date;
 }
 
+interface User {
+	_id: string;
+	name: string;
+	avatar: string;
+	Online: boolean;
+	Ingame: boolean;
+	MachHistory: MachHistory[];
+	Achievements: Achievement[];
+	friend?: boolean;
+}
+
+interface User_small {
+	_id: string;
+	name: string;
+	avatar: string;
+	Online: boolean;
+	Ingame: boolean;
+	Role?: RoleType;
+}
+
 interface PersonalChat {
 	_id: string;
 	name: string;
@@ -39,6 +50,12 @@ interface GroupChat {
 	privileged: boolean;
 }
 
+interface Message {
+	_id: string;
+	content: string;
+	user: User_small;
+}
+
 enum RoleType {
 	Admin = 'Admin',
 	Participant = 'Participant',
@@ -47,19 +64,9 @@ enum RoleType {
 	Blocked = 'Blocked',
 }
 
-interface User_small {
-	_id: string;
-	name: string;
-	avatar: string;
-	Online: boolean;
-	Ingame: boolean;
-	Role?: RoleType;
+interface AppData {
+	user: User;
 }
 
-interface Message {
-	_id: string;
-	content: string;
-	user: User_small;
-}
-
-export default User;
+export default AppData;
+export { User, MachHistory, Achievement, User_small, PersonalChat, GroupChat, Message, RoleType };

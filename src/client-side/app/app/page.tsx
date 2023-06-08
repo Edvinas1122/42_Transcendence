@@ -1,23 +1,18 @@
-import Image from 'next/image'
-// import MyComponent from '../components/myComponent'
-import UserProfile, { AllUsers } from '../components/Profiles'
-import AutoAuthGarant from '../components/auth/auth'
-import { SocketProvider } from '@/components/socket/socket'
-import Notifications from '@/components/notifications/notifications'
-import Chat, { CreateChat } from '@/components/chat/Chat'
+import React from 'react';
+import RootUI, {AppData} from '@/app/Routes';
+import dynamic from 'next/dynamic';
+import { AppProps } from 'next/app';
 
-export default function Home() {
-	return (
-		// <h1>Page</h1>
-		<div>
-			<AutoAuthGarant />
-			<UserProfile />
-			<AllUsers />
-			<SocketProvider>
-				<Notifications />
-			</SocketProvider>
-			<Chat />
-			<CreateChat />
-		</div>
-	)
+/*
+	Declare the Root component as client-side only.
+*/
+const DynamicComponent = dynamic(
+	() => import('@/app/Routes'),
+	{ ssr: false }
+);
+
+function Home({ Component, pageProps }: AppProps) {
+	return <DynamicComponent {...pageProps} />;
 }
+
+export default Home;
