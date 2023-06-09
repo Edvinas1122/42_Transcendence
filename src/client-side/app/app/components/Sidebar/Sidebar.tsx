@@ -4,7 +4,6 @@ export default function Sidebar({ displays }) {
   const [view, setView] = useState(0);
   const { component: DisplayComponent, name, props } = displays[view];
 
-  console.log("in sidebar: " + props);
   return (
     <div>
       <div>

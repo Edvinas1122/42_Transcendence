@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom';
 import AppData from '@/app/dtos/AppData';
 import Sidebar  from './components/Sidebar/Sidebar';
 import AppDisplays from './components/components.config';
@@ -33,9 +33,29 @@ async function fetchDataForDisplay(display) {
 	return display;
 }
 
+const UserView = () => {
+	const { id } = useParams();
+
+	return (
+		<div>
+			<h1>User View</h1>
+			<p>id: {id}</p>
+		</div>
+	);
+}
+
+const authValidate = () => {
+	const authToken = Cookie.get('access_token');
+	if (!authToken) {
+		window.location.href = '/auth';
+	}
+	return authToken;
+}  
+
+
 const RootUI = () => {
 	const [displays, setDisplays] = useState(AppDisplays);
-	const authToken = Cookie.get('access_token');
+	const authToken = authValidate();
 	const eventSource = new EventSource(`http://localhost:3000/api/sse/?token=${authToken}`);
 
 	const fetchData = async (displayType) => {
@@ -61,14 +81,14 @@ const RootUI = () => {
 
 	useEffect(() => {
 		fetchData();
-	}, []);
+	}, []); 
 
 	return (
 		<Router>
 			<div>
 			<Routes>
 				<Route path="/" element={<Sidebar displays={displays}/>} />
-				{/* <Route path="/auth" element={<Authenticate />} /> */}
+				<Route path="/user/:id" element={<UserView />} />
 			</Routes>
 			</div>
 		</Router>

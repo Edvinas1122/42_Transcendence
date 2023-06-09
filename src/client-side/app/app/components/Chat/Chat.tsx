@@ -15,6 +15,18 @@ interface Chat{
 	createdAt: Date;
 }
 
+const ChatBox = ({props}: Chat) => {
+	
+	const chat: Chat = props;
+
+	return (
+		<div>
+			<h2>{chat.name}</h2>
+			<p>{chat.id}</p>
+		</div>
+	);
+}
+
 const Chats = ({props}: Chat[]) => {
 
 	// let [availableChats, setAvailableChats] = useState(chats);

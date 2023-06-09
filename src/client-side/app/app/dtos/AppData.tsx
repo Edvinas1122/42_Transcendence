@@ -40,6 +40,7 @@ interface PersonalChat {
 	_id: string;
 	name: string;
 	participant: User_small;
+	messages: Message[];
 }
 
 interface GroupChat {
@@ -47,6 +48,7 @@ interface GroupChat {
 	name: string;
 	owner: User_small;
 	participants: User_small[];
+	messages: Message[];
 	privileged: boolean;
 }
 

@@ -32,7 +32,6 @@ export class ProfileManagementController {
 		@Get('get-last-pending-friend-request')
 		async getLastPendingFriendRequest(@Req() req: Request) {
 			const currentUserId = req['user']['id'];
-			// const currentUserId = 1;
 			return this.profileManagementService.getLastPendingFriendRequest(currentUserId);
 		}
 
