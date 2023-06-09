@@ -9,6 +9,7 @@ import { ProfileManagementModule } from './users/profile-management/profile-mana
 // import { EventsGateway } from './events/events.gateway';
 import { EventsModule } from './events/events.module';
 import { ChatModule } from './chat/chat.module';
+import { DriveModule } from './drive/drive.module';
 
 @Module({
 	imports: [
@@ -17,6 +18,7 @@ import { ChatModule } from './chat/chat.module';
 		ProfileManagementModule,
 		EventsModule,
 		ChatModule,
+		DriveModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

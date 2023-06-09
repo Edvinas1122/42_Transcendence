@@ -16,6 +16,8 @@ COPY app/tsconfig.json ./
 
 # Create /app/src directory
 RUN mkdir src
+RUN mkdir /uploads
+
 
 # Copy the rest of the application
 RUN npm install --save @nestjs/typeorm typeorm pg
@@ -25,6 +27,10 @@ RUN npm install passport-jwt @nestjs/jwt
 RUN npm install cookie-parser 
 
 RUN npm i --save @nestjs/websockets @nestjs/platform-socket.io
+
+# file upload
+RUN npm install npm i -D @types/multer
+RUN npm install axios
 
 # RUN npm install axios // not needed anymore now
 COPY app/ ./

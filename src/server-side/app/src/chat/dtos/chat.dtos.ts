@@ -1,14 +1,14 @@
-	export class CreateChatDto {
-		name: string;
-		ownerID: number;
-		private: boolean;
-		password: string;
-		participantsID: number[];
-		// mutedUsersID: number[];
-		// bannedUsersID: number[];
-		invitedUsersID?: number[];
-		// add more fields as per your requirements
-	}
+export class CreateChatDto {
+	name: string;
+	ownerID: number;
+	private: boolean;
+	password: string;
+	participantsID: number[];
+	// mutedUsersID: number[];
+	// bannedUsersID: number[];
+	invitedUsersID?: number[];
+	// add more fields as per your requirements
+}
 
 export class ChatIdDto {
 	chatId: number;
@@ -36,4 +36,23 @@ export class SendMessageToChatDto {
 
 export class DeleteMessageDto {
 	messageId: number;
+}
+
+import { UserInfo } from '../../users/dtos/user.dto';
+import { Message } from './message.dtos';
+
+export class Chat {
+	_id: string;
+	name: string;
+	messages: Message[];
+}
+
+export class PersonalChat extends Chat {
+	participant: UserInfo;
+}
+
+export class GroupChatDto extends Chat {
+	owner: UserInfo;
+	participants: UserInfo[];
+	privileged: boolean;
 }

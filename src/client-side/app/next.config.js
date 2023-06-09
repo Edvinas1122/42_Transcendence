@@ -7,6 +7,10 @@ const nextConfig = {
 				destination: '/auth/',
 			},
 			{
+				source: '/avatar/',
+				destination: '/avatar/',
+			},
+			{
 				source: '/:any*',
 				destination: '/',
 			}

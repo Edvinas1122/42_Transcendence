@@ -54,9 +54,9 @@ const authValidate = () => {
 
 
 const RootUI = () => {
-	const [displays, setDisplays] = useState(AppDisplays);
-	const authToken = authValidate();
-	const eventSource = new EventSource(`http://localhost:3000/api/sse/?token=${authToken}`);
+	const	[displays, setDisplays] = useState(AppDisplays);
+	// const	authToken = authValidate();
+	let		eventSource = new EventSource(`http://localhost:3000/api/sse/?token=${authValidate()}`);
 
 	const fetchData = async (displayType) => {
 		const fetchedDisplayData = await Promise.all(
@@ -78,6 +78,17 @@ const RootUI = () => {
 		// Trigger fetchData with the type of data received
 		fetchData(data.type);
 	};
+
+	eventSource.onerror = function (err) {
+		console.error('EventSource failed:', err);
+		if (eventSource.readyState === EventSource.CLOSED) {
+			console.log('Connection was closed. Reconnecting...');
+			// Optionally, you could add a delay here, to avoid too many immediate reconnection attempts
+			setTimeout(() => {
+				eventSource = new EventSource(`http://localhost:3000/api/sse/?token=${authValidate()}`);
+			}, 5000);
+		}
+	  };
 
 	useEffect(() => {
 		fetchData();
