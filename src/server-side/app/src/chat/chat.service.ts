@@ -2,7 +2,6 @@ import { Injectable, Inject, NotFoundException, BadRequestException } from '@nes
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat } from './entities/chat.entity';
-import { EventsGateway } from '../events/events.gateway';
 import { Message } from './entities/message.entity';
 import { User } from '../users/entities/user.entity';
 import { CreateChatDto, ChatDto, PersonalChatDto, GroupChatDto } from './dtos/chat.dtos';

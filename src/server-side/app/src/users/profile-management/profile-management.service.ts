@@ -4,8 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Relationship, RelationshipStatus } from './entities/relationship.entity';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
-import { EventsGateway } from '../../events/events.gateway';
-import { RelationshipNotificationMessage } from './utils/messages.types';
+// import { RelationshipNotificationMessage } from './utils/messages.types';
 import { UserInfo } from '../dtos/user.dto';
 
 @Injectable()
@@ -13,7 +12,6 @@ export class ProfileManagementService {
 	constructor(
 		@InjectRepository(Relationship)
 		private relationshipsRepository: Repository<Relationship>,
-		private readonly eventsGateway: EventsGateway
 	) {}
 
 	async sendFriendRequest(senderId: number, receiverId: number): Promise<Relationship>{
@@ -31,8 +29,8 @@ export class ProfileManagementService {
 		// if (alreadyExists)
 		//   return alreadyExists;
 		const info = await this.relationshipsRepository.save(relationship);
-		this.eventsGateway.sendToUser(receiverId, 
-		RelationshipNotificationMessage(RelationshipStatus.PENDING, null));
+		// this.eventsGateway.sendToUser(receiverId, 
+		// RelationshipNotificationMessage(RelationshipStatus.PENDING, null));
 		return info;
 	}
 
@@ -88,8 +86,8 @@ export class ProfileManagementService {
 
 		const updatedRelationship = await this.relationshipsRepository.save(friendRequest);
 
-		this.eventsGateway.sendToUser(requestSenderId,
-			RelationshipNotificationMessage(RelationshipStatus.APPROVED, null));
+		// this.eventsGateway.sendToUser(requestSenderId,
+		// 	RelationshipNotificationMessage(RelationshipStatus.APPROVED, null));
 
 		return updatedRelationship;
 	}

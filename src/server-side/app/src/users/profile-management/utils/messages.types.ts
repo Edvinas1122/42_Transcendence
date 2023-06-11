@@ -7,14 +7,14 @@ import { RelationshipStatus } from '../entities/relationship.entity';
 //   REJECT = 'REJECT',
 // }
 
-export function RelationshipNotificationMessage(event: RelationshipStatus, message: string | null): WSMessage {
-  return {
-    type: WSMessageType.NOTIFICATION,
-    info: {
-      category: 'Relationship',
-      event: event,
-      fetch: true,
-      message: message
-    }
-  }
-}
+// export function RelationshipNotificationMessage(event: RelationshipStatus, message: string | null): WSMessage {
+//   return {
+//     type: WSMessageType.NOTIFICATION,
+//     info: {
+//       category: 'Relationship',
+//       event: event,
+//       fetch: true,
+//       message: message
+//     }
+//   }
+// }
