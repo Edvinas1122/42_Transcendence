@@ -15,7 +15,7 @@ COPY app/tsconfig.json ./
 
 
 RUN npm install js-cookie
-RUN npm install socket.io-client bufferutil utf-8-validate
+# RUN npm install socket.io-client bufferutil utf-8-validate
 RUN npm install react-router-dom
 RUN npm install axios
 RUN npm install

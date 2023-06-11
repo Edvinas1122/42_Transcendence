@@ -30,7 +30,7 @@ RUN npm i --save @nestjs/websockets @nestjs/platform-socket.io
 
 # file upload
 RUN npm install npm i -D @types/multer
-RUN npm install axios
+# RUN npm install axios
 
 # RUN npm install axios // not needed anymore now
 COPY app/ ./

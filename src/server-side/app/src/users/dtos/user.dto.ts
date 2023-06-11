@@ -7,20 +7,20 @@ export class UpdateUserDto {
 }
 
 export class UserInfo {
-	constructor(user?: User) {
-		this._id = user ? user.id : null;
-		this.name = user ? user.name : null;
-		this.avatar = user ? user.avatar : null;
-		this.Online = false;
-		this.Ingame = false;
-		// this.Role = user && user.Role ? user.Role : undefined; // for chat context
-	}
-	_id?: number;
-	name: string;
-	avatar: string;
-	Online?: boolean;
-	Ingame?: boolean;
-	Role?: RoleType;
+    constructor(user: User, role?: RoleType) {
+        this._id = user.id;
+        this.name = user.name;
+        this.avatar = user.avatar;
+        this.Online = false;
+        this.Ingame = false;
+        this.Role = role;
+    }
+    _id: number;
+    name: string;
+    avatar: string;
+    Online?: boolean;
+    Ingame?: boolean;
+    Role?: RoleType;
 }
 
 export class UserProfileInfo extends UserInfo {

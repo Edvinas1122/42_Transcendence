@@ -3,7 +3,7 @@ import { ChatService } from './chat.service';
 import { Chat } from './entities/chat.entity';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
-import { CreateChatDto, ChatIdDto, UpdateChatDto, UserChatActionDto } from './dtos/chat.dtos'; // import DTOs
+import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, UserChatActionDto } from './dtos/chat.dtos'; // import DTOs
 import { EventService } from '../events/sse.service';
 
 @UseGuards(JwtAuthGuard)
@@ -21,7 +21,7 @@ export class ChatController {
 	}
 
 	@Get('available')
-	async findAvailableChats(@Req() req: Request): Promise<Chat[]> {
+	async findAvailableChats(@Req() req: Request): Promise<ChatDto[]> {
 		console.log("requesting for all charts" + req['user']['id']);
 		const UserId = req['user']['id'];
 		const chats = await this.chatService.getUserChats(UserId);

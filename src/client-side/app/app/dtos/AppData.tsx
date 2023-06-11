@@ -16,39 +16,47 @@ interface Achievement {
 	achievedOn: Date;
 }
 
+
+// interface User {
+// 	_id: string;
+// 	name: string;
+// 	avatar: string;
+// 	Online: boolean;
+// 	Ingame: boolean;
+// 	MachHistory: MachHistory[];
+// 	Achievements: Achievement[];
+// 	friend?: boolean;
+// }
+
 interface User {
 	_id: string;
 	name: string;
 	avatar: string;
-	Online: boolean;
-	Ingame: boolean;
+	Online?: boolean; // non Current user context
+	Ingame?: boolean; 
+	Role?: RoleType; // chat context
+}
+
+interface UserProfile extends User {
 	MachHistory: MachHistory[];
 	Achievements: Achievement[];
 	friend?: boolean;
 }
 
-interface User_small {
-	_id: string;
+interface Chat {
+	_id: number;
 	name: string;
-	avatar: string;
-	Online: boolean;
-	Ingame: boolean;
-	Role?: RoleType;
-}
-
-interface PersonalChat {
-	_id: string;
-	name: string;
-	participant: User_small;
 	messages: Message[];
+	personal: boolean;
 }
 
-interface GroupChat {
-	_id: string;
-	name: string;
+interface PersonalChat extends Chat {
+	participant: User_small;
+}
+
+interface GroupChat extends Chat {
 	owner: User_small;
 	participants: User_small[];
-	messages: Message[];
 	privileged: boolean;
 }
 
@@ -71,4 +79,4 @@ interface AppData {
 }
 
 export default AppData;
-export { User, MachHistory, Achievement, User_small, PersonalChat, GroupChat, Message, RoleType };
+export { User, UserProfile, MachHistory, Achievement, PersonalChat, GroupChat, Message, RoleType };

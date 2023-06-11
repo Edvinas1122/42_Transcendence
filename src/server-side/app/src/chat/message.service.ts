@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './entities/message.entity';
 import { User } from '../users/entities/user.entity';
 import { ChatService } from './chat.service';
+import { RoleService } from './role.service';
+import { UsersService } from '../users/users.service';
 
 
 @Injectable()
@@ -13,8 +15,9 @@ export class MessageService {
 		// private chatRepository: Repository<Chat>,
 		@InjectRepository(Message)
 		private messagesRepository: Repository<Message>,
-		@InjectRepository(User)
-		private usersRepository: Repository<User>,
+		@Inject(UsersService)
+		private usersService: UsersService,
+		@Inject(ChatService)
 		private chatService: ChatService,
 	) {}
 
@@ -33,7 +36,7 @@ export class MessageService {
 
 	async sendMessageToChat(content: string, senderId: number, chatId: number): Promise<Message> {
 		const chat = await this.chatService.getChat(chatId);
-		const sender = await this.usersRepository.findOne({where: { id: senderId }});
+		const sender = await this.usersService.findUser(senderId);
 
 		if (!chat || !sender) {
 			throw new NotFoundException('Chat or sender not found');
@@ -43,19 +46,16 @@ export class MessageService {
 	}
 
 	async sendMessageToUser(content: string, senderId: number, recipientId: number): Promise<Message> {
-		const sender = await this.usersRepository.findOne({where: { id: senderId }});
-		const recipient = await this.usersRepository.findOne({where: { id: recipientId }});
 	
-		if (!sender || !recipient) {
-			throw new NotFoundException('Sender or recipient not found');
+		const sender = await this.usersService.findUser(senderId);
+		
+		if (!sender) {
+			throw new NotFoundException('Sender not found');
 		}
-	
-		// Try to find an existing personal chat between the sender and recipient
-		let chat = await this.chatService.findPersonalChat(sender, recipient);
-	
-		// If no such chat exists, create a new one
+		
+		let chat = await this.chatService.findPersonalChat(sender, recipientId);
 		if (!chat) {
-			chat = await this.chatService.createPersonalChat(sender, recipient);
+			chat = await this.chatService.createPersonalChat(sender, recipientId);
 		}
 	
 		// Now we have a chat, either found or newly created, so we can send the message

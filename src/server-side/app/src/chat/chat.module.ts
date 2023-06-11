@@ -13,12 +13,13 @@ import { RoleService } from './role.service';
 import { MessagesController } from './message.controller';
 import { RolesController } from './roles.controller';
 import { Role } from './entities/role.entity';
-import { UsersService } from '../users/users.service';
+// import { UsersService } from '../users/users.service';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Chat, Message, User, Role]), EventsModule],
+	imports: [TypeOrmModule.forFeature([Chat, Message, User, Role]), EventsModule, UsersModule],
 	controllers: [ChatController, MessagesController, RolesController],
-	providers: [ChatService, RoleService , MessageService, UsersService, ],
+	providers: [ChatService, RoleService , MessageService ],
 	exports: [ChatService, MessageService, RoleService],
 })
 export class ChatModule {}

@@ -8,6 +8,7 @@ export enum RoleType {
   Muted = 'Muted',
   Invited = 'Invited',
   Blocked = 'Blocked',
+  Any = 'Any',
 }
 
 @Entity()

@@ -3,7 +3,8 @@ import { RoleService, RoleType } from './role.service';
 import { Chat } from './entities/chat.entity';
 import { User } from '../users/entities/user.entity';
 import { ChatService } from './chat.service';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/users.service'
+import { UserInfo } from '../users/dtos/user.dto';
 
 @Controller('roles')
 export class RolesController {
@@ -14,10 +15,13 @@ export class RolesController {
 		) {}
 
 	@Get('chats/:chatId/:role')
-	async getChatRelatives(@Param('chatId') chatId: number, @Param('role') role: RoleType): Promise<User[]> {
+	async getChatRelatives(@Param('chatId') chatId: number, @Param('role') role: RoleType): Promise<UserInfo[]> {
 		const chat = new Chat();
 		chat.id = chatId;
-		return await this.roleService.getChatRelatives(role, chat);
+		if (role === RoleType.Any) {
+			return await this.roleService.getChatRelatives(chat);
+		}
+		return await this.roleService.getChatRoleRelatives(role, chat);
 	}
 
 	@Get('users/:userId')

@@ -1,11 +1,11 @@
 "use client"; // This is a client component 👈🏽
 
-import { User } from '@/app/dtos/AppData';
+import { UserProfile } from '@/app/dtos/AppData';
 import FileUpload from './Upload/UploadFile';
 
-const PersonalProfile = ({props}: User) => {
+const PersonalProfile = ({props}: UserProfile) => {
 
-    const Profile: User = props;
+    const Profile: UserProfile = props;
 
     return (
         <div>

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { UserProfileInfo } from './dtos/user.dto';
+import { UserProfileInfo, UserInfo } from './dtos/user.dto';
 import { MachHistory } from './dtos/game-stats.dto';
 
 @Injectable()
@@ -18,6 +18,10 @@ export class UsersService {
 
 	async findOne(name: string): Promise<User | null> {
 		return this.userRepository.findOne({ where: { name } });
+	}
+
+	async findUser(id: number): Promise<User | null> {
+		return this.userRepository.findOne({ where: { id } });
 	}
 
 	async getUserProfile(id: number): Promise<UserProfileInfo> {
@@ -57,6 +61,16 @@ export class UsersService {
 			user = await this.userRepository.save(user);
 		}
 	
+		return user;
+	}
+
+	async getUserInfo(id: number): Promise<UserInfo> {
+		const resultUser = await this.userRepository.findOne({ where: { id } });
+		if (!resultUser) {
+			throw new NotFoundException('User not found');
+		}
+		const user: UserInfo = new UserInfo(resultUser);
+		user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
 		return user;
 	}
 

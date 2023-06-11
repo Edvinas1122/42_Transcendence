@@ -5,6 +5,7 @@ import { Chat } from './entities/chat.entity';
 import { RoleType, Role } from './entities/role.entity';
 import { Repository, In, Not } from 'typeorm';
 import { UsersService } from '../users/users.service';
+import { UserInfo } from '../users/dtos/user.dto';
 
 
 @Injectable()
@@ -16,12 +17,23 @@ export class RoleService {
 		// private usersService: UsersService,
 	) {}
 
-	async getChatRelatives(role: RoleType, chat: Chat): Promise<User[]> {
+	
+	async getChatRelatives(chat: Chat): Promise<UserInfo[]> {
 		const relatives = await this.roleRepository.find({
-		where: { chat: chat, type: role },
-		relations: ['user'],
+			where: { chat: chat },
+			relations: ['user'],
 		});
-		return relatives.map(relative => relative.user);
+		
+		return relatives.map(relative => new UserInfo(relative.user, relative.type));
+	}
+
+	async getChatRoleRelatives(role: RoleType, chat: Chat): Promise<UserInfo[]> {
+		const relatives = await this.roleRepository.find({
+			where: { chat: chat, type: role },
+			relations: ['user'],
+		});
+		
+		return relatives.map(relative => new UserInfo(relative.user, relative.type));
 	}
 
 	async getUserRoles(userId: number): Promise<Role[]> {
@@ -29,6 +41,15 @@ export class RoleService {
 		where: { user: { id: userId } as User },
 		relations: ['chat'],
 		});
+		return roles;
+	}
+
+	async getAvailableUserRoles(userId: number): Promise<Role[]> {
+		const roles = await this.roleRepository.find({
+			where: { user: { id: userId } as User, type: Not(RoleType.Blocked) },
+			relations: ['chat'],
+		});
+	
 		return roles;
 	}
 

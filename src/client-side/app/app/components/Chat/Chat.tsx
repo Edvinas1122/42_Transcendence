@@ -3,17 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { GroupChat } from '@/app/dtos/AppData';
 import CreateChat from './Controlls/CreateChat';
+import Chat from '../Chat/Chat'
 
-interface Chat{
-	id: string;
-	name: string;
-	ownedID: string;
-	private: boolean;
-	perspnal: boolean;
-	delete: boolean;
-	deleteAt: Date;
-	createdAt: Date;
-}
 
 const ChatBox = ({props}: Chat) => {
 	
@@ -54,7 +45,7 @@ const Chats = ({props}: Chat[]) => {
 					<h2>Available Chats</h2>
 					<ul>
 						{chats.map(chat => (
-							<li key={chat.id}>{chat.name}</li>
+							<li key={chat._id}>{chat.name}</li>
 						))}
 					</ul>
 				</div>
