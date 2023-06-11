@@ -39,7 +39,7 @@ interface Chat {
 }
 
 interface PersonalChat extends Chat {
-	participant: User_small;
+	participant: User;
 }
 
 interface GroupChat extends Chat {

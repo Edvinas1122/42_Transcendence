@@ -11,8 +11,6 @@ import { UsersService } from '../users/users.service';
 @Injectable()
 export class MessageService {
 	constructor(
-		// @InjectRepository(Chat)
-		// private chatRepository: Repository<Chat>,
 		@InjectRepository(Message)
 		private messagesRepository: Repository<Message>,
 		@Inject(UsersService)
@@ -34,14 +32,17 @@ export class MessageService {
 		return await this.messagesRepository.find({where: { chatID: chatId }});
 	}
 
-	async sendMessageToChat(content: string, senderId: number, chatId: number): Promise<Message> {
+	async sendMessageToChat(content: string, senderId: number, password: string, chatId: number): Promise<Message> {
 		const chat = await this.chatService.getChat(chatId);
 		const sender = await this.usersService.findUser(senderId);
 
 		if (!chat || !sender) {
 			throw new NotFoundException('Chat or sender not found');
 		}
-		
+		if (chat.password && chat.password !== password || chat.password === '' && password !== '') {
+			throw new UnauthorizedException('Wrong password');
+		}
+
 		return await this.messagesRepository.save({content: content, sender: sender, chat: chat});
 	}
 

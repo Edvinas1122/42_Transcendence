@@ -6,91 +6,114 @@ import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { EventsGateway } from '../../events/events.gateway';
 import { RelationshipNotificationMessage } from './utils/messages.types';
+import { UserInfo } from '../dtos/user.dto';
 
 @Injectable()
 export class ProfileManagementService {
-  constructor(
-    @InjectRepository(Relationship)
-    private relationshipsRepository: Repository<Relationship>,
-    private readonly eventsGateway: EventsGateway
-  ) {}
+	constructor(
+		@InjectRepository(Relationship)
+		private relationshipsRepository: Repository<Relationship>,
+		private readonly eventsGateway: EventsGateway
+	) {}
 
-  async sendFriendRequest(senderId: number, receiverId: number): Promise<Relationship>{
-    const relationship = new Relationship();
-    relationship.user1ID = senderId;
-    relationship.user2ID = receiverId;
-    relationship.status = RelationshipStatus.PENDING;
+	async sendFriendRequest(senderId: number, receiverId: number): Promise<Relationship>{
+		const relationship = new Relationship();
+		relationship.user1ID = senderId;
+		relationship.user2ID = receiverId;
+		relationship.status = RelationshipStatus.PENDING;
+	
+		const alreadyExists = await this.relationshipsRepository.findOne({
+			where: [
+				{ user1ID: senderId, user2ID: receiverId },
+				{ user1ID: receiverId, user2ID: senderId }
+			]
+		});
+		// if (alreadyExists)
+		//   return alreadyExists;
+		const info = await this.relationshipsRepository.save(relationship);
+		this.eventsGateway.sendToUser(receiverId, 
+		RelationshipNotificationMessage(RelationshipStatus.PENDING, null));
+		return info;
+	}
+
+	async getPendingFriendRequest(senderId: number, receiverId: number): Promise<Relationship> {
+		return this.relationshipsRepository.findOne({
+		where: [
+			{ user1ID: senderId, user2ID: receiverId, status: RelationshipStatus.PENDING },
+			{ user1ID: receiverId, user2ID: senderId, status: RelationshipStatus.PENDING }
+		]
+		});
+	}
+
   
-    const alreadyExists = await this.relationshipsRepository.findOne({
-        where: [
-            { user1ID: senderId, user2ID: receiverId },
-            { user1ID: receiverId, user2ID: senderId }
-        ]
-      });
-    // if (alreadyExists)
-    //   return alreadyExists;
-    const info = await this.relationshipsRepository.save(relationship);
-    this.eventsGateway.sendToUser(receiverId, 
-      RelationshipNotificationMessage(RelationshipStatus.PENDING, null));
-    return info;
-  }
+	async getUsersSentRequestTo(receiverId: number): Promise<UserInfo[]>
+	{
+		const relationships = await this.relationshipsRepository.find({
+			where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
+			relations: ["user1"]
+		});
+		
+		// Extract users from the relationships
+		const users = relationships.map(rel => rel.user1);
+		const usersInfo = users.map(user => new UserInfo(user));
+			
+		return usersInfo;
+	}
 
-  async getPendingFriendRequest(senderId: number, receiverId: number): Promise<Relationship> {
-    return this.relationshipsRepository.findOne({
-      where: [
-        { user1ID: senderId, user2ID: receiverId, status: RelationshipStatus.PENDING },
-        { user1ID: receiverId, user2ID: senderId, status: RelationshipStatus.PENDING }
-      ]
-    });
-  }
+	async getLastPendingFriendRequest( receiverId: number): Promise<UserInfo> {
+		const relationship = await this.relationshipsRepository.findOne({
+		where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
+		relations: ["user1"]
+		});
 
+		const user = relationship.user1;
+
+		return new UserInfo(user);
+	}
   
-  async getUsersSentRequestTo(receiverId: number): Promise<User[]> {
-    const relationships = await this.relationshipsRepository.find({
-      where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
-      relations: ["user1"]
-    });
-    
-    // Extract users from the relationships
-    const users = relationships.map(rel => rel.user1);
-    
-    return users;
-  }
+	async approveFriendRequest(requestSenderId: number, requestReceiverId: number): Promise<Relationship> {
+		const friendRequest = await this.relationshipsRepository.findOne({ 
+		where: { 
+			user1ID: requestSenderId,
+			user2ID: requestReceiverId,
+			status: RelationshipStatus.PENDING
+		} 
+		});
 
-  async getLastPendingFriendRequest( receiverId: number): Promise<User> {
-    const relationship = await this.relationshipsRepository.findOne({
-      where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
-      relations: ["user1"]
-    });
+		if (!friendRequest) {
+		throw new NotFoundException('Friend request not found');
+		}
 
-    const user = relationship.user1;
+		friendRequest.status = RelationshipStatus.APPROVED;
 
-    return user;
-  }
-  
-  async approveFriendRequest(requestSenderId: number, requestReceiverId: number): Promise<Relationship> {
-    const friendRequest = await this.relationshipsRepository.findOne({ 
-      where: { 
-        user1ID: requestSenderId,
-        user2ID: requestReceiverId,
-        status: RelationshipStatus.PENDING
-      } 
-    });
+		const updatedRelationship = await this.relationshipsRepository.save(friendRequest);
 
-    if (!friendRequest) {
-      throw new NotFoundException('Friend request not found');
-    }
+		this.eventsGateway.sendToUser(requestSenderId,
+			RelationshipNotificationMessage(RelationshipStatus.APPROVED, null));
 
-    friendRequest.status = RelationshipStatus.APPROVED;
+		return updatedRelationship;
+	}
 
-    const updatedRelationship = await this.relationshipsRepository.save(friendRequest);
+	async getAllFriends(userId: number): Promise<UserInfo[]> {
+		const relationships = await this.relationshipsRepository.find({
+			where: [
+				{ user1ID: userId, status: RelationshipStatus.APPROVED },
+				{ user2ID: userId, status: RelationshipStatus.APPROVED }
+			],
+			relations: ["user1", "user2"]
+		});
 
-    this.eventsGateway.sendToUser(requestSenderId,
-        RelationshipNotificationMessage(RelationshipStatus.APPROVED, null));
-
-    return updatedRelationship;
-  }
-
+		// Extract users from the relationships
+		const users = relationships.map(rel => {
+			if (rel.user1ID === userId)
+				return rel.user2;
+			else
+				return rel.user1;
+			}
+		);
+		const usersInfo = users.map(user => new UserInfo(user));
+		return usersInfo;
+	}
 
   // async removeFriend(userName: string, friendName: string): Promise<any> {
   //   const friendRequest = await this.relationshipsRepository.findOne({ 

@@ -2,13 +2,22 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
 import { Chat } from './chat.entity';
 import { User } from '../../users/entities/user.entity';
 
+export enum AcceptedRoleType {
+	Admin = 'Admin',
+	Participant = 'Participant',
+	Muted = 'Muted',
+	Invited = 'Invited',
+	Blocked = 'Blocked',
+}
+
 export enum RoleType {
-  Admin = 'Admin',
-  Participant = 'Participant',
-  Muted = 'Muted',
-  Invited = 'Invited',
-  Blocked = 'Blocked',
-  Any = 'Any',
+	Admin = 'Admin',
+	Participant = 'Participant',
+	Muted = 'Muted',
+	Invited = 'Invited',
+	Blocked = 'Blocked',
+	Owner = 'Owner', // carefull
+	Any = 'Any', // carefull
 }
 
 @Entity()

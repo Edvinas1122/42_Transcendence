@@ -1,24 +1,23 @@
-import { Controller, Get, Req, Post, Body } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body, Param } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { UserProfileInfo } from './dtos/user.dto';
 
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
 	constructor(
 		private readonly usersService: UsersService,
 	) {}
 
-	@UseGuards(JwtAuthGuard)
 	@Get('all')
 	async findAllUsers(@Req() req: Request): Promise<User[]> {
 		console.log(req['user']['name']);
 		return await this.usersService.findAll();
 	}
 
-	@UseGuards(JwtAuthGuard)
 	@Get('me')
 	async findCurrentUser(@Req() req: Request): Promise<UserProfileInfo> {
 		const currentUser = req['user']['id'];
@@ -26,7 +25,13 @@ export class UsersController {
 		return user;
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@Get('profile/:id')
+	async findUser(@Req() req: Request, @Param() requesteeId: number): Promise<UserProfileInfo> {
+		const currentUser = req['user']['id'];
+		const requestee = await this.usersService.getUserProfile(requesteeId);
+		return requestee;
+	}
+
 	@Get('dummy')
 	findAllDummy() {
 		return [

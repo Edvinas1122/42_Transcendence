@@ -1,20 +1,28 @@
-import { Controller, Get, Post, Delete, Param, Body } from '@nestjs/common';
-import { RoleService, RoleType } from './role.service';
+import { Controller, Get, Req, Post, Delete, Param, Body, Patch, UseGuards, Inject } from '@nestjs/common';
+import { RoleService, RoleType, AcceptedRoleType } from './role.service';
 import { Chat } from './entities/chat.entity';
 import { User } from '../users/entities/user.entity';
 import { ChatService } from './chat.service';
 import { UsersService } from '../users/users.service'
 import { UserInfo } from '../users/dtos/user.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto } from './dtos/chat.dtos'; // import DTOs
+import { PrivilegedGuard } from './guards/owner.guard';
 
-@Controller('roles')
+
+@UseGuards(JwtAuthGuard)
+@Controller('chat/roles')
 export class RolesController {
 	constructor(
+		@Inject(RoleService)
 		private readonly roleService: RoleService,
-		private readonly chatSerice: ChatService,
+		@Inject(ChatService)
+		private readonly chatService: ChatService,
+		@Inject(UsersService)
 		private readonly userService: UsersService,
 		) {}
 
-	@Get('chats/:chatId/:role')
+	@Get(':chatId/:role')
 	async getChatRelatives(@Param('chatId') chatId: number, @Param('role') role: RoleType): Promise<UserInfo[]> {
 		const chat = new Chat();
 		chat.id = chatId;
@@ -24,10 +32,10 @@ export class RolesController {
 		return await this.roleService.getChatRoleRelatives(role, chat);
 	}
 
-	@Get('users/:userId')
-	async getUserRoles(@Param('userId') userId: number): Promise<any[]> {
-		return await this.roleService.getUserRoles(userId);
-	}
+	// @Get('users/:userId')
+	// async getUserRoles(@Param('userId') userId: number): Promise<any[]> {
+	// 	return await this.roleService.getUserRoles(userId);
+	// }
 
 	// @Post('chats/:chatId/:role')
 	// async addRelativeToChat(@Param('chatId') chatId: number, @Param('role') role: RoleType, @Body('userId') userId: number): Promise<boolean> {
@@ -36,35 +44,40 @@ export class RolesController {
 	// 	return await this.roleService.addRelativeToChat(role, chat, user);
 	// }
 
-	@Post('chats/:chatId/invite')
-	async acceptInvite(@Param('chatId') chatId: number): Promise<boolean> {
-		const chat = await this.chatSerice.getChat(chatId);
-		const user = await this.userService.getUser(1);
-		if (!chat || !user) {
-			return false;
-		}
-		const role = await this.roleService.getRole(chat.id, user.id);
-		if (!role || role.type !== RoleType.Invited) {
-			return false;
-		}
-		return await this.roleService.editRole(role, RoleType.Participant);
+	@Post(':chatId/join')
+	async joinChat(@Req() req: Request, @Param() chatId, @Body() body: JoinChatDto): Promise<boolean> {
+		const UserId = req['user']['id'];
+		const chatDto = await this.chatService.joinChat(UserId, chatId, body.chatPassword);
+		// this.eventService.emit('chat', chatDto);
+		return chatDto;
 	}
 
-	@Delete('chats/:chatId/:role/:userId')
+	@UseGuards(PrivilegedGuard)
+	@Delete(':chatId/:userId')
 	async removeChatRelative(@Param('chatId') chatId: number, @Param('userId') userId: number): Promise<boolean> {
-		const chat = await this.chatSerice.getChat(chatId);
+		const chat = await this.chatService.getChat(chatId);
 		return await this.roleService.removeChatRelative(chat, userId);
 	}
 
-	@Delete('chats/:chatId/:role')
+	@UseGuards(PrivilegedGuard)
+	@Delete(':chatId/')
 	async removeChatRelatives(@Param('chatId') chatId: number, @Body('userIds') userIds: number[]): Promise<void> {
-		const chat = await this.chatSerice.getChat(chatId);
+		const chat = await this.chatService.getChat(chatId);
 		await this.roleService.removeChatRelatives(chat, userIds);
 	}
 
-	@Get('chats/:chatId/:role/:userId')
-	async isChatRelative(@Param('chatId') chatId: number, @Param('role') role: RoleType, @Param('userId') userId: number): Promise<boolean> {
-		const chat = await this.chatSerice.getChat(chatId);
-		return await this.roleService.isChatRelative(chat, userId);
+	// @Get('chats/:chatId/:role/:userId')
+	// async isChatRelative(@Param('chatId') chatId: number, @Param('role') role: RoleType, @Param('userId') userId: number): Promise<boolean> {
+	// 	const chat = await this.chatService.getChat(chatId);
+	// 	return await this.roleService.isChatRelative(chat, userId);
+	// }
+
+	@UseGuards(PrivilegedGuard)
+	@Patch('chats/:chatId/:role/:userId')
+	async editRole(@Param('chatId') chatId: number, @Param('role') role: RoleType, @Param('userId') userId: number, @Body('newRole') newRole: RoleType): Promise<boolean> {
+		const chat = await this.chatService.getChat(chatId);
+		const user = await this.userService.getUser(userId);
+		const roleObj = await this.roleService.getRole(chat.id, user.id);
+		return await this.roleService.editRole(roleObj, newRole);
 	}
 }

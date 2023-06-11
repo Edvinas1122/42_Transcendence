@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '../users/entities/user.entity';
 import { Chat } from './entities/chat.entity';
-import { RoleType, Role } from './entities/role.entity';
+import { RoleType, Role, AcceptedRoleType } from './entities/role.entity';
 import { Repository, In, Not } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserInfo } from '../users/dtos/user.dto';
@@ -101,6 +101,33 @@ export class RoleService {
 		return role;
 	}
 
+	// async userHasRole(userId: number, role: RoleType): Promise<boolean> {
+	// 	const relative = await this.roleRepository.findOne({
+	// 		where: { user: { id: userId }, type: role },
+	// 	});
+	// 	return !!relative;
+	// }
+
+	async isPrivileged(userId: number, chatId: number): Promise<boolean> {
+		const relative = await this.roleRepository.findOne({
+			where: { user: { id: userId }, type: In([RoleType.Owner, RoleType.Admin]), chat: { id: chatId } },
+		});
+		return !!relative;
+	}
+
+	async isPermited(userId: number, chatId: number): Promise<boolean> {
+		const relative = await this.roleRepository.findOne({
+			where: { user: { id: userId }, type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant]), chat: { id: chatId } },
+		});
+		return !!relative;
+	}
+	// async userOwnerOfChat(userId: number, chatId: number): Promise<boolean> {
+	// 	const relative = await this.roleRepository.findOne({
+	// 		where: { user: { id: userId }, type: RoleType.Owner, chat: { id: chatId } },
+	// 	});
+	// 	return !!relative;
+	// }
+
 	// async editRole(chat: Chat, user: User, role: RoleType): Promise<boolean> {
 
 	// 	const relative = await this.roleRepository.findOne({
@@ -121,4 +148,4 @@ export class RoleService {
 	}
 }
 
-export { RoleType } from './entities/role.entity';
+export { RoleType, AcceptedRoleType } from './entities/role.entity';

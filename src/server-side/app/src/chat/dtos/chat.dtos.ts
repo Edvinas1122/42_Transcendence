@@ -3,10 +3,9 @@ export class CreateChatDto {
 	ownerID: number;
 	private: boolean;
 	password: string;
-	participantsID: number[];
-	// mutedUsersID: number[];
-	// bannedUsersID: number[];
 	invitedUsersID?: number[];
+	// mutedUsersID?: number[];
+	// bannedUsersID?: number[];
 	// add more fields as per your requirements
 }
 
@@ -18,20 +17,13 @@ export class UpdateChatDto extends CreateChatDto {
 	id: number;
 }
 
-export class UserChatActionDto {
-	chatId: number;
-	userId: number;
+export class JoinChatDto {
+	chatPassword: string;
 }
 
-export class SendMessageDto {
+export class SendMessagetDto {
 	content: string;
-	receiverId: number;
-}
-
-export class SendMessageToChatDto {
-	content: string;
-	chatId: number;
-	password: string;
+	password: string | null;
 }
 
 export class DeleteMessageDto {

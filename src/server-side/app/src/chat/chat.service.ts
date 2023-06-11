@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat } from './entities/chat.entity';
@@ -15,14 +15,11 @@ export class ChatService {
 	constructor(
 		@InjectRepository(Chat)
 		private chatRepository: Repository<Chat>,
-		// @InjectRepository(User)
-		// private userRepository: Repository<User>,
-		// @Inject(MessageService)
-		// private messageService: MessageService,
 		@Inject(UsersService)
 		private usersService: UsersService,
-		// private readonly eventsGateway: EventsGateway,
+		@Inject(RoleService)
 		private readonly roleService: RoleService
+		// private readonly eventsGateway: EventsGateway,
 	) {}
 
 	async getAllChats(): Promise<Chat[]> {
@@ -52,6 +49,7 @@ export class ChatService {
 			if (!chat.personal) {
 				const groupChatDto = new GroupChatDto(chat, owner, participants);
 				// populate the GroupChatDto instance with data from the chat entity
+				groupChatDto.privileged = await this.roleService.isPrivileged(userId, chat.id);
 				return groupChatDto;
 			} else {
 				const personalChatDto = new PersonalChatDto(chat, participants[0]);
@@ -80,7 +78,7 @@ export class ChatService {
 		chat.personal = false;
 
 		const savedChat = await this.chatRepository.save(chat);
-		await this.roleService.addRelativeToChat(RoleType.Participant, savedChat, owner);
+		await this.roleService.addRelativeToChat(RoleType.Owner, savedChat, owner);
 	
 		return savedChat;
 	}
@@ -150,4 +148,15 @@ export class ChatService {
 		}
 		return null;
 	}
+
+	async joinChat(userId: number, chatId: number, password?: string): Promise<boolean>
+	{
+		const role = await this.roleService.getRole(chatId, userId);
+		if (role.type !== RoleType.Invited) {
+			throw new BadRequestException('User not an invitee');
+		}
+		await this.roleService.editRole(role, RoleType.Participant);
+		return true;
+	}
+
 }
