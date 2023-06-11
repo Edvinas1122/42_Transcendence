@@ -16,18 +16,6 @@ interface Achievement {
 	achievedOn: Date;
 }
 
-
-// interface User {
-// 	_id: string;
-// 	name: string;
-// 	avatar: string;
-// 	Online: boolean;
-// 	Ingame: boolean;
-// 	MachHistory: MachHistory[];
-// 	Achievements: Achievement[];
-// 	friend?: boolean;
-// }
-
 interface User {
 	_id: string;
 	name: string;
@@ -55,15 +43,15 @@ interface PersonalChat extends Chat {
 }
 
 interface GroupChat extends Chat {
-	owner: User_small;
-	participants: User_small[];
+	owner: User;
+	participants: User[];
 	privileged: boolean;
 }
 
 interface Message {
 	_id: string;
 	content: string;
-	user: User_small;
+	user: User;
 }
 
 enum RoleType {
