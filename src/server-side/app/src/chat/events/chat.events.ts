@@ -31,7 +31,6 @@ class ChatEvent extends SseMessage {
 	{
 		const payload: ChatData = {roomId: roomId, event: eventType, subType: subType, data: data};
 		super(EventType.Chat, payload);
-		console.log('ChatEvent', eventType, roomId, subType, data);
 	}
 }
 

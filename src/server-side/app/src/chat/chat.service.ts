@@ -174,5 +174,4 @@ export class ChatService {
 			await this.chatEventGateway.updateParticipantsOfRoomEvent(chat, eventType);
 		}
 	}
-
 }

@@ -15,7 +15,6 @@ import { DriveModule } from './drive/drive.module';
 	imports: [
 		TypeOrmModule.forRoot(typeOrmConfig),
 		AuthModule,
-		ProfileManagementModule,
 		EventsModule,
 		ChatModule,
 		DriveModule,

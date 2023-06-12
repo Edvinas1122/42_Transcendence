@@ -21,6 +21,7 @@ export class MessagesController {
 	@Post(':chatId')
 	async sendMessage(@Req() req: Request, @Param('chatId') chatId: number, @Body() message: SendMessagetDto): Promise<MessageDto> {
 		const userId = req['user']['id'];
+		console.log('getting message', message);
 		return await this.messageService.sendMessageToChat(message.content, userId, message.password, chatId);
 	}
 

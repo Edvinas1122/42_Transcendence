@@ -22,19 +22,19 @@ export enum RoleType {
 
 @Entity()
 export class Role {
-  @PrimaryGeneratedColumn()
-  id: number;
+@PrimaryGeneratedColumn()
+id: number;
 
-  @Column({
-    type: "enum",
-    enum: RoleType,
-    default: RoleType.Participant
-  })
-  type: RoleType;
+@Column({
+	type: "enum",
+	enum: RoleType,
+	default: RoleType.Participant
+})
+type: RoleType;
 
-  @ManyToOne(() => User, user => user.roles)
-  user: User;
+@ManyToOne(() => User, user => user.roles)
+user: User;
 
-  @ManyToOne(() => Chat, chat => chat.roles)
-  chat: Chat;
+@ManyToOne(() => Chat, chat => chat.roles)
+chat: Chat;
 }

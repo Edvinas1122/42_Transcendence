@@ -10,6 +10,8 @@ users/
 		get-all-pending-friend-request/
 		get-last-pending-friend-request/
 
+		-- So far working
+
 
 chat/
 	available/ - Chat[] - Personal and Group chats available to token bearer
@@ -18,7 +20,8 @@ chat/
 
 	roles/
 		:chatId/join (POST) - JoinChatDto - Accept pending request and join
-		:chatId/(:role)(or Any) - Get chat relatives 
+		:chatId/(:role)(or Any) - Get chat relatives
+		<!-- :chatId/invite (POST) - IviteToChat - Invite to chat  -->
 		:chatId/:userId - (DELETE) - delete chat member - Kick
 		:chatId/ - (DELETE) - userIds: number[] - delete chat members - Kick many
 	

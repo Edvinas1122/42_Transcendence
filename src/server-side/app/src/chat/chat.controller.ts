@@ -18,11 +18,9 @@ export class ChatController {
 
 	@Get('available')
 	async findAvailableChats(@Req() req: Request): Promise<ChatDto[]> {
-		console.log("requesting for all charts" + req['user']['id']);
 		const UserId = req['user']['id'];
 		const chats = await this.chatService.getUserChats(UserId);
 		// const chats = await this.chatService.getChat(1);
-		console.log(chats);
 		return chats;
 		// return await this.chatService.getAllChats();
 	}
