@@ -31,9 +31,6 @@ export class ChatController {
 	async createChat(@Req() req: Request, @Body() createChatDto: CreateChatDto): Promise<Chat | null>
 	{
 		const userId = req['user']['id'];
-		// const userId = 1;
-		console.log("creating chat for user " + userId);
-		// Check if the ID arrays are defined. If not, initialize them as empty arrays.
 		createChatDto.ownerID = userId;
 		createChatDto.invitedUsersID = createChatDto.invitedUsersID ? [...createChatDto.invitedUsersID, userId] : [userId];
 		const resultChat = await this.chatService.createGroupChat(createChatDto);

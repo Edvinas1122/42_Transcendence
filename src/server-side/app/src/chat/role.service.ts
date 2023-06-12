@@ -28,10 +28,15 @@ export class RoleService {
 	}
 
 	async getChatRoleRelatives(chat: Chat, role: RoleType = RoleType.Blocked): Promise<UserInfo[]> {
+		console.log('Relatives', role);
 		const relatives = await this.roleRepository.find({
-			where: { chat: chat, type: role },
+			where: { 
+				chat: { id: chat.id },
+				type: role
+			},
 			relations: ['user'],
 		});
+		console.log('Relatives', relatives);
 		
 		return relatives.map(relative => new UserInfo(relative.user, relative.type));
 	}

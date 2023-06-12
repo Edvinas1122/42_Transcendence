@@ -80,7 +80,7 @@ export class ChatService {
 
 		const savedChat = await this.chatRepository.save(chat);
 		await this.roleService.addRelativeToChat(RoleType.Owner, savedChat, owner);
-
+		
 		// send event to all users that are online unless the chat is private then send to participants only
 		await this.updateEvent(savedChat, RoomEventType.NewAvailable);
 	

@@ -61,6 +61,7 @@ export class EventService {
 
 	async sendToAll(data: SseMessage, except?: number[]): Promise<void> {
 		const users = this.eventSubjects.keys();
+		console.log('sendToAll', users);
 		for (const user of users) {
 			if (!except || !except.includes(Number(user))) {
 				this.sendEvent(user, data);

@@ -17,8 +17,11 @@ export class ChatEventGateway {
 	) {}
 
 	async updateOnlineUsersChatEvent(chat: Chat, eventType: RoomEventType, info?: any): Promise<boolean> {
+		console.log('updateOnlineUsersChatEvent', chat.id, eventType, info);
 		const data: ChatRoomEvent = new ChatRoomEvent(chat.id, eventType, info);
+		
 		const users = await this.roleService.getChatRoleRelatives(chat, RoleType.Blocked); // exclude blocked users
+		console.log('ChatEvent', eventType, data);
 		await this.eventService.sendToAll(data as SseMessage, users.map(user => user._id));
 		return true;
 	}

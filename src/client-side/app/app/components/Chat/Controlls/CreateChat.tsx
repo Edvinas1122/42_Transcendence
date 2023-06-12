@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import fetchWithToken from '@/app/network/fetchWithToken';
+import { CreateChatRequest } from '../../dtos/PostData';
 
 const CreateChat = () => {
 	const [name, setName] = useState("");
@@ -8,7 +9,7 @@ const CreateChat = () => {
   
 	const handleSubmit = (e) => {
 	  e.preventDefault();
-	  const chatData = { name, private: isPrivate, password };
+	  const chatData: CreateChatRequest = { name, private: isPrivate, password };
   
 	  fetchWithToken('/chat/create', {
 		method: 'POST',
