@@ -4,7 +4,7 @@ import { Chat } from './entities/chat.entity';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto } from './dtos/chat.dtos'; // import DTOs
-import { EventService } from '../events/sse.service';
+import { EventService } from '../events/events.service';
 import { PrivilegedGuard } from './guards/owner.guard';
 
 @UseGuards(JwtAuthGuard)
@@ -39,7 +39,7 @@ export class ChatController {
 		const resultChat = await this.chatService.createGroupChat(createChatDto);
 		if (resultChat)
 		{
-			this.eventService.sendEventToUser(userId.toString(), {type: 'chat', data: resultChat});
+			// this.eventService.sendEventToUser(userId.toString(), {type: 'chat', data: resultChat});
 			return resultChat;
 		}
 		return null;

@@ -56,7 +56,7 @@ const authValidate = () => {
 const RootUI = () => {
 	const	[displays, setDisplays] = useState(AppDisplays);
 	// const	authToken = authValidate();
-	let		eventSource = new EventSource(`http://localhost:3000/api/sse/?token=${authValidate()}`);
+	let		eventSource = new EventSource(`http://localhost:3000/events/sse/?token=${authValidate()}`);
 
 	const fetchData = async (displayType) => {
 		const fetchedDisplayData = await Promise.all(

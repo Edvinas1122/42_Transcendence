@@ -6,7 +6,10 @@ import { User } from '../users/entities/user.entity';
 import { ChatService } from './chat.service';
 import { RoleService } from './role.service';
 import { UsersService } from '../users/users.service';
-
+import { ChatEventGateway, MessageEventType } from './chat-event.gateway';
+import { Chat } from './entities/chat.entity';
+import { UserInfo } from '../users/dtos/user.dto';
+import { MessageDto } from './dtos/message.dtos';
 
 @Injectable()
 export class MessageService {
@@ -17,22 +20,26 @@ export class MessageService {
 		private usersService: UsersService,
 		@Inject(ChatService)
 		private chatService: ChatService,
+		@Inject(ChatEventGateway)
+		private readonly chatEventGateway: ChatEventGateway,
 	) {}
 
-	async getChatMessages(chatId: number): Promise<Message[]> {
+	async getChatMessages(chatId: number): Promise<MessageDto[]> {
 		console.log('getChatMessages');
 		const chat = await this.chatService.getChat(chatId);
-		console.log(chat);
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
+		console.log(chat);
 		console.log('returning messages');
 		const messages = await this.messagesRepository.find({where: { chat: chat }});
 		console.log(messages);
-		return await this.messagesRepository.find({where: { chatID: chatId }});
+		// Map each Message to a MessageDto
+		const messageDtos = messages.map(message => new MessageDto(message));
+		return messageDtos;
 	}
 
-	async sendMessageToChat(content: string, senderId: number, password: string, chatId: number): Promise<Message> {
+	async sendMessageToChat(content: string, senderId: number, password: string, chatId: number): Promise<MessageDto> {
 		const chat = await this.chatService.getChat(chatId);
 		const sender = await this.usersService.findUser(senderId);
 
@@ -43,10 +50,13 @@ export class MessageService {
 			throw new UnauthorizedException('Wrong password');
 		}
 
-		return await this.messagesRepository.save({content: content, sender: sender, chat: chat});
+		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
+		const returnedMessage: MessageDto = new MessageDto(message);
+		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
+		return returnedMessage;
 	}
 
-	async sendMessageToUser(content: string, senderId: number, recipientId: number): Promise<Message> {
+	async sendMessageToUser(content: string, senderId: number, recipientId: number): Promise<MessageDto> {
 	
 		const sender = await this.usersService.findUser(senderId);
 		
@@ -60,10 +70,20 @@ export class MessageService {
 		}
 	
 		// Now we have a chat, either found or newly created, so we can send the message
-		const message = new Message();
-		message.content = content;
-		message.sender = sender;
-		message.chat = chat;
-		return await this.messagesRepository.save(message);
+		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
+		const returnedMessage: MessageDto = new MessageDto(message);
+		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
+		return returnedMessage;
+	}
+
+	public async updateEvent(chat: Chat, eventType: MessageEventType = MessageEventType.New, message?: MessageDto) {
+		if (chat.personal || chat.private) {
+			await this.chatEventGateway.updateParticipantsOfMessageEvent(chat, message, eventType);
+		}
+		else {
+			await this.chatEventGateway.updateOnlineUsersMessageEvent(chat, message, eventType);
+		}
 	}
 }
+
+export { MessageDto };

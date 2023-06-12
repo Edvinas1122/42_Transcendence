@@ -1,38 +1,13 @@
-// export enum WSMessageType {
-//   NOTIFICATION = 'notification',
-//   MESSAGE = 'message',
-//   GAMEDATA = 'gamedata'
-// }
+import { EventType } from "./entities/event.entity";
 
-// interface NotificationInfo {
-//   category: string;
-//   event: string;
-//   fetch: boolean;
-//   message?: string | JSON;
-//   silent?: boolean;
-// }
+export class SseMessage {
+	constructor(type: EventType, payload?: any) {
+		this.type = type;
+		this.payload = payload ?? {};
+		this.timestamp = Date.now();
+	}
+	type: EventType;
+	payload: any;
+	timestamp: number;
+}
 
-// export interface WSMessage {
-//   type: WSMessageType;
-//   info: NotificationInfo | string;
-// }
-
-// export enum SystemEvent {
-//   ERROR = 'ERROR',
-//   WARNING = 'WARNING',
-//   INFO = 'INFO',
-//   SUCCESS = 'SUCCESS',
-// }
-
-// export function SystemMessage(event: SystemEvent, message: string = ""): WSMessage | string {
-//   return {
-//     type: WSMessageType.NOTIFICATION,
-//     info: {
-//       category: 'System',
-//       event: event,
-//       fetch: false,
-//       silent: true,
-//       message: message
-//     }
-//   }
-// }

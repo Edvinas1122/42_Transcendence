@@ -11,8 +11,8 @@ export class UserInfo {
         this._id = user.id;
         this.name = user.name;
         this.avatar = user.avatar;
-        this.Online = false;
-        this.Ingame = false;
+        // this.Online = false;
+        // this.Ingame = false;
         this.Role = role;
     }
     _id: number;

@@ -2,6 +2,7 @@ import PersonalProfile from "./UserProfile/Profiles";
 import Chats from "./Chat/Chat";
 // import { User, GroupChat } from '@/app/dtos/AppData';
 import { Link } from 'react-router-dom';
+import { EventType } from "../dtos/EventData";
 
 const FriendsAndUsers = () => (
     <div>

@@ -4,10 +4,10 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { interval, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { EventService } from './sse.service';
+import { EventService } from './events.service';
 import * as jwt from 'jsonwebtoken';
 
-@Controller("api")
+@Controller("events")
 export class EventsController {
     constructor(private eventService: EventService) {}
 

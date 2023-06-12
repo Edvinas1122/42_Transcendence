@@ -31,11 +31,11 @@ export class DeleteMessageDto {
 }
 
 import { UserInfo } from '../../users/dtos/user.dto';
-import { Message } from './message.dtos';
+import { MessageDto } from './message.dtos';
 import { Chat } from '../entities/chat.entity';
 
 export class ChatDto {
-	constructor(chat: Chat, pesonal: boolean, messages?: Message[]) {
+	constructor(chat: Chat, pesonal: boolean, messages?: MessageDto[]) {
 		this._id = chat.id;
 		this.name = chat.name;
 		// set a default empty array or set the messages directly if you have them at this point
@@ -44,12 +44,12 @@ export class ChatDto {
 
 	_id: number;
 	name: string;
-	messages: Message[];
+	messages: MessageDto[];
 	personal: boolean;
 }
 
 export class PersonalChatDto extends ChatDto {
-	constructor(chat: Chat, participant: UserInfo, messages?: Message[]) {
+	constructor(chat: Chat, participant: UserInfo, messages?: MessageDto[]) {
 		super(chat, true, messages);
 		this.participant = participant || null; // Assuming you can pass the participant during construction
 	}
@@ -57,7 +57,7 @@ export class PersonalChatDto extends ChatDto {
 }
 
 export class GroupChatDto extends ChatDto {
-	constructor(chat: Chat, owner: UserInfo, privileged: boolean, participants?: UserInfo[], messages?: Message[]) {
+	constructor(chat: Chat, owner: UserInfo, privileged: boolean, participants?: UserInfo[], messages?: MessageDto[]) {
 		super(chat, false, messages);
 		this.owner = owner || null; // Assuming you can pass the owner during construction
 		this.participants = participants || []; // Assuming you can pass the participants during construction

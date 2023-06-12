@@ -29,7 +29,7 @@ export class RolesController {
 		if (role === RoleType.Any) {
 			return await this.roleService.getChatRelatives(chat);
 		}
-		return await this.roleService.getChatRoleRelatives(role, chat);
+		return await this.roleService.getChatRoleRelatives(chat, role);
 	}
 
 	// @Get('users/:userId')
