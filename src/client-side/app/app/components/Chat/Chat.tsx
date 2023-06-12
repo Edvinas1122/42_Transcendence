@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { GroupChat } from '@/app/dtos/AppData';
 import CreateChat from './Controlls/CreateChat';
 import Chat from '../Chat/Chat'
+import ChatList from './ChatList';
 
 
 const ChatBox = ({props}: Chat) => {
@@ -29,31 +30,12 @@ const Chats = ({props}: Chat[]) => {
 	const chats: Chat[] = props;
 	// console.log("in chats: " + chats[0].name);
 
-	if (!chats)
-		return (
-			<div>
-				<div>No chats available</div>
-				<div>
-					<CreateChat />
-				</div>
-			</div>
-		);
-	else
-		return (
-			<div>
-				<div>
-					<h2>Available Chats</h2>
-					<ul>
-						{chats.map(chat => (
-							<li key={chat._id}>{chat.name}</li>
-						))}
-					</ul>
-				</div>
-				<div>
-					<CreateChat />
-				</div>
-			</div>
-		);
+	return (
+		<div>
+			<ChatList chats={chats} />
+			<CreateChat />
+		</div>
+	);
 }
 
 export default Chats;
