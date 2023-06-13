@@ -6,7 +6,6 @@ import Sidebar  from './components/Sidebar/Sidebar';
 import AppDisplays from './components/components.config';
 import fetchWithToken from "./network/fetchWithToken";
 import Cookie from "js-cookie";
-import ChatPage from "./components/Chat/ChatPage";
 
 
 const dataExample : AppData = {
@@ -101,7 +100,6 @@ const RootUI = () => {
 			<Routes>
 				<Route path="/" element={<Sidebar displays={displays}/>} />
 				<Route path="/user/:id" element={<UserView />} />
-				<Route exact path="/chat/:chatId" element={<ChatPage />} />
 			</Routes>
 			</div>
 		</Router>
