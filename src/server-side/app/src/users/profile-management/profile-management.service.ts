@@ -99,6 +99,92 @@ export class ProfileManagementService {
 		return updatedRelationship;
 	}
 
+	async rejectFriendRequest(requestSenderId: number, requestReceiverId: number): Promise<Boolean> {
+		const friendRequest = await this.relationshipsRepository.findOne({
+			where: {
+				user1ID: requestSenderId,
+				user2ID: requestReceiverId,
+				status: RelationshipStatus.PENDING
+			}
+		});
+
+		if (!friendRequest) {
+			throw new NotFoundException('Friend request not found');
+		} else if (friendRequest.status !== RelationshipStatus.PENDING) {
+			throw new HttpException('Friend request is not pending', HttpStatus.CONFLICT);
+		}
+
+		await this.relationshipsRepository.remove(friendRequest);
+
+		this.eventsGateway.sendUserRelationshipEvent(requestSenderId, RelationshipType.Declined, requestReceiverId);
+		return true;
+	}
+
+	async removeFriend(userId: number, friendId: number): Promise<Boolean> {
+		const relationship = await this.relationshipsRepository.findOne({
+			where: [
+				{ user1ID: userId, user2ID: friendId, status: RelationshipStatus.APPROVED },
+				{ user1ID: friendId, user2ID: userId, status: RelationshipStatus.APPROVED }
+			]
+		});
+
+		if (!relationship) {
+			throw new NotFoundException('Friend not found');
+		} else if (relationship.status !== RelationshipStatus.APPROVED) {
+			throw new HttpException('Friend request is not approved', HttpStatus.CONFLICT);
+		}
+
+		await this.relationshipsRepository.remove(relationship);
+
+		this.eventsGateway.sendUserRelationshipEvent(userId, RelationshipType.Removed, friendId);
+		return true;
+	}
+
+	async blockUser(userId: number, blockedUserId: number): Promise<Boolean> {
+		// find the relationship if exists
+		const relationship = await this.relationshipsRepository.findOne({
+			where: [
+				{ user1ID: userId, user2ID: blockedUserId },
+				{ user1ID: blockedUserId, user2ID: userId }
+			]
+		});
+	
+		// if there's a relationship, remove it
+		if (relationship) {
+			await this.relationshipsRepository.remove(relationship);
+		}
+	
+		// create a new relationship where user1ID is the blocker and user2ID is the one being blocked
+		const newRelationship = new Relationship();
+		newRelationship.user1ID = userId;
+		newRelationship.user2ID = blockedUserId;
+		newRelationship.status = RelationshipStatus.BLOCKED;
+	
+		await this.relationshipsRepository.save(newRelationship);
+		this.eventsGateway.sendUserRelationshipEvent(userId, RelationshipType.Blocked, blockedUserId);
+	
+		return true;
+	}
+
+	async unblockUser(userId: number, blockedUserId: number): Promise<Boolean> {
+		const relationship = await this.relationshipsRepository.findOne({
+			where: [
+				{ user1ID: userId, user2ID: blockedUserId, status: RelationshipStatus.BLOCKED },
+			]
+		});
+
+		if (!relationship) {
+			throw new NotFoundException('User not found');
+		} else if (relationship.status !== RelationshipStatus.BLOCKED) {
+			throw new HttpException('User is not blocked', HttpStatus.CONFLICT);
+		}
+		
+		await this.relationshipsRepository.remove(relationship);
+		this.eventsGateway.sendUserRelationshipEvent(userId, RelationshipType.Unblocked, blockedUserId);
+		return true;
+	}
+
+
 	async getAllFriends(userId: number): Promise<UserInfo[]> {
 		const relationships = await this.relationshipsRepository.find({
 			where: [
@@ -120,49 +206,19 @@ export class ProfileManagementService {
 		return usersInfo;
 	}
 
-	// async removeFriend(userName: string, friendName: string): Promise<any> {
-	//   const friendRequest = await this.relationshipsRepository.findOne({ 
-	//     where: { 
-	//       user1ID: requestSenderId,
-	//       user2ID: requestReceiverId,
-	//       status: RelationshipStatus.PENDING
-	//     } 
-	//   });
+	async getPersonallyBlockedUsers(userId: number): Promise<any> {
+		const relationships = await this.relationshipsRepository.find({
+			where: [
+				{ user1ID: userId, status: RelationshipStatus.BLOCKED },
+			],
+			relations: ["user2"]
+		});
 
-	//   if (!friendRequest) {
-	//     throw new NotFoundException('Friend request not found');
-	//   }
-
-	//   friendRequest.status = RelationshipStatus.REJECTED;
-
-	//   const updatedRelationship = await this.relationshipsRepository.save(friendRequest);
-
-	//   this.eventsGateway.sendToUser(requestSenderId, 'Friend request approved');
-
-	//   return updatedRelationship;
-	// }
-
-
-	// async blockUser(userName: string, targetName: string): Promise<any> {
-	//   const friendRequest = await this.relationshipsRepository.findOne({ 
-	//     where: { 
-	//       user1ID: requestSenderId,
-	//       user2ID: requestReceiverId,
-	//     } 
-	//   });
-
-	//   if (!friendRequest) {
-	//     throw new NotFoundException('Friend request not found');
-	//   }
-
-	//   friendRequest.status = RelationshipStatus.BLOCKED;
-
-	//   const updatedRelationship = await this.relationshipsRepository.save(friendRequest);
-
-	//   this.eventsGateway.sendToUser(requestSenderId, 'Friend request approved');
-
-	//   return updatedRelationship;
-	// }
+		// Extract users from the relationships
+		const users = relationships.map(rel => rel.user2);
+		const usersInfo = users.map(user => new UserInfo(user));
+		return usersInfo;
+	}
 
 	private async getBlockedUsers(userId: number): Promise<any> {
 		const relationships = await this.relationshipsRepository.find({
