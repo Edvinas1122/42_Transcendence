@@ -13,8 +13,7 @@ const FriendRequestCard = ({ friend, onAccept, onDeny }) => {
 
     return (
         <div>
-            {/* <img src={}/> */}
-            <h1>request</h1>
+            <img src={friend.avatar}/>
             <h1>{friend.name}</h1>
             <button onClick={handleAccept}>Accept</button>
             <button onClick={handleDeny}>Deny</button>
