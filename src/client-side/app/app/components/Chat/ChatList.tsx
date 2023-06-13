@@ -1,17 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Chat from './Chat'
 
-const ChatList = ({ chats }) => {
+const ChatList = ({chat}) => {
   return (
     <div>
-      {chats ? <h2>Chats</h2> : <h2>No Chats Available</h2>}
-      <ul>
-        {chats.map((chat) => (
-          <li key={chat._id}>
-            <Link to={`/chat/${chat._id}`}>{chat.name}</Link>
-          </li>
-        ))}
-      </ul>
+		  <h2>{chat.name}</h2>
+			{/* <p>{chat.id}</p> */}
+      {/* more beautiful things */}
     </div>
   );
 };
