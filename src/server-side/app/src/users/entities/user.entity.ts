@@ -3,6 +3,7 @@ import { Relationship } from '../profile-management/entities/relationship.entity
 import { Chat } from '../../chat/entities/chat.entity';
 import { Message } from '../../chat/entities/message.entity';
 import { Role } from '../../chat/entities/role.entity';
+import { Event } from '../../events/entities/event.entity';
 
 @Entity()
 export class User {
@@ -39,6 +40,8 @@ export class User {
 	@OneToMany(() => Message, message => message.sender)
 	messagesSent: Message[];
 
+	@OneToMany(() => Event, (event) => event.user)
+	events: Event[];
 
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
 	createdAt: Date;

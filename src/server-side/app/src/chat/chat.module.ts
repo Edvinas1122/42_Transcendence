@@ -15,11 +15,12 @@ import { RolesController } from './roles.controller';
 import { Role } from './entities/role.entity';
 // import { UsersService } from '../users/users.service';
 import { UsersModule } from '../users/users.module';
+import { ChatEventGateway } from './chat-event.gateway';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Chat, Message, User, Role]), EventsModule, UsersModule],
+	imports: [TypeOrmModule.forFeature([Chat, Message, Role]), EventsModule, UsersModule],
 	controllers: [ChatController, MessagesController, RolesController],
-	providers: [ChatService, RoleService , MessageService ],
+	providers: [ChatService, RoleService , MessageService, ChatEventGateway],
 	exports: [ChatService, MessageService, RoleService],
 })
 export class ChatModule {}

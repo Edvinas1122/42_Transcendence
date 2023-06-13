@@ -8,6 +8,7 @@ import { CreateChatDto, ChatDto, PersonalChatDto, GroupChatDto } from './dtos/ch
 import { RoleService, RoleType } from './role.service';
 import { MessageService } from './message.service';
 import { UsersService } from '../users/users.service';
+import { ChatEventGateway, RoomEventType } from './chat-event.gateway';
 
 @Injectable()
 export class ChatService {
@@ -17,8 +18,9 @@ export class ChatService {
 		@Inject(UsersService)
 		private usersService: UsersService,
 		@Inject(RoleService)
-		private readonly roleService: RoleService
-		// private readonly eventsGateway: EventsGateway,
+		private readonly roleService: RoleService,
+		@Inject(ChatEventGateway)
+		private readonly chatEventGateway: ChatEventGateway,
 	) {}
 
 	async getAllChats(): Promise<Chat[]> {
@@ -78,6 +80,9 @@ export class ChatService {
 
 		const savedChat = await this.chatRepository.save(chat);
 		await this.roleService.addRelativeToChat(RoleType.Owner, savedChat, owner);
+		
+		// send event to all users that are online unless the chat is private then send to participants only
+		await this.updateEvent(savedChat, RoomEventType.NewAvailable);
 	
 		return savedChat;
 	}
@@ -91,10 +96,13 @@ export class ChatService {
 		// Remove all related roles to this chat before deleting the chat
 		const chatRelatives = await this.roleService.getChatRelatives(chatToDelete);
 		for (const relative of chatRelatives) {
+			// await this.chatEventGateway.sendEventToChat(chatToDelete, EventType.CHAT_ROOM_DELETED);
 			await this.roleService.removeChatRelative(chatToDelete, relative._id);
 		}
 
 		await this.chatRepository.delete(chatId);
+
+		await this.updateEvent(chatToDelete, RoomEventType.Deleted);
 		
 		return true;
 	}
@@ -158,4 +166,12 @@ export class ChatService {
 		return true;
 	}
 
+	private async updateEvent(chat: Chat, eventType: RoomEventType): Promise<void> {
+		if (!chat.private) {
+			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType);
+		}
+		else {
+			await this.chatEventGateway.updateParticipantsOfRoomEvent(chat, eventType);
+		}
+	}
 }

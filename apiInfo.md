@@ -10,6 +10,8 @@ users/
 		get-all-pending-friend-request/
 		get-last-pending-friend-request/
 
+		-- So far working
+
 
 chat/
 	available/ - Chat[] - Personal and Group chats available to token bearer
@@ -18,14 +20,38 @@ chat/
 
 	roles/
 		:chatId/join (POST) - JoinChatDto - Accept pending request and join
-		:chatId/(:role)(or Any) - Get chat relatives 
+		:chatId/(:role)(or Any) - Get chat relatives
+		<!-- :chatId/invite (POST) - IviteToChat - Invite to chat  -->
 		:chatId/:userId - (DELETE) - delete chat member - Kick
 		:chatId/ - (DELETE) - userIds: number[] - delete chat members - Kick many
 	
 	messages/
 		:chatId - get chat messages
 		:chatId (POST) -  SendMessagetDto - Send message to chat
+		user/:recipientId (Post) - SendMessageDto - Send personal message to user
 	
 
+// SSE events points
 
+events/:id (GET) - get unseen events - 
+events/sse/ - Subscibable SSE event port
 
+event types - 
+	- chat
+		- room : (room_id)
+			- added -- new chat visible to user
+			- invited -- invited to chat a user
+			- kicked -- user is kicked from chat
+			- joined -- some user joined chat
+			- ...
+		- message : (room_id)
+			- received
+			- ...
+	- users
+		- friends
+			- invited
+			- ...
+		- online
+			- 
+	- game
+		-...

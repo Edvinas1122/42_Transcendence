@@ -10,19 +10,19 @@ import { Relationship } from './entities/relationship.entity';
 export class ProfileManagementController {
 	constructor(private readonly profileManagementService: ProfileManagementService) {}
 
-		// @UseGuards(FriendRequestGuard)
+		// @UseGuards(FriendRequestGuard) // guard is inside the service
 		@Post('send-friend-request')
 		async sendFriendRequest(@Req() req: Request, @Body('receiverId') receiverId: number): Promise<Relationship> {
 			const currentUserId = req['user']['id'];
-			// console.log(currentUserId);
+			console.log("send friend request", currentUserId, receiverId);
 			return this.profileManagementService.sendFriendRequest(currentUserId, receiverId);
 		}
 
-		@UseGuards(FriendApproveGuard)
+		// @UseGuards(FriendApproveGuard) // guard is inside the service
 		@Post('approve-friend-request')
 		async approveFriendRequest(@Req() req: Request, @Body('requesterId') requesterId: number): Promise<Relationship> {
 			const currentUserId = req['user']['id'];
-			return this.profileManagementService.approveFriendRequest(currentUserId, requesterId);
+			return this.profileManagementService.approveFriendRequest(requesterId, currentUserId);
 		}
 
 		@Get('get-all-pending-friend-request')

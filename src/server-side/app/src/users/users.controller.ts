@@ -25,6 +25,7 @@ export class UsersController {
 		return user;
 	}
 
+	// Blocked Guard
 	@Get('profile/:id')
 	async findUser(@Req() req: Request, @Param() requesteeId: number): Promise<UserProfileInfo> {
 		const currentUser = req['user']['id'];
@@ -32,21 +33,12 @@ export class UsersController {
 		return requestee;
 	}
 
-	@Get('dummy')
-	findAllDummy() {
-		return [
-			{ id: 1, name: 'Dummy User 1', email: 'dummy1@email.com' },
-			{ id: 2, name: 'Dummy User 2', email: 'dummy2@email.com' },
-			{ id: 3, name: 'Dummy User 3', email: 'dummy3@email.com' },
-		];
-	}
-
-	@Post()
-	async createUser(@Body() user: User): Promise<User | null>
-	{
-		const resultUser = await this.usersService.create(user);
-		if (resultUser)
-			return resultUser;
-		return user;
-	}
+	// @Post()
+	// async createUser(@Body() user: User): Promise<User | null>
+	// {
+	// 	const resultUser = await this.usersService.create(user);
+	// 	if (resultUser)
+	// 		return resultUser;
+	// 	return user;
+	// }
 }

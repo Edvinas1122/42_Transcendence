@@ -1,11 +1,14 @@
-import { CanActivate, ExecutionContext, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, CanActivate, ExecutionContext, Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../../users.service';
 import { ProfileManagementService } from '../profile-management.service';
+import { In } from 'typeorm';
 
 @Injectable()
 export class FriendApproveGuard implements CanActivate {
   constructor(
+    @Inject(UsersService)
     private readonly userService: UsersService,
+    @Inject(ProfileManagementService)
     private readonly profileManagementService: ProfileManagementService,
   ) {}
 
@@ -36,7 +39,9 @@ export class FriendApproveGuard implements CanActivate {
 @Injectable()
 export class FriendRequestGuard implements CanActivate {
   constructor(
+    @Inject(UsersService)
     private readonly userService: UsersService,
+    @Inject(ProfileManagementService)
     private readonly profileManagementService: ProfileManagementService,
   ) {}
 

@@ -49,7 +49,7 @@ interface GroupChat extends Chat {
 }
 
 interface Message {
-	_id: string;
+	_id: number;
 	content: string;
 	user: User;
 }

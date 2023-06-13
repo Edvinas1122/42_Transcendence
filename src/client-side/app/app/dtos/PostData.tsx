@@ -1,13 +1,16 @@
 interface CreateChatRequest {
 	name: string;
 	private: boolean;
-	password: string;
+	password?: string;
 	invitedUsersID?: number[];
 }
 
-interface SendMessage {
+class SendMessageDto {
+	constructor(message: string, password?: string) {
+		this.content = message;
+	}
 	content: string;
 	password?: string;
 }
 
-export { CreateChatRequest, SendMessage };
+export { CreateChatRequest, SendMessageDto };
