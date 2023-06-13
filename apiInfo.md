@@ -5,13 +5,15 @@ users/
 	profile/:id - UserProfile - id owners personal profile
 	
 	manage/
-		send-friend-request/ (POST) body receiverId=:id
-		approve-friend-request/ (POST) body requesterId=:id
+		send-friend-request/:receiverId (POST)
+		approve-friend-request/:requesteeId (POST)
+		reject-friend-request/:requesterId (POST)
+		remove-friend/:friendId (POST)
+		block-user/:blockeeId (POST)
+		unblock-user/:blockeeId (POST)
 		get-all-pending-friend-request/
 		get-last-pending-friend-request/
-
-		-- So far working
-
+		friends/ - get token bearers friends
 
 chat/
 	available/ - Chat[] - Personal and Group chats available to token bearer

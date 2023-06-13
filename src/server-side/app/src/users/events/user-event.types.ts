@@ -9,6 +9,9 @@ enum RelationshipType {
 	Invited = "invited",
 	Approved = "approved",
 	Blocked = "blocked",
+	Declined = "declined", // not a type but an event
+	Removed = "removed", // not a type but an event
+	Unblocked = "unblocked", // not a type but an event
 }
 
 enum OnlineStatusEventTypes {

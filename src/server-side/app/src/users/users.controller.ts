@@ -32,13 +32,4 @@ export class UsersController {
 		const requestee = await this.usersService.getUserProfile(requesteeId);
 		return requestee;
 	}
-
-	// @Post()
-	// async createUser(@Body() user: User): Promise<User | null>
-	// {
-	// 	const resultUser = await this.usersService.create(user);
-	// 	if (resultUser)
-	// 		return resultUser;
-	// 	return user;
-	// }
 }

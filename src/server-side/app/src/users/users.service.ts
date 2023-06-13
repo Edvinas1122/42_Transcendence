@@ -88,3 +88,5 @@ export class UsersService {
 	}
 
 }
+
+export { User };
