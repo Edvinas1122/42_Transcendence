@@ -58,7 +58,13 @@ export class AuthController
 		const newUserHere = await this.usersService.create(newUser as User);
 		console.log("New user created", newUserHere, "his id is", newUserHere.id);
 		const accessToken = await this.authService.generateToken({id: newUserHere.id, owner: newUserHere.name});
-		res.cookie('access_token', accessToken, { maxAge: 9000000000, httpOnly: false, secure: false });
+		// res.cookie('access_token', accessToken, { maxAge: 9000000000, httpOnly: false, secure: false });
+		res.cookie('access_token', accessToken, { 
+			maxAge: 9000000000, 
+			httpOnly: false, 
+			secure: true, // set secure to true
+			sameSite: 'none' // set sameSite to 'none'
+		});
 		return res.redirect(process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL);
 	}
 
