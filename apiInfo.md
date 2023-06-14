@@ -24,7 +24,8 @@ chat/
 	roles/
 		:chatId/join (POST) - JoinChatDto - Accept pending request and join
 		:chatId/(:role)(or Any) - Get chat relatives
-		<!-- :chatId/invite (POST) - IviteToChat - Invite to chat  -->
+		:chatId/invite/:userId (POST) - Invite to chat
+		:chatId/invite/accept (POST) - Accept an invite to a chat
 		:chatId/:userId - (DELETE) - delete chat member - Kick
 		:chatId/ - (DELETE) - userIds: number[] - delete chat members - Kick many
 	

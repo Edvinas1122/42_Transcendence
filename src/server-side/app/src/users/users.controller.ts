@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UseGuards } from '@nestjs/common';
@@ -13,12 +13,11 @@ export class UsersController {
 		private readonly usersService: UsersService,
 	) {}
 
-	@Get('all')
-	async findAllUsers(@UserId() currentUserId: number): Promise<User[]>
-	{
-		// console.log(req['user']['name']);
-		return await this.usersService.findAll();
-	}
+	// @Get('all')
+	// async findAllUsers(@UserId() currentUserId: number): Promise<User[]>
+	// {
+	// 	return await this.usersService.findAll();
+	// }
 
 	@Get('me')
 	async findCurrentUser(@UserId() currentUser: number): Promise<UserProfileInfo>
@@ -27,9 +26,8 @@ export class UsersController {
 		return user;
 	}
 
-	// Blocked Guard
 	@Get('profile/:id')
-	async findUser(@UserId() userId: number, @Param() requesteeId: number): Promise<UserProfileInfo>
+	async findUser(@UserId() userId: number, @Param('id', new ParseIntPipe()) requesteeId: number): Promise<UserProfileInfo>
 	{
 		const requestee = await this.usersService.getUserProfile(requesteeId);
 		return requestee;

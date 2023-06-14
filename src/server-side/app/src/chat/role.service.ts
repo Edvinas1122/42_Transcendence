@@ -1,11 +1,12 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { User } from '../users/entities/user.entity';
 import { Chat } from './entities/chat.entity';
 import { RoleType, Role, AcceptedRoleType } from './entities/role.entity';
 import { Repository, In, Not } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserInfo } from '../users/dtos/user.dto';
+import { EventService } from '../events/events.service';
 
 
 @Injectable()
@@ -13,8 +14,8 @@ export class RoleService {
 	constructor(
 		@InjectRepository(Role)
 		private roleRepository: Repository<Role>,
-		// @InjectRepository(UsersService)
-		// private usersService: UsersService,
+		@Inject(EventService)
+		private eventService: EventService,
 	) {}
 
 	
@@ -73,13 +74,24 @@ export class RoleService {
 		}
 	}
 
-	async removeChatRelative(chat: Chat, userId: number): Promise<boolean> {
-		await this.roleRepository.delete({
-		chat: chat,
-		user: { id: userId } as User,
-		});
+	async removeChatRelative(chat: Chat, userId: number, expectedRole?: RoleType): Promise<boolean> {
+		const conditions = {
+		  chat: chat,
+		  user: { id: userId } as User,
+		};
+		
+		if (expectedRole) {
+		  conditions['role'] = expectedRole;
+		}
+	  
+		const result = await this.roleRepository.delete(conditions);
+		
+		if (result.affected === 0) {
+		  throw new HttpException('The user does not have the expected role', HttpStatus.BAD_REQUEST);
+		}
+		
 		return true;
-	}
+	  }
 
 	async removeChatRelatives(chat: Chat, userIds: number[]): Promise<boolean> {
 		await this.roleRepository.delete({
