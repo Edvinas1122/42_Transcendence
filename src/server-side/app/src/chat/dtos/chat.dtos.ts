@@ -1,12 +1,28 @@
+import { IsArray, IsBoolean, IsInt, IsOptional, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
+
+
 export class CreateChatDto {
+	@IsString()
+	@MinLength(1)
 	name: string;
-	ownerID: number;
+
+	@IsBoolean()
 	private: boolean;
-	password: string;
+
+	@IsOptional()
+	@IsInt()
+	ownerID?: number;
+
+	@IsOptional()
+	@IsString()
+	password?: string;
+
+	@IsOptional()
+	@IsArray()
+	@ValidateNested({ each: true })
+	@Type(() => Number)
 	invitedUsersID?: number[];
-	// mutedUsersID?: number[];
-	// bannedUsersID?: number[];
-	// add more fields as per your requirements
 }
 
 export class ChatIdDto {

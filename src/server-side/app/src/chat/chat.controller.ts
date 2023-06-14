@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Post, Body, Param, Delete, NotFoundException, Inject } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body, Param, Delete, NotFoundException, Inject, ValidationPipe, ParseIntPipe } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { Chat } from './entities/chat.entity';
 import { UseGuards } from '@nestjs/common';
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto } from './dtos/chat.dtos'; // import DTOs
 import { EventService } from '../events/events.service';
 import { PrivilegedGuard } from './guards/owner.guard';
+import { UserId } from '../utils/user-id.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('chat')
@@ -17,8 +18,7 @@ export class ChatController {
 	) {}
 
 	@Get('available')
-	async findAvailableChats(@Req() req: Request): Promise<ChatDto[]> {
-		const UserId = req['user']['id'];
+	async findAvailableChats(@UserId() UserId: number): Promise<ChatDto[]> {
 		const chats = await this.chatService.getUserChats(UserId);
 		// const chats = await this.chatService.getChat(1);
 		return chats;
@@ -26,9 +26,8 @@ export class ChatController {
 	}
 
 	@Post('create')
-	async createChat(@Req() req: Request, @Body() createChatDto: CreateChatDto): Promise<Chat | null>
+	async createChat(@UserId() userId: number, @Body(new ValidationPipe({ transform: true })) createChatDto: CreateChatDto): Promise<Chat | null>
 	{
-		const userId = req['user']['id'];
 		createChatDto.ownerID = userId;
 		createChatDto.invitedUsersID = createChatDto.invitedUsersID ? [...createChatDto.invitedUsersID, userId] : [userId];
 		const resultChat = await this.chatService.createGroupChat(createChatDto);
@@ -42,10 +41,8 @@ export class ChatController {
 
 	@UseGuards(PrivilegedGuard)
 	@Delete(':chatId')
-	async deleteChat(@Req() req: Request, @Param() chatId: number): Promise<boolean>
+	async deleteChat(@UserId() userId: number, @Param('chatId', new ParseIntPipe()) chatId: number): Promise<boolean>
 	{
-		const userId = req['user']['id'];
-
 		const resultChat = await this.chatService.deleteChat(chatId);
 		if (!resultChat)
 			throw new NotFoundException('Chat not found');

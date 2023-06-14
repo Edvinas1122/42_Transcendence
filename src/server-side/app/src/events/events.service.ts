@@ -69,6 +69,10 @@ export class EventService {
 		}
 	}
 
+	async getAllOnlineUsers(): Promise<number[]> {
+		return Array.from(this.eventSubjects.keys()).map(Number);
+	}
+
 
 	getUserEventStream(userId: string) {
 		return this.eventSubjects.get(userId)?.asObservable();

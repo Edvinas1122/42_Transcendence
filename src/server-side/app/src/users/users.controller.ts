@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { UserProfileInfo } from './dtos/user.dto';
+import { UserId } from '../utils/user-id.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -13,22 +14,23 @@ export class UsersController {
 	) {}
 
 	@Get('all')
-	async findAllUsers(@Req() req: Request): Promise<User[]> {
-		console.log(req['user']['name']);
+	async findAllUsers(@UserId() currentUserId: number): Promise<User[]>
+	{
+		// console.log(req['user']['name']);
 		return await this.usersService.findAll();
 	}
 
 	@Get('me')
-	async findCurrentUser(@Req() req: Request): Promise<UserProfileInfo> {
-		const currentUser = req['user']['id'];
+	async findCurrentUser(@UserId() currentUser: number): Promise<UserProfileInfo>
+	{
 		const user = await this.usersService.getUserProfile(currentUser);
 		return user;
 	}
 
 	// Blocked Guard
 	@Get('profile/:id')
-	async findUser(@Req() req: Request, @Param() requesteeId: number): Promise<UserProfileInfo> {
-		const currentUser = req['user']['id'];
+	async findUser(@UserId() userId: number, @Param() requesteeId: number): Promise<UserProfileInfo>
+	{
 		const requestee = await this.usersService.getUserProfile(requesteeId);
 		return requestee;
 	}

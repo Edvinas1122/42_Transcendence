@@ -26,7 +26,7 @@ const Messages = ({chatProp}: {chatProp: Chat}) => {
 	  return <div>Loading...</div>;
 	}
   
-	console.log("in messages: " + chat.name);
+	// console.log("in messages: " + chat.name);
   
 	return (
 	<div>

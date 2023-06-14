@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 // import { User } from '../entities/user.entity';
 import { Relationship, RelationshipStatus } from './entities/relationship.entity';
 import { User } from '../entities/user.entity';
-import { Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 // import { RelationshipNotificationMessage } from './utils/messages.types';
 import { UserInfo } from '../dtos/user.dto';
 import { UserEventGateway, RelationshipType } from '../user-event.gateway';
@@ -41,10 +41,10 @@ export class ProfileManagementService {
 
 	async getPendingFriendRequest(senderId: number, receiverId: number): Promise<Relationship> {
 		return this.relationshipsRepository.findOne({
-		where: [
-			{ user1ID: senderId, user2ID: receiverId, status: RelationshipStatus.PENDING },
-			{ user1ID: receiverId, user2ID: senderId, status: RelationshipStatus.PENDING }
-		]
+			where: [
+				{ user1ID: senderId, user2ID: receiverId, status: RelationshipStatus.PENDING },
+				{ user1ID: receiverId, user2ID: senderId, status: RelationshipStatus.PENDING }
+			]
 		});
 	}
 
@@ -203,6 +203,7 @@ export class ProfileManagementService {
 			}
 		);
 		const usersInfo = users.map(user => new UserInfo(user));
+		await this.setUsersOnlineStatus(usersInfo);
 		return usersInfo;
 	}
 
@@ -220,7 +221,38 @@ export class ProfileManagementService {
 		return usersInfo;
 	}
 
-	private async getBlockedUsers(userId: number): Promise<any> {
+	async getAllNotBlockedUsers(userId: number): Promise<UserInfo[]> {
+		const users = this.relationshipsRepository.find({
+		  where: [
+			{ user1ID: userId, status: Not(RelationshipStatus.BLOCKED) },
+			{ user2ID: userId, status: Not(RelationshipStatus.BLOCKED) },
+		  ],
+		  relations: ['user1', 'user2'],
+		});
+
+		const usersInfo = (await users).map(user => {
+			if (user.user1ID === userId)
+			return new UserInfo(user.user2);
+			else
+			return new UserInfo(user.user1);
+		});
+		await this.setUsersOnlineStatus(usersInfo);
+
+		return usersInfo;
+	  }
+
+
+	private async setUsersOnlineStatus(users: UserInfo[]): Promise<UserInfo[]> {
+		const onlineUsers: number[] = await this.eventsGateway.getAllOnlineUsers();
+		users.forEach(user => {
+			if (onlineUsers.includes(user._id)) {
+				user.Online = true;
+			}
+		});
+		return users;
+	}
+
+	private async getBlockedUsers(userId: number): Promise<UserInfo[]> {
 		const relationships = await this.relationshipsRepository.find({
 			where: [
 				{ user1ID: userId, status: RelationshipStatus.BLOCKED },

@@ -11,8 +11,9 @@ users/
 		remove-friend/:friendId (POST)
 		block-user/:blockeeId (POST)
 		unblock-user/:blockeeId (POST)
+
 		get-all-pending-friend-request/
-		get-last-pending-friend-request/
+
 		friends/ - get token bearers friends
 
 chat/
@@ -52,8 +53,15 @@ event types -
 	- users
 		- friends
 			- invited
+			- approved
+			- blocked
+			- declined
+			- removed
+			- unblocked
 			- ...
 		- online
-			- 
+			- online
+			- offline
+			- ingame
 	- game
 		-...
