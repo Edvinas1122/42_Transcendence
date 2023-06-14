@@ -6,24 +6,25 @@ import CreateChat from './Controlls/CreateChat';
 import Chat from './Chat'
 import ChatList from './ChatList';
 import SendMessage from './SendMessage';
+import Messages from './Messages/Messages';
 
-const Messages = ({chatProp}: {chatProp: Chat}) => {
-	const chat: Chat = chatProp;
+// const Messages = ({chatProp}: {chatProp: Chat}) => {
+// 	const chat: Chat = chatProp;
   
-	if (!chat) {
-	  return <div>Loading...</div>;
-	}
+// 	if (!chat) {
+// 	  return <div>Loading...</div>;
+// 	}
   
-	// console.log("in messages: " + chat.name);
+// 	// console.log("in messages: " + chat.name);
   
-	return (
-	<div>
-		<h2>{chat.name}</h2>
-		<p>{chat.id}</p>
-		<p>Example</p>
-	</div>
-	);
-}
+// 	return (
+// 	<div>
+// 		<h2>{chat.name}</h2>
+// 		<p>{chat.id}</p>
+// 		<p>Example</p>
+// 	</div>
+// 	);
+// }
 
 const Chats = ({props}: {props: Chat[]}) => {
 	const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
@@ -44,7 +45,7 @@ const Chats = ({props}: {props: Chat[]}) => {
 				handleChatBoxClick(chat)}><ChatList chat={chat}/></li>)}
 			<CreateChat />
 			<h2>Messages</h2>
-			{selectedChat && <Messages chatProp={selectedChat} />}
+			{selectedChat && <Messages chatId={selectedChat._id} />}
 			{selectedChat && <SendMessage chatId={selectedChat._id} />}
 		</div>
 		</>

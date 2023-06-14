@@ -44,7 +44,7 @@ const UserProfile = () => {
     if (user) {
         return (
             <div>
-                {/* <img src={user.avatar}></img> */}
+                <img src={user.avatar}></img>
                 <h1>{user.name}</h1>
                 {!user.friend && <button onClick={handleSendFriendRequest}>Add Friend</button>}
                 <button onClick={handleBlockUser}>Block User</button>
