@@ -10,6 +10,8 @@ import { ProfileManagementModule } from './users/profile-management/profile-mana
 import { EventsModule } from './events/events.module';
 import { ChatModule } from './chat/chat.module';
 import { DriveModule } from './drive/drive.module';
+import { NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { HttpsRedirectMiddleware } from './utils/http.middleware';
 
 @Module({
 	imports: [
@@ -23,3 +25,12 @@ import { DriveModule } from './drive/drive.module';
 	providers: [AppService],
 })
 export class AppModule {}
+
+
+// export class AppModule implements NestModule {
+// 	configure(consumer: MiddlewareConsumer) {
+// 	  consumer
+// 		.apply(HttpsRedirectMiddleware)
+// 		.forRoutes('*');
+// 	}
+//   }

@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { corsConfig } from './config/cors.config';
+import { HttpsRedirectMiddleware } from './utils/http.middleware';
 import * as cookieParser from 'cookie-parser';
 import * as fs from 'fs';
 
@@ -13,6 +14,7 @@ const httpsOptions = {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { httpsOptions });
   app.enableCors(corsConfig); // enable cors
+
   app.use(cookieParser());
   await app.listen(3000);
 }
