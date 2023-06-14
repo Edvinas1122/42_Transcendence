@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 // add child for styling user list 
@@ -10,14 +10,16 @@ const UserList = ({users}) => {
 
     const handleFilterChange = (e) => {
         setFilter(e.target.value);
+        filteredUsers = filterUsers(users, filter);
     };
 
     const handleSortChange = (e) => {
         setSort(e.target.value);
+        sortedUsers = sortUsers(filteredUsers, sort);
     };
 
-    const filteredUsers = filterUsers(users, filter);
-    const sortedUsers = sortUsers(filteredUsers, sort);
+    let filteredUsers = filterUsers(users, filter);
+    let sortedUsers = sortUsers(filteredUsers, sort);
 
     return (
         <div className="user-list">
@@ -55,7 +57,7 @@ const filterUsers = (users, filter) => {
         case 'all':
             return users;
         case 'online':
-            return users.filter((user) => user.online);
+            return users.filter((user) => user.Online);
         case 'friends': 
             return users.filter((user) => user.friend);
         default:
