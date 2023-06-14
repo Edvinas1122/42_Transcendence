@@ -3,6 +3,7 @@
 import { UserProfile } from '@/app/dtos/AppData';
 import FileUpload from './Upload/UploadFile';
 import sendFriendRequest from '../Global/SendFriendRequest.module';
+import blockUser from '../Global/BlockUser.module';
 
 const PersonalProfile = ({props}: UserProfile) => {
 
@@ -12,9 +13,17 @@ const PersonalProfile = ({props}: UserProfile) => {
         try {
             sendFriendRequest(Profile._id);
         } catch (error) {
-            console.log("Send Friend request failed: ", error);
+            console.error("Send Friend request failed: ", error);
         }
-    }; //Remove later lmao
+    }; 
+
+    const handleBlockUser = () => {
+        try {
+            blockUser(Profile._id);
+        } catch (error) {
+            console.error("Failed to block user: ", error);
+        }
+    }; //Remove later lmao, testing functions 
 
     return (
         <div>
@@ -22,6 +31,7 @@ const PersonalProfile = ({props}: UserProfile) => {
             <img src={Profile.avatar} alt={`${Profile.name} avatar`} />
             <FileUpload />
             <button onClick={handleSendFriendRequest}>Send friend request</button>
+            <button onClick={handleBlockUser}>Block User</button>
         </div>
     );
 }
