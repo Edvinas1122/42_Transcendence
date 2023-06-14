@@ -1,19 +1,47 @@
-import React, { useState } from 'react';
+import { useContext } from "react";
+import { SidebarContext } from "../../context/sidebarContext";
+import PersonalProfile from "../UserProfile/Profiles";
+import FriendsAndUsers from "../FriendsAndUsers/FriendsAndUsers";
+import Chats from "../Chat/Chat";
 
-export default function Sidebar({ displays }) {
-  const [view, setView] = useState(0);
-  const { component: DisplayComponent, name, props } = displays[view];
+function Sidebar() {
+  const { displays, setDisplays } = useContext(SidebarContext);
+
+  const renderComponent = () => {
+    switch(displays) {
+      case 'profile':
+        return <PersonalProfile />;
+      case 'friends':
+        return <FriendsAndUsers />;
+      case 'chat':
+        return <Chats />;
+      // Add more cases as necessary for different displays
+      default:
+        return null;
+    }
+  }
 
   return (
     <div>
-      <div>
-        {displays.map((display, index) => (
-          <button key={index} onClick={() => setView(index)}>
-            {display.name}
-          </button>
-        ))}
-      </div>
-      <DisplayComponent props={props} />
+      {/* Update the sidebar display when a link is clicked */}
+      <nav>
+        <ul>
+          <li>
+            <button onClick={() => setDisplays('profile')}>Profile</button>
+          </li>
+          <li>
+            <button onClick={() => setDisplays('friends')}>Friends</button>
+          </li>
+          <li>
+            <button onClick={() => setDisplays('chat')}>Chat</button>
+          </li>
+        </ul>
+      </nav>
+
+      {/* Render the component based on the value of displays */}
+      {renderComponent()}
     </div>
   );
 }
+
+export default Sidebar;

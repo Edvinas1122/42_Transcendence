@@ -13,16 +13,12 @@ import { UserId } from '../utils/user-id.decorator';
 export class ChatController {
 	constructor(
 		private readonly chatService: ChatService,
-		@Inject(EventService)
-		private readonly eventService: EventService,
 	) {}
 
 	@Get('available')
 	async findAvailableChats(@UserId() UserId: number): Promise<ChatDto[]> {
 		const chats = await this.chatService.getUserChats(UserId);
-		// const chats = await this.chatService.getChat(1);
 		return chats;
-		// return await this.chatService.getAllChats();
 	}
 
 	@Post('create')
@@ -33,7 +29,6 @@ export class ChatController {
 		const resultChat = await this.chatService.createGroupChat(createChatDto);
 		if (resultChat)
 		{
-			// this.eventService.sendEventToUser(userId.toString(), {type: 'chat', data: resultChat});
 			return resultChat;
 		}
 		return null;

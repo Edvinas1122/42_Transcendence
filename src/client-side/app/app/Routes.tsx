@@ -1,25 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AppData from '@/app/dtos/AppData';
 import Sidebar  from './components/Sidebar/Sidebar';
 import AppDisplays from './components/components.config';
 import fetchWithToken from "./network/fetchWithToken";
 import UserProfile from "./components/FriendsAndUsers/UserProfile/UserProfile";
-import Cookie from "js-cookie";
+import { TokenProvider, TokenContext } from "./context/tokenContext";
+import { EventSourceProvider } from "./context/eventContext";
+import { SidebarProvider } from "./context/sidebarContext";
+import FriendsAndUsers from "./components/FriendsAndUsers/FriendsAndUsers";
+import PersonalProfile from "./components/UserProfile/Profiles";
+import Chats from "./components/Chat/Chat";
 
 
-const dataExample : AppData = {
-	user: {
-		_id: "1234567890",
-		name: "John Doe",
-		avatar: "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
-		Online: true,
-		Ingame: false,
-		MachHistory: [],
-		Achievements: [],
-	}
-}
+
 
 async function fetchDataForDisplay(display) {
 	if (display.propsFetchAPI) {
@@ -34,30 +29,9 @@ async function fetchDataForDisplay(display) {
 	return display;
 }
 
-const UserView = () => {
-	const { id } = useParams();
-
-	return (
-		<div>
-			<h1>User View</h1>
-			<p>id: {id}</p>
-		</div>
-	);
-}
-
-const authValidate = () => {
-	const authToken = Cookie.get('access_token');
-	if (!authToken) {
-		window.location.href = '/auth';
-	}
-	return authToken;
-}  
-
 
 const RootUI = () => {
 	const	[displays, setDisplays] = useState(AppDisplays);
-	// const	authToken = authValidate();
-	let		eventSource = new EventSource(`http://localhost:3000/events/sse/?token=${authValidate()}`);
 
 	const fetchData = async (displayType) => {
 		const fetchedDisplayData = await Promise.all(
@@ -71,38 +45,31 @@ const RootUI = () => {
 		);
 		setDisplays(fetchedDisplayData);
 	};
-	
-	eventSource.onmessage = (event) => {
-		const data = JSON.parse(event.data);
-		console.log(data);
-
-		// Trigger fetchData with the type of data received
-		fetchData(data.type);
-	};
-
-	eventSource.onerror = function (err) {
-		console.error('EventSource failed:', err);
-		if (eventSource.readyState === EventSource.CLOSED) {
-			console.log('Connection was closed. Reconnecting...');
-			// Optionally, you could add a delay here, to avoid too many immediate reconnection attempts
-			setTimeout(() => {
-				eventSource = new EventSource(`http://localhost:3000/api/sse/?token=${authValidate()}`);
-			}, 5000);
-		}
-	  };
 
 	useEffect(() => {
 		fetchData();
 	}, []); 
 
 	return (
-		<Router>
-			<Routes>
-				<Route path="/" element={<Sidebar displays={displays}/>} />
-				<Route path="/user/:id" element={<UserView />} />
-				<Route path="/users/:userId" element={<UserProfile />} />
-			</Routes>
-		</Router>
+		<TokenProvider>
+			<TokenContext.Consumer>
+			{([token]) => (
+				<EventSourceProvider token={token}>
+					<Router>
+						<SidebarProvider>
+							<Sidebar />
+							<Routes>
+								<Route path="/friends" element={<FriendsAndUsers />} />
+								<Route path="/users" element={<PersonalProfile />} />
+								<Route path="/chat" element={<Chats />} />
+								<Route path="/users/:userId" element={<UserProfile />} />
+							</Routes>
+						</SidebarProvider>
+					</Router>
+				</EventSourceProvider>
+			)}
+			</TokenContext.Consumer>
+		</TokenProvider>
 	);
 };
 

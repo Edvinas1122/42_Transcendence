@@ -29,7 +29,7 @@ export class UsersService {
 			{ id, status: RelationshipStatus.BLOCKED })
 			.getMany();
 
-			return users.map(user => new UserInfo(user));
+		return this.setToUsers(users, [id]);
 	}
 
 	async findOne(name: string): Promise<User | null> {
@@ -101,6 +101,17 @@ export class UsersService {
 		}
 		user.avatar = avatar;
 		return await this.userRepository.save(user);
+	}
+
+	private setToUsers(users: User[], filter?: number[]): UserInfo[] {
+		const result: UserInfo[] = [];
+		// set all users to UserInfo except that has id in filter
+		users.forEach(user => {
+			if (!filter || !filter.includes(user.id)) {
+				result.push(new UserInfo(user));
+			}
+		});
+		return result;
 	}
 
 }

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import fetchWithToken from '@/app/network/fetchWithToken';
 import { useParams } from 'react-router-dom';
 import sendFriendRequest from '../../Global/SendFriendRequest.module';
 import blockUser from '../../Global/BlockUser.module';
+import { TokenContext } from '@/app/context/tokenContext';
 
 const UserProfile = () => {
+    const [token, setToken] = useContext(TokenContext)
     const { userId } = useParams();
     const [user, setUser] = useState(null);
 
@@ -30,7 +32,7 @@ const UserProfile = () => {
 
     const fetchUser = async () => {
         try {
-            const response = await fetchWithToken(`/users/profile/${userId}`); 
+            const response = await fetchWithToken(`/users/profile/${userId}`, token); 
             const userProfile = await response.json();
 
             setUser(userProfile);

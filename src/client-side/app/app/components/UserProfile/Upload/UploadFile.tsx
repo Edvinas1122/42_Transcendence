@@ -16,7 +16,7 @@ const FileUpload = () => {
         formData.append('file', file);
         
         try {
-            const response = await axios.post('http://localhost:3000/drive/upload', formData, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/drive/upload`, formData, {
                 headers: {
                     'Authorization': `Bearer ${Cookie.get('access_token')}`,
                 }

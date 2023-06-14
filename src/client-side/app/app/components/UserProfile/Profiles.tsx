@@ -1,13 +1,37 @@
 "use client"; // This is a client component 👈🏽
 
+import React, { useState, useEffect, useContext } from 'react';
 import { UserProfile } from '@/app/dtos/AppData';
 import FileUpload from './Upload/UploadFile';
 import sendFriendRequest from '../Global/SendFriendRequest.module';
 import blockUser from '../Global/BlockUser.module';
+import { TokenContext } from '@/app/context/tokenContext';
+import fetchWithToken from '@/app/network/fetchWithToken';
 
-const PersonalProfile = ({props}: UserProfile) => {
+const PersonalProfile = () => {
 
-    const Profile: UserProfile = props;
+    const [token, setToken] = useContext(TokenContext)
+    const [Profile, setProfile] = useState<UserProfile>({
+        _id: '',
+        name: '',
+        avatar: ''
+    });
+
+    const fetchProfile = async () => {
+        try {
+            const response = await fetchWithToken('/users/me', token);
+            const profileData = await response.json();
+
+            setProfile(profileData);
+            console.log("Fetch profile ok");
+        } catch (error) {
+            console.error('Error fetching profile: ', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProfile();
+    }, []);
 
     const handleSendFriendRequest = () => {
         try {

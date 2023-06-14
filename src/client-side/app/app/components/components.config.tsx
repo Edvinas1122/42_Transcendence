@@ -6,11 +6,7 @@ import { EventType } from "../dtos/EventData";
 import FriendsAndUsers from "./FriendsAndUsers/FriendsAndUsers"
 import UserProfile from "@/components/Profiles";
 
-// const FriendsAndUsers = () => (
-//     <div>
-//         <Link to="/user/Jonas">View Jonas Profile</Link>
-//     </div>
-// );
+
 const GameQue = () => <div>View 4</div>;
 
 

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import fetchWithToken from '@/app/network/fetchWithToken';
+import { TokenContext } from '@/app/context/tokenContext';
 
 const FriendRequestCard = ({ friend, onAccept, onDeny }) => {
 
@@ -25,6 +26,7 @@ const FriendRequestCard = ({ friend, onAccept, onDeny }) => {
 
 const FriendRequestsMenu = () => {
 
+    const [token, setToken] = useContext(TokenContext);
     const [friendRequests, setFriendRequests] = useState([]);
 
     useEffect(() => {
@@ -33,7 +35,7 @@ const FriendRequestsMenu = () => {
 
     const fetchFriendRequests = async () => {
         try {
-            const response = await fetchWithToken('/users/manage/get-all-pending-friend-request');
+            const response = await fetchWithToken('/users/manage/get-all-pending-friend-request', token);
             const friendRequestsData = await response.json();
 
             setFriendRequests(friendRequestsData);
@@ -47,7 +49,7 @@ const FriendRequestsMenu = () => {
         try {
             const response = await fetchWithToken(`/users/manage/approve-friend-request/${friendRequestId}`, {
               method: 'POST',  
-            });
+            }, token);
             console.log("Accepted friend request!");
             // handle response and update UI?
             fetchFriendRequests();
@@ -60,7 +62,7 @@ const FriendRequestsMenu = () => {
         try {
             const response = await fetchWithToken(`/users/manage/reject-friend-request/${friendRequestId}`, {
               method: 'POST',  
-            });
+            }, token);
             console.log("Rejected friend request!");
             // handle response and update UI?
             fetchFriendRequests();

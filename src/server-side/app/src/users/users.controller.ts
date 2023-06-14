@@ -16,9 +16,9 @@ export class UsersController {
 	@Get('all')
 	async findAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
 	{
-		// const users = await this.usersService.getAllNotBlockedUsers(currentUserId);
-		const users = await this.usersService.findAll();
-		console.log("hetehhtew", users);
+		const users = await this.usersService.findAllUsersNotBlocked(currentUserId);
+
+		// const users = await this.usersService.findAll();
 		return users;
 	}
 

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { TokenContext } from '@/app/context/tokenContext';
 import fetchWithToken from '@/app/network/fetchWithToken';
 
 import FriendRequestsMenu from './PendingFriendRequests/FriendRequests';
@@ -10,6 +11,7 @@ import './FriendsAndUsers.css'
 
 const FriendsAndUsers = () => {
     const [userList, setUserList] = useState([]);
+    const [token, setToken] = useContext(TokenContext);
 
     useEffect(() => {
         fetchUsers();
@@ -17,7 +19,7 @@ const FriendsAndUsers = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetchWithToken('/users/all'); 
+            const response = await fetchWithToken('/users/all', token); 
             const usersData = await response.json();
 
             setUserList(usersData);

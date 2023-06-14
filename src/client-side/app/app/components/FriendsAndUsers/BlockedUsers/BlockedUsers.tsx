@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import fetchWithToken from '@/app/network/fetchWithToken';
+import { TokenContext } from '@/app/context/tokenContext';
 
 const BlockedUsers = () => {
     const [blockedUsers, setBlockedUsers] = useState([]);
+    const [token, setToken] = useContext(TokenContext);
 
     useEffect(() => {
         fetchBlockedUsers();
@@ -10,7 +12,7 @@ const BlockedUsers = () => {
 
     const fetchBlockedUsers = async () => {
         try {
-            const response = await fetchWithToken('/users/manage/get-blocked-users');
+            const response = await fetchWithToken('/users/manage/get-blocked-users', token);
             const blockedData = await response.json();
 
             setBlockedUsers(blockedData);
@@ -27,7 +29,7 @@ const BlockedUsers = () => {
             body: JSON.stringify({ blockeeId: blockeeId })
         };
     
-        return fetchWithToken(`users/manage/unblock-user/${blockeeId}`, blockOptions)
+        return fetchWithToken(`users/manage/unblock-user/${blockeeId}`, blockOptions, token)
             .then(data => console.log(data))
             .catch(error => console.error('Error: ', error));
     };

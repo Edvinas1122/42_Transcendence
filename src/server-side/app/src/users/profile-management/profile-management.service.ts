@@ -19,6 +19,8 @@ export class ProfileManagementService {
 	) {}
 
 	async sendFriendRequest(senderId: number, receiverId: number): Promise<Relationship>{
+		if (senderId == receiverId)
+			throw new HttpException('You cannot send friend request to yourself', HttpStatus.BAD_REQUEST);
 		const relationship = new Relationship();
 		relationship.user1ID = senderId;
 		relationship.user2ID = receiverId;
@@ -41,11 +43,13 @@ export class ProfileManagementService {
 	}
 
 	async getAllPendingFriendRequest(receiverId: number): Promise<UserInfo[]> {
+		console.log('receiverId', receiverId);
 		const pending = await this.relationshipsRepository.find({
 			where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
 			relations: ["user1"]
 		});
 
+		console.log(pending);
 		// Extract users from the relationships
 		const users = pending.map(rel => rel.user1);
 		const usersInfo = users.map(user => new UserInfo(user));
@@ -207,7 +211,7 @@ export class ProfileManagementService {
 				return rel.user1;
 			}
 		);
-		const usersInfo = users.map(user => new UserInfo(user));
+		const usersInfo = this.setToUsers(users);
 		await this.setUsersOnlineStatus(usersInfo);
 		return usersInfo;
 	}
@@ -278,5 +282,16 @@ export class ProfileManagementService {
 		);
 		const usersInfo = users.map(user => new UserInfo(user));
 		return usersInfo;
+	}
+
+	private setToUsers(users: User[], filter?: number[]): UserInfo[] {
+		const result: UserInfo[] = [];
+		// set all users to UserInfo except that has id in filter
+		users.forEach(user => {
+			if (!filter || !filter.includes(user.id)) {
+				result.push(new UserInfo(user));
+			}
+		});
+		return result;
 	}
 }
