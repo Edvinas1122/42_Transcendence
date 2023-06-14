@@ -58,7 +58,9 @@ export class ProfileManagementController {
 	@Get('get-all-pending-friend-request')
 	async getPendingFriendRequest(@UserId() currentUserId: number): Promise<UserInfo[]> 
 	{
-		return this.profileManagementService.getUsersSentRequestTo(currentUserId);
+		const users = await this.profileManagementService.getAllPendingFriendRequest(currentUserId);
+		console.log("get all pending friend request", users);
+		return users;
 	}
 
 	@Get('get-last-pending-friend-request')

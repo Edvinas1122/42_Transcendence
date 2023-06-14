@@ -40,13 +40,17 @@ export class ProfileManagementService {
 		return info;
 	}
 
-	async getPendingFriendRequest(senderId: number, receiverId: number): Promise<Relationship> {
-		return this.relationshipsRepository.findOne({
-			where: [
-				{ user1ID: senderId, user2ID: receiverId, status: RelationshipStatus.PENDING },
-				{ user1ID: receiverId, user2ID: senderId, status: RelationshipStatus.PENDING }
-			]
+	async getAllPendingFriendRequest(receiverId: number): Promise<UserInfo[]> {
+		const pending = await this.relationshipsRepository.find({
+			where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
+			relations: ["user1"]
 		});
+
+		// Extract users from the relationships
+		const users = pending.map(rel => rel.user1);
+		const usersInfo = users.map(user => new UserInfo(user));
+
+		return usersInfo;
 	}
 
   

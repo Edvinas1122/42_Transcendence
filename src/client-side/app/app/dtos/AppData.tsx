@@ -23,12 +23,12 @@ interface User {
 	Online?: boolean; // non Current user context
 	Ingame?: boolean; 
 	Role?: RoleType; // chat context
+	friend?: boolean;
 }
 
 interface UserProfile extends User {
 	MachHistory: MachHistory[];
 	Achievements: Achievement[];
-	friend?: boolean;
 }
 
 interface Chat {
