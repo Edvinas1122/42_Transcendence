@@ -1,0 +1,49 @@
+/* this is only here to make the preview less confusing */
+
+
+.friend-requests {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 9px;
+    overflow-y: scroll;
+    width: 256px;
+    border: 1px solid #000000;
+}
+
+.friend-request-card {
+    border: 1px solid #000000;
+}
+
+.user-list {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+    gap: 18px;
+
+    position: relative;
+    width: 450px;
+    height: 295px;
+    overflow-y: scroll;
+
+    border: 1px solid #000000;
+}
+
+.menus {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 7px;
+    gap: 23px;
+
+    width: 303px;
+    height: 26px;
+
+
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}

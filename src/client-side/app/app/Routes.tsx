@@ -5,6 +5,7 @@ import AppData from '@/app/dtos/AppData';
 import Sidebar  from './components/Sidebar/Sidebar';
 import AppDisplays from './components/components.config';
 import fetchWithToken from "./network/fetchWithToken";
+import UserProfile from "./components/FriendsAndUsers/UserProfile/UserProfile";
 import Cookie from "js-cookie";
 
 
@@ -99,6 +100,7 @@ const RootUI = () => {
 			<Routes>
 				<Route path="/" element={<Sidebar displays={displays}/>} />
 				<Route path="/user/:id" element={<UserView />} />
+				<Route path="/users/:userId" element={<UserProfile />} />
 			</Routes>
 		</Router>
 	);

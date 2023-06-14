@@ -7,6 +7,19 @@ import Chat from './Chat'
 import ChatList from './ChatList';
 import SendMessage from './SendMessage';
 
+
+const ChatBox = ({props}: Chat) => {
+	
+	const chat: Chat = props;
+
+	return (
+		<div>
+			<h2>{chat.name}</h2>
+			<p>{chat.id}</p>
+		</div>
+	);
+}
+
 const Messages = ({chatProp}: {chatProp: Chat}) => {
 	const chat: Chat = chatProp;
   
@@ -14,7 +27,7 @@ const Messages = ({chatProp}: {chatProp: Chat}) => {
 	  return <div>Loading...</div>;
 	}
   
-	// console.log("in messages: " + chat.name);
+	console.log("in messages: " + chat.name);
   
 	return (
 	<div>
@@ -35,19 +48,39 @@ const Chats = ({props}: {props: Chat[]}) => {
 
 	const chats: Chat[] = props;
 	// console.log("in chats: " + chats[0].name);
+
+
+	if (!chats)
 	return (
-		<>
 		<div>
-			{!chats ? <h1>No chats available</h1> : <h1>Available Chats</h1>}
-			{chats?.map((chat) => 
-				<li key={chat._id} onClick={() => 
-				handleChatBoxClick(chat)}><ChatList chat={chat}/></li>)}
-			<CreateChat />
+			<div>No chats available</div>
+			<div>
+				<CreateChat />
+			</div>
+		</div>
+	);
+	else
+	return (
+		<div>
+		<div>
+			<h2>Available Chats</h2>
+				<ul>
+					{chats.map(chat => (
+						<li key={chat._id} onClick={() => handleChatBoxClick(chat)}>
+						<ChatBox props={chat} />
+						</li>
+					))}
+				</ul>
+		</div>
+		<div>
 			<h2>Messages</h2>
 			{selectedChat && <Messages chatProp={selectedChat} />}
 			{selectedChat && <SendMessage chatId={selectedChat._id} />}
 		</div>
-		</>
+			<div>
+				<CreateChat />
+			</div>
+		</div>
 	);
 }
 

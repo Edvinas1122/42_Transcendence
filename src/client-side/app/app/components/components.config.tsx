@@ -3,12 +3,14 @@ import Chats from "./Chat/Chat";
 // import { User, GroupChat } from '@/app/dtos/AppData';
 import { Link } from 'react-router-dom';
 import { EventType } from "../dtos/EventData";
+import FriendsAndUsers from "./FriendsAndUsers/FriendsAndUsers"
+import UserProfile from "@/components/Profiles";
 
-const FriendsAndUsers = () => (
-    <div>
-        <Link to="/user/Jonas">View Jonas Profile</Link>
-    </div>
-);
+// const FriendsAndUsers = () => (
+//     <div>
+//         <Link to="/user/Jonas">View Jonas Profile</Link>
+//     </div>
+// );
 const GameQue = () => <div>View 4</div>;
 
 
