@@ -39,7 +39,7 @@ const UserList = ({users}) => {
                 <div key={user._id}>
                     <img src={user.avatar} width="50" height="50"/>
                     <h1>{user.name}</h1>
-                    <Link to={`/users/${user.id}`}>View Profile</Link>
+                    <Link to={`/users/${user._id}`}>View Profile</Link>
                 </div>
             ))}
         </div>

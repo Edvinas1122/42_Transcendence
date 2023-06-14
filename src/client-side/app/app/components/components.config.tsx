@@ -4,6 +4,7 @@ import Chats from "./Chat/Chat";
 import { Link } from 'react-router-dom';
 import { EventType } from "../dtos/EventData";
 import FriendsAndUsers from "./FriendsAndUsers/FriendsAndUsers"
+import UserProfile from "@/components/Profiles";
 
 // const FriendsAndUsers = () => (
 //     <div>
