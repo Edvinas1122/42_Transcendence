@@ -34,6 +34,9 @@ RUN npm install npm i -D @types/multer
 
 COPY app/ ./
 
+# Generate SSL certificate
+RUN mkdir -p /etc/ssl/certs && openssl req -x509 -newkey rsa:4096 -nodes -out /etc/ssl/certs/cert.pem -keyout /etc/ssl/certs/key.pem -days 365 -subj '/CN=localhost'
+
 
 # Expose the port that the application will run on
 EXPOSE 3000

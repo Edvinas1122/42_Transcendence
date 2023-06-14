@@ -45,9 +45,10 @@ export class AuthController
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
 		}
 		const randomName = Math.random().toString(36).substring(7);
+		const randomId = Math.floor(Math.random() * 1000000);
 
 		const newUser = {
-			id: 1,
+			id: randomId,
 			name: randomName, // assuming username corresponds to the 'name' in User entity
 			avatar: "", // default avatar if any or you can leave this field to be updated later
 			ImageLinks: {}, // default empty json or you can leave this field to be updated later
