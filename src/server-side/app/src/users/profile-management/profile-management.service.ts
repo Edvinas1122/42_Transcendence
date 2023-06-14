@@ -8,6 +8,7 @@ import { Repository, Not } from 'typeorm';
 import { UserInfo } from '../dtos/user.dto';
 import { UserEventGateway, RelationshipType } from '../user-event.gateway';
 
+
 @Injectable()
 export class ProfileManagementService {
 	constructor(
@@ -221,25 +222,27 @@ export class ProfileManagementService {
 		return usersInfo;
 	}
 
-	async getAllNotBlockedUsers(userId: number): Promise<UserInfo[]> {
-		const users = this.relationshipsRepository.find({
-		  where: [
-			{ user1ID: userId, status: Not(RelationshipStatus.BLOCKED) },
-			{ user2ID: userId, status: Not(RelationshipStatus.BLOCKED) },
-		  ],
-		  relations: ['user1', 'user2'],
-		});
+	// async getAllNotBlockedUsers(userId: number): Promise<UserInfo[]> {
+	// 	// const users = await this.relationshipsRepository.find({
+	// 	//   where: [
+	// 	// 	{ user1ID: userId,  },
+	// 	// 	{ user2ID: userId,  },
+	// 	//   ],
+	// 	//   relations: ['user1', 'user2'],
+	// 	// });
+	// 	const users = await this.usersService.getAllUsers();
+	// 	console.log(users);
 
-		const usersInfo = (await users).map(user => {
-			if (user.user1ID === userId)
-			return new UserInfo(user.user2);
-			else
-			return new UserInfo(user.user1);
-		});
-		await this.setUsersOnlineStatus(usersInfo);
+	// 	const usersInfo = (await users).map(user => {
+	// 		if (user.user1ID === userId)
+	// 		return new UserInfo(user.user2);
+	// 		else
+	// 		return new UserInfo(user.user1);
+	// 	});
+	// 	// await this.setUsersOnlineStatus(usersInfo);
 
-		return usersInfo;
-	  }
+	// 	return usersInfo;
+	//   }
 
 
 	private async setUsersOnlineStatus(users: UserInfo[]): Promise<UserInfo[]> {

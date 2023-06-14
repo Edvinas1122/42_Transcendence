@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello Worldaaaa!';
+  redirectToDev(): { url: string } {
+    // redirect to /auth/UserDev/
+    return { url: 'https://localhost:3000/auth/UserDev/' };
   }
 }

@@ -1,9 +1,9 @@
-import { Controller, Get, Req, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
-import { UserProfileInfo } from './dtos/user.dto';
+import { UserProfileInfo, UserInfo } from './dtos/user.dto';
 import { UserId } from '../utils/user-id.decorator';
 
 @UseGuards(JwtAuthGuard)
@@ -14,10 +14,12 @@ export class UsersController {
 	) {}
 
 	@Get('all')
-	async findAllUsers(@UserId() currentUserId: number): Promise<User[]>
+	async findAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
 	{
-		// console.log(req['user']['name']);
-		return await this.usersService.findAll();
+		// const users = await this.usersService.getAllNotBlockedUsers(currentUserId);
+		const users = await this.usersService.findAll();
+		console.log("hetehhtew", users);
+		return users;
 	}
 
 	@Get('me')
@@ -27,9 +29,8 @@ export class UsersController {
 		return user;
 	}
 
-	// Blocked Guard
 	@Get('profile/:id')
-	async findUser(@UserId() userId: number, @Param() requesteeId: number): Promise<UserProfileInfo>
+	async findUser(@UserId() userId: number, @Param('id', new ParseIntPipe()) requesteeId: number): Promise<UserProfileInfo>
 	{
 		const requestee = await this.usersService.getUserProfile(requesteeId);
 		return requestee;

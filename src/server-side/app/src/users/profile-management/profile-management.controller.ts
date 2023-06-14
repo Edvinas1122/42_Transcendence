@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Req, Body, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Param, Req, Body, UseGuards, HttpException, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { ProfileManagementService } from './profile-management.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
 import { FriendApproveGuard, FriendRequestGuard } from './guards/post-relationship.guard';
@@ -14,46 +14,46 @@ export class ProfileManagementController {
 	) {}
 
 	@Post('send-friend-request/:receiverId')
-	async sendFriendRequest(@UserId() currentUserId: number, @Param('receiverId') receiverId: number): Promise<Relationship> {
+	async sendFriendRequest(@UserId() currentUserId: number, @Param('receiverId', new ParseIntPipe()) receiverId: number): Promise<Relationship> {
 		console.log("send friend request", currentUserId, receiverId);
 		return this.profileManagementService.sendFriendRequest(currentUserId, receiverId);
 	}
 
 	@Post('approve-friend-request/:requesterId')
-	async approveFriendRequest(@UserId() currentUserId: number, @Param('requesterId') requesterId: number): Promise<Relationship>
+	async approveFriendRequest(@UserId() currentUserId: number, @Param('requesterId', new ParseIntPipe()) requesterId: number): Promise<Relationship>
 	{
 		return this.profileManagementService.approveFriendRequest(requesterId, currentUserId);
 	}
 
 	@Post('reject-friend-request/:requesterId')
-	async rejectFriendRequest(@UserId() currentUserId: number, @Param('requesterId') requesterId: number): Promise<Boolean>
+	async rejectFriendRequest(@UserId() currentUserId: number, @Param('requesterId', new ParseIntPipe()) requesterId: number): Promise<Boolean>
 	{
 		return this.profileManagementService.rejectFriendRequest(requesterId, currentUserId);
 	}
 
 	@Post('remove-friend/:friendId')
-	async removeFriend(@UserId() currentUserId: number, @Param('friendId') friendId: number): Promise<Boolean> 
+	async removeFriend(@UserId() currentUserId: number, @Param('friendId', new ParseIntPipe()) friendId: number): Promise<Boolean> 
 	{
 		return this.profileManagementService.removeFriend(currentUserId, friendId);
 	}
 
 	@Post('block-user/:blockeeId')
-	async blockUser(@UserId() currentUserId: number, @Param('blockeeId') blockeeId: number): Promise<Boolean> 
+	async blockUser(@UserId() currentUserId: number, @Param('blockeeId', new ParseIntPipe()) blockeeId: number): Promise<Boolean> 
 	{
 		return this.profileManagementService.blockUser(currentUserId, blockeeId);
 	}
 
 	@Post('unblock-user/:blockeeId')
-	async unblockUser(@UserId() currentUserId: number, @Param('blockeeId') blockeeId: number): Promise<Boolean> 
+	async unblockUser(@UserId() currentUserId: number, @Param('blockeeId', new ParseIntPipe()) blockeeId: number): Promise<Boolean> 
 	{
 		return this.profileManagementService.unblockUser(currentUserId, blockeeId);
 	}
 
-	@Get('get-all')
-	async getAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
-	{
-		return this.profileManagementService.getAllNotBlockedUsers(currentUserId);
-	}
+	// @Get('get-all')
+	// async getAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
+	// {
+	// 	return this.profileManagementService.getAllNotBlockedUsers(currentUserId);
+	// }
 
 	@Get('get-all-pending-friend-request')
 	async getPendingFriendRequest(@UserId() currentUserId: number): Promise<UserInfo[]> 

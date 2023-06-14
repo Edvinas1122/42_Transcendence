@@ -1,5 +1,6 @@
-import { IsArray, IsBoolean, IsInt, IsOptional, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsOptional, IsEnum, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
+import { RoleType } from '../entities/role.entity';
 
 
 export class CreateChatDto {
@@ -34,16 +35,26 @@ export class UpdateChatDto extends CreateChatDto {
 }
 
 export class JoinChatDto {
-	chatPassword: string;
-}
-
-export class SendMessagetDto {
+	@IsString()
+	@IsOptional()
+	chatPassword?: string;
+  }
+export class SendMessageDto {
+	@IsString()
 	content: string;
-	password: string | null;
+  
+	@IsString()
+	@IsOptional()
+	password?: string | null;
 }
 
 export class DeleteMessageDto {
 	messageId: number;
+}
+
+export class EditRoleDto {
+	@IsEnum(RoleType)
+	newRole: RoleType;
 }
 
 import { UserInfo } from '../../users/dtos/user.dto';
