@@ -49,11 +49,11 @@ export class ProfileManagementController {
 		return this.profileManagementService.unblockUser(currentUserId, blockeeId);
 	}
 
-	@Get('get-all')
-	async getAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
-	{
-		return this.profileManagementService.getAllNotBlockedUsers(currentUserId);
-	}
+	// @Get('get-all')
+	// async getAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
+	// {
+	// 	return this.profileManagementService.getAllNotBlockedUsers(currentUserId);
+	// }
 
 	@Get('get-all-pending-friend-request')
 	async getPendingFriendRequest(@UserId() currentUserId: number): Promise<UserInfo[]> 

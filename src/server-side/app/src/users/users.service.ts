@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserProfileInfo, UserInfo } from './dtos/user.dto';
 import { MachHistory } from './dtos/game-stats.dto';
+import { RelationshipStatus } from './profile-management/entities/relationship.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,8 +13,23 @@ export class UsersService {
 	private userRepository: Repository<User>,
 	) {}
 
-	async findAll(): Promise<User[]> {
-		return this.userRepository.find();
+	async findAll(): Promise<UserInfo[]> {
+		const users = await this.userRepository.find();
+		return users.map(user => new UserInfo(user));
+	}
+
+	async findAllUsersNotBlocked(id: number): Promise<UserInfo[]> {
+		console.log('id', id);
+		const users = await this.userRepository
+		.createQueryBuilder('user')
+		.where('user.id NOT IN ' +
+			`(SELECT "user2ID" FROM "relationship" WHERE "status" = :status AND "user1ID" = :id 
+			UNION ALL 
+			SELECT "user1ID" FROM "relationship" WHERE "status" = :status AND "user2ID" = :id)`,
+			{ id, status: RelationshipStatus.BLOCKED })
+			.getMany();
+
+			return users.map(user => new UserInfo(user));
 	}
 
 	async findOne(name: string): Promise<User | null> {

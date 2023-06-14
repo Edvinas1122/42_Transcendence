@@ -3,6 +3,7 @@ api fetch endpoints
 users/
 	me/ - UserProfile - personal profile of token bearer
 	profile/:id - UserProfile - id owners personal profile
+	all/ - get all profiles (except blocked)
 	
 	manage/
 		send-friend-request/:receiverId (POST)
