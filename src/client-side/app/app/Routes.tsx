@@ -97,13 +97,11 @@ const RootUI = () => {
 
 	return (
 		<Router>
-			<div>
 			<Routes>
 				<Route path="/" element={<Sidebar displays={displays}/>} />
 				<Route path="/user/:id" element={<UserView />} />
 				<Route path="/users/:userId" element={<UserProfile />} />
 			</Routes>
-			</div>
 		</Router>
 	);
 };

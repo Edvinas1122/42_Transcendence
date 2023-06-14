@@ -27,12 +27,11 @@ RUN npm install passport-jwt @nestjs/jwt
 RUN npm install cookie-parser 
 
 RUN npm i --save @nestjs/websockets @nestjs/platform-socket.io
+RUN npm install class-validator class-transformer
 
 # file upload
 RUN npm install npm i -D @types/multer
-# RUN npm install axios
 
-# RUN npm install axios // not needed anymore now
 COPY app/ ./
 
 

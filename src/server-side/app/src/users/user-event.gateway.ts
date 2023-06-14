@@ -19,6 +19,10 @@ export class UserEventGateway {
 		const userOnlineStatusEvent = new UserOnlineStatusEvent(userId, event);
 		await this.eventService.sendToAll(userOnlineStatusEvent, except);
 	}
+
+	async getAllOnlineUsers(): Promise<number[]> {
+		return await this.eventService.getAllOnlineUsers();
+	}
 }
 
 export { UserRelationshipEvent, UserOnlineStatusEvent, RelationshipType, OnlineStatusEventTypes };

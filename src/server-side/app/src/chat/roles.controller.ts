@@ -8,6 +8,7 @@ import { UserInfo } from '../users/dtos/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto } from './dtos/chat.dtos'; // import DTOs
 import { PrivilegedGuard } from './guards/owner.guard';
+import { UserId } from '../utils/user-id.decorator';
 
 
 @UseGuards(JwtAuthGuard)
@@ -45,8 +46,8 @@ export class RolesController {
 	// }
 
 	@Post(':chatId/join')
-	async joinChat(@Req() req: Request, @Param() chatId, @Body() body: JoinChatDto): Promise<boolean> {
-		const UserId = req['user']['id'];
+	async joinChat(@UserId() UserId: number, @Param() chatId, @Body() body: JoinChatDto): Promise<boolean>
+	{
 		const chatDto = await this.chatService.joinChat(UserId, chatId, body.chatPassword);
 		// this.eventService.emit('chat', chatDto);
 		return chatDto;
