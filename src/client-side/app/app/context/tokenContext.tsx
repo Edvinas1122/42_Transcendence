@@ -8,13 +8,17 @@ export const TokenContext = createContext();
 export const TokenProvider = ({ children }) => {
 	const [token, setToken] = useState(null);
 
+
 	useEffect(() => {
 		const fetchToken = async () => {
 			let newToken: string | undefined = undefined;
 			try {
 				if (process.env.NEXT_PUBLIC_DEV === 'true') {
+					// const httpsAgent = new https.Agent({
+					// 	rejectUnauthorized: false,
+					// });
 					console.log("Dev token getting");
-					const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/auth/DevToken`);
+					const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/auth/DevToken`, {rejectUnauthorized: false});
 					const data = await response.json();
 					newToken = data.accessToken;
 				} else {

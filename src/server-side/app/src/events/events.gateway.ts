@@ -5,7 +5,6 @@ import { join } from 'path';
 import { interval, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { EventService } from './events.service';
-import { ConnectEventDto } from './dtos/event.dtos';
 import * as jwt from 'jsonwebtoken';
 
 

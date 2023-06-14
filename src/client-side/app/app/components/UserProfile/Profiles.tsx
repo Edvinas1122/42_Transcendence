@@ -35,7 +35,8 @@ const PersonalProfile = () => {
 
     const handleSendFriendRequest = () => {
         try {
-            sendFriendRequest(Profile._id);
+            console.log("sending request: ", token);
+            sendFriendRequest(Profile._id, token);
         } catch (error) {
             console.error("Send Friend request failed: ", error);
         }

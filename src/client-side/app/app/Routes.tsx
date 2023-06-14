@@ -14,41 +14,7 @@ import PersonalProfile from "./components/UserProfile/Profiles";
 import Chats from "./components/Chat/Chat";
 
 
-
-
-async function fetchDataForDisplay(display) {
-	if (display.propsFetchAPI) {
-	try {
-		const response = await fetchWithToken(display.propsFetchAPI);
-		const data = await response.json();
-		return { ...display, props: data };
-	} catch (error) {
-		return display;
-	}
-	}
-	return display;
-}
-
-
 const RootUI = () => {
-	const	[displays, setDisplays] = useState(AppDisplays);
-
-	const fetchData = async (displayType) => {
-		const fetchedDisplayData = await Promise.all(
-			AppDisplays.map(display => {
-				if (!displayType || display.subscibe === displayType) {
-					return fetchDataForDisplay(display);
-				} else {
-					return display;
-				}
-			})
-		);
-		setDisplays(fetchedDisplayData);
-	};
-
-	useEffect(() => {
-		fetchData();
-	}, []); 
 
 	return (
 		<TokenProvider>

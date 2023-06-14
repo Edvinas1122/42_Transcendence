@@ -12,7 +12,7 @@ const UserProfile = () => {
 
     const handleSendFriendRequest = () => {
         try {
-            sendFriendRequest(userId);
+            sendFriendRequest(userId, token);
         } catch (error) {
             console.error("Send Friend request failed: ", error);
         }
