@@ -31,7 +31,7 @@ const CreateChat = () => {
 	}
   
 	return (
-	  <div>
+	  <div className="create-chat">
 		<h2>Create Chat</h2>
 		<form onSubmit={handleSubmit}>
 		  <label>

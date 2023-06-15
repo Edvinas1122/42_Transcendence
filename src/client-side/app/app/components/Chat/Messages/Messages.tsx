@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 const MessageBubble = ({message}) => {
     return (
-        <div>
+        <div className="message-bubble">
             <h1>{message.content}</h1>
             <p>{message.user.name}</p>
         </div>
@@ -25,15 +25,23 @@ const Messages = ({chatId}) => {
             const messageArray = await response.json();
 
             setMessages(messageArray);
-            console.log("messages fetched")
+            console.log("messages fetched from : ", chatId, messageArray, messages);
         } catch (error) {
             console.error("Error fetching messages: ", error);
         }
     };
 
+    let testmessage = {
+        content:"If this message is showing, no messages are available in the chat",
+        user:{
+            name:"test user",
+        },
+    };
+    
     return (
-        <div>
-            {messages.length <= 0 && <p>No messages to display</p>}
+        <div className="chat-message-box">
+            {/* {messages.length <= 0 && <p>No messages to display</p>} */}
+            {messages.length <= 0 && <MessageBubble message={testmessage}/>}
             {messages.map((message) => {
                 <MessageBubble
                     key={message._id}

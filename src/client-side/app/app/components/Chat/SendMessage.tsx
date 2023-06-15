@@ -33,17 +33,29 @@ const SendMessage: React.FC<SendMessageProps> = ({chatId}) => {
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-      />
-      <button type="submit">Send</button>
-	  <p>Selected: {chatId}</p>
-    </form>
-  );
+  if (chatId === 0) {
+    return (
+      <div className="chat-send-message">
+        <p>Select a chat to continue...</p>
+      </div>
+      
+    );
+  } else {
+    return (
+      <div className="chat-send-message">
+        <form onSubmit={handleSubmit}>
+          <input
+            placeholder="message the chat..."
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <button type="submit">Send</button>
+        <p>Selected: {chatId}</p>
+        </form>
+      </div>
+    );
+  };
 };
 
 export default SendMessage;

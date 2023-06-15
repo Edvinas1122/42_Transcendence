@@ -7,24 +7,9 @@ import Chat from './Chat'
 import ChatList from './ChatList';
 import SendMessage from './SendMessage';
 import Messages from './Messages/Messages';
+import ListChatUsers from './ChatUsers/ListChatUsers';
+import "./chat.css";
 
-// const Messages = ({chatProp}: {chatProp: Chat}) => {
-// 	const chat: Chat = chatProp;
-  
-// 	if (!chat) {
-// 	  return <div>Loading...</div>;
-// 	}
-  
-// 	// console.log("in messages: " + chat.name);
-  
-// 	return (
-// 	<div>
-// 		<h2>{chat.name}</h2>
-// 		<p>{chat.id}</p>
-// 		<p>Example</p>
-// 	</div>
-// 	);
-// }
 
 const Chats = ({props}: {props: Chat[]}) => {
 	const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
@@ -38,15 +23,25 @@ const Chats = ({props}: {props: Chat[]}) => {
 	// console.log("in chats: " + chats[0].name);
 	return (
 		<>
-		<div>
-			{!chats ? <h1>No chats available</h1> : <h1>Available Chats</h1>}
-			{chats?.map((chat) => 
-				<li key={chat._id} onClick={() => 
-				handleChatBoxClick(chat)}><ChatList chat={chat}/></li>)}
-			<CreateChat />
-			<h2>Messages</h2>
-			{selectedChat && <Messages chatId={selectedChat._id} />}
-			{selectedChat && <SendMessage chatId={selectedChat._id} />}
+		<div className="chat">
+			<div className="chat-sidebar">
+				<div className="chat-list">
+					{!chats ? <h1>No chats available</h1> : <h1>Available Chats</h1>}
+					<div className="available-chats">
+						{chats?.map((chat) => 
+						<div key={chat._id} onClick={() => 
+						handleChatBoxClick(chat)}><ChatList chat={chat}/></div>)}
+					</div>
+				</div>
+				<CreateChat />
+			</div>
+			<div className="selected-chat">
+				<div className="chat-window">
+					{<Messages chatId={selectedChat? selectedChat._id : 0} />}
+					{<SendMessage chatId={selectedChat? selectedChat._id : 0} />}
+				</div>
+				{<ListChatUsers chatId={selectedChat? selectedChat._id : 0} />}
+			</div>
 		</div>
 		</>
 	);

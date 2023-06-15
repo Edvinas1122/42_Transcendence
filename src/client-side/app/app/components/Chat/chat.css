@@ -1,0 +1,143 @@
+/* Ignore this, it's just for dev to make it less confusing */
+
+.chat {
+    position: relative;
+    width: 867px;
+    height: 540px;
+}
+
+input {
+    border: 1px solid grey;
+}
+
+.chat-sidebar {
+    box-sizing: border-box;
+
+    position: absolute;
+    width: 304px;
+    height: 540px;
+    left: 0px;
+    top: 0px;
+    
+    border: 1px solid #000000;
+} 
+
+.selected-chat {
+    box-sizing: border-box;
+
+    position: absolute;
+    width: 563px;
+    height: 540px;
+    left: 304px;
+    top: 0px;
+    
+    border: 1px solid #000000;    
+}
+
+.chat-list {
+    position: absolute;
+    width: 304px;
+    height: 313px;
+    left: 0px;
+    top: 0px;
+    
+}
+
+.available-chats {
+    box-sizing: border-box;
+
+    /* Auto layout */
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 14px;
+
+    position: absolute;
+    width: 243px;
+    height: 262px;
+    left: 24px;
+    top: 39px;
+
+    border: 1px solid #000000;
+}
+
+.create-chat {
+    box-sizing: border-box;
+
+    /* Auto layout */
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 13px;
+    gap: 11px;
+    
+    position: absolute;
+    width: 304px;
+    height: 203px;
+    left: 0px;
+    top: 313px;
+    
+    border: 1px solid #000000;
+}
+
+
+
+.chat-window {
+    position: absolute;
+    width: 388px;
+    height: 540px;
+    left: 0px;
+    top: 0px;
+}
+
+.chat-message-box {
+    box-sizing: border-box;
+
+    /* Auto layout */
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px 18px;
+    gap: 21px;
+
+    position: absolute;
+    width: 338px;
+    height: 389px;
+    left: 21px;
+    top: 27px;
+
+    border: 1px solid #000000;
+}
+
+.chat-send-message {
+    box-sizing: border-box;
+
+    position: absolute;
+    width: 388px;
+    height: 104px;
+    left: 0px;
+    top: 436px;
+
+    border: 1px solid #000000;
+}
+
+.chat-send-message input {
+    width: 300px;
+    height: 80px;
+}
+
+.chat-user-list {
+    box-sizing: border-box;
+
+    position: absolute;
+    width: 175px;
+    height: 540px;
+    left: 388px;
+    top: 0px;
+
+    border: 1px solid #000000;
+}
