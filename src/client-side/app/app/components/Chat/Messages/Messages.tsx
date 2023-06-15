@@ -4,7 +4,9 @@ import React, { useEffect, useState } from 'react';
 const MessageBubble = ({message}) => {
     return (
         <div className="message-bubble">
-            <h1>{message.content}</h1>
+            <div className="bubble-content">
+                <h1>{message.content}</h1>
+            </div>
             <p>{message.user.name}</p>
         </div>
     );
@@ -37,7 +39,7 @@ const Messages = ({chatId}) => {
             name:"test user",
         },
     };
-    
+
     return (
         <div className="chat-message-box">
             {/* {messages.length <= 0 && <p>No messages to display</p>} */}

@@ -47,3 +47,10 @@
     order: 0;
     flex-grow: 0;
 }
+
+.bubble-content {
+    border: 1px solid #000000;
+    background-color: aquamarine;
+    padding: 5px;
+    border-radius: 10px;
+}
