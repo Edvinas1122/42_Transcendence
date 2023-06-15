@@ -7,27 +7,29 @@ import { AuthorizedFetchContext } from '@/app/context/authContext';
 
 const PersonalProfile = () => {
 
-    const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
-    const [ProfileData, setProfileData] = useState<UserProfile>({} as UserProfile);
+	const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
+	const [ProfileData, setProfileData] = useState<UserProfile>({} as UserProfile);
 
-    const fetchProfileData = async () => {
-        const personalProfileData = await fetchWithToken(`/users/profile/${token.id}`, {});
-        const personalProfile = await personalProfileData.json();
-        setProfileData(personalProfile);
-    }
 
-    useEffect(() => {
-        if (!loading)
-            fetchProfileData();
-    });
+	useEffect(() => {
+		if (!token) return;
+		const fetchProfileData = async () => {
+			const personalProfileData = await fetchWithToken(`/users/profile/${token.id}`, {});
+			const personalProfile = await personalProfileData.json();
+			setProfileData(personalProfile);
+		}
+		fetchProfileData();
+	}, [fetchWithToken, token]);
 
-    return (
-        <div>
-            <h1>{ProfileData.name}</h1>
-            <img src={ProfileData.avatar} alt={`${ProfileData.name} avatar`} />
-            <FileUpload />
-        </div>
-    );
+	if (loading)
+		return (<p>Loading...</p>);
+	return (
+		<div>
+			<h1>{ProfileData.name}</h1>
+			{/* <img src={ProfileData.avatar} alt={`${ProfileData.name} avatar`} /> */}
+			<FileUpload />
+		</div>
+	);
 }
 
 export default PersonalProfile;

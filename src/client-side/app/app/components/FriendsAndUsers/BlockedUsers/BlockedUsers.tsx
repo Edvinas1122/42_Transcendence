@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import fetchWithToken from '@/app/network/fetchWithToken';
-import { TokenContext } from '@/app/context/tokenContext';
 import { AuthorizedFetchContext } from '@/app/context/authContext';
+import { User } from '@/app/dtos/AppData';
 
 
 const BlockedUsers = () => {
@@ -9,22 +8,22 @@ const BlockedUsers = () => {
     const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
 
     useEffect(() => {
+        const fetchBlockedUsers = async () => {
+            try {
+                const response = await fetchWithToken('/users/manage/get-blocked-users');
+                const blockedData = await response.json();
+    
+                setBlockedUsers(blockedData);
+                console.log("blocked users fetch ok");
+            } catch (error) {
+                console.error("Error fetching blocked users: ", error);
+            }
+        };
+    
         fetchBlockedUsers();
-    }, []);
+    }, [fetchWithToken]);
 
-    const fetchBlockedUsers = async () => {
-        try {
-            const response = await fetchWithToken('/users/manage/get-blocked-users');
-            const blockedData = await response.json();
-
-            setBlockedUsers(blockedData);
-            console.log("blocked users fetch ok");
-        } catch (error) {
-            console.error("Error fetching blocked users: ", error);
-        }
-    };
-
-    const handleUnblock = () => {
+    const handleUnblock = (blockeeId: string) => {
         const blockOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -41,7 +40,7 @@ const BlockedUsers = () => {
             <h2>Blocked Users</h2>
             {blockedUsers.length <= 0 && <p>No blocked users</p>}
             <ul>
-                {blockedUsers.map((user) => (
+                {blockedUsers.map((user: User) => (
                     <li key={user._id}>
                         {user.name}
                         <button onClick={() => handleUnblock(user._id)}>Unblock</button>

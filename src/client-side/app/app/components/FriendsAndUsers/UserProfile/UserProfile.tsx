@@ -1,54 +1,68 @@
+"use client";
+
 import React, { useState, useEffect, useContext } from 'react';
-import fetchWithToken from '@/app/network/fetchWithToken';
 import { useParams } from 'react-router-dom';
-import sendFriendRequest from '../../Global/SendFriendRequest.module';
-import blockUser from '../../Global/BlockUser.module';
+// import blockUser from '../../Global/BlockUser.module';
 import { AuthorizedFetchContext } from '@/app/context/authContext';
+import { User } from '@/app/dtos/AppData';
 
 const UserProfile = () => {
     const { userId } = useParams();
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
     const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
 
     const handleSendFriendRequest = () => {
         const sendFriendRequest = async () => {
-            try {
-                const response = await fetchWithToken(`/users/manage/send-friend-request/${user._id}`, {
-                    method: 'POST',
-                });
-
-            } catch (error) {
-                console.error("Send Friend request failed: ", error);
-            }
+			if (userId) {
+				alert("Friend request sent!");
+				try {
+					console.log("Sending friend request...", userId);
+					const response = await fetchWithToken(`/users/manage/send-friend-request/${userId}`, {
+						method: 'POST',
+					});
+	
+				} catch (error) {
+					console.error("Send Friend request failed: ", error);
+				}
+			}
         };
     };
 
     const handleBlockUser = () => {
-        try {
-            blockUser(userId);
-        } catch (error) {
-            console.error("Failed to block user: ", error);
-        }
+		const blockUser = async () => {
+			if (userId) {
+				alert("User blocked!");
+				try {
+					console.log("Blocking user...", userId);
+					const response = await fetchWithToken(`/users/manage/block-user/${userId}`, {
+						method: 'POST',
+					});
+	
+				} catch (error) {
+					console.error("Block user failed: ", error);
+				}
+			}
+		};
     };
 
     useEffect(() => {
+		const fetchUser = async () => {
+			try {
+				const response = await fetchWithToken(`/users/profile/${userId}`, token); 
+				const userProfile = await response.json();
+				setUser(userProfile);
+				console.log("user profile fetched");
+
+			} catch (error) {
+				console.error("Failed to fetch user profile: ", error);
+			}
+		};
         if (!loading)
             fetchUser();
-    }, []);
+    }, [loading, fetchWithToken, token, userId]);
+    
 
-    const fetchUser = async () => {
-        try {
-            const response = await fetchWithToken(`/users/profile/${userId}`, token); 
-            const userProfile = await response.json();
-            setUser(userProfile);
-            console.log("user profile fetched");
-
-        } catch (error) {
-            console.error("Failed to fetch user profile: ", error);
-        }
-    };
-
-    if (user) {
+    if (user && !loading) {
         return (
             <div>
                 {/* <img src={user.avatar}></img> */}

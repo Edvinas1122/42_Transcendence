@@ -1,10 +1,17 @@
  import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import fetchWithToken from '@/app/network/fetchWithToken';
 import { AuthorizedFetchContext } from '@/app/context/authContext';
 import { UsersContext } from '@/app/context/appDataProvider';
+import { User } from '@/app/dtos/AppData';
+import Image from 'next/image';
 
-const FriendRequestCard = ({ friend, onAccept, onDeny }) => {
+interface FriendRequestCardProps {
+    friend: User;
+    onAccept: (id: string) => Promise<void>;
+    onDeny: (id: string) => Promise<void>;
+  }
+
+const FriendRequestCard = ({ friend, onAccept, onDeny }: FriendRequestCardProps) => {
 
     const handleAccept = () => {
         onAccept(friend._id);
@@ -16,7 +23,7 @@ const FriendRequestCard = ({ friend, onAccept, onDeny }) => {
 
     return (
         <div className="friend-request-card">
-            <img src={friend.avatar}/>
+            {/* <Image src={friend.avatar}/> */}
             <h1>{friend.name}</h1>
             <button onClick={handleAccept}>Accept</button>
             <button onClick={handleDeny}>Deny</button>
@@ -27,59 +34,48 @@ const FriendRequestCard = ({ friend, onAccept, onDeny }) => {
 
 const FriendRequestsMenu = () => {
 
-    const { fetchWithToken } = useContext(AuthorizedFetchContext);
-    // const [friendRequests, setFriendRequests] = useState([]);
-    const { friendInvites } = useContext(UsersContext);
+    const { fetchWithToken, loading } = useContext(AuthorizedFetchContext);
+    const { friendInvites, fetchInvitations } = useContext(UsersContext);
 
-    // useEffect(() => {
-    //     fetchFriendRequests();
-    // }, []);
+	useEffect(() => {
+		fetchInvitations();
+	}, [fetchInvitations]);
 
-    // const fetchFriendRequests = async () => {
-    //     try {
-    //         const response = await fetchWithToken('/users/manage/get-all-pending-friend-request', token);
-    //         const friendRequestsData = await response.json();
-
-    //         setFriendRequests(friendRequestsData);
-    //         console.log(friendRequestsData);
-    //     } catch (error) {
-    //         console.error('Error fetching friend requests: ', error);
-    //     }
-    // };
-
-    const handleAcceptRequest = async (friendRequestId) => {
+    const handleAcceptRequest = async (friendRequestId: string) => {
         try {
             const response = await fetchWithToken(`/users/manage/approve-friend-request/${friendRequestId}`, {
               method: 'POST',  
-            }, token);
+            });
             console.log("Accepted friend request!");
             // handle response and update UI?
-            fetchFriendRequests();
+            fetchInvitations();
         } catch (error) {
             console.error('Error accepting friend request: ', error);
         }
     };
 
-    const handleDenyRequest = async (friendRequestId) => {
+    const handleDenyRequest = async (friendRequestId: string) => {
         try {
             const response = await fetchWithToken(`/users/manage/reject-friend-request/${friendRequestId}`, {
               method: 'POST',  
-            }, token);
+            });
             console.log("Rejected friend request!");
             // handle response and update UI?
-            fetchFriendRequests();
+            fetchInvitations();
         } catch (error) {
             console.error('Error rejecting friend request: ', error);
         }
     };
 
+    if (loading)
+        return (<p>Loading...</p>);
     return (
         <div className="friend-requests">
             <h1>Friend Requests</h1>
             {friendInvites.length <= 0 && <p>No pending friend requests</p>}
-            {friendInvites?.map((friend) => (
+            {friendInvites?.map((friend: User) => (
                 <FriendRequestCard
-                    key={friend.id}
+                    key={friend._id}
                     friend={friend} 
                     onAccept={handleAcceptRequest} 
                     onDeny={handleDenyRequest}

@@ -1,7 +1,8 @@
+"use client";
 import React from 'react';
-import Chat from './Chat'
+import { Chat } from '@/app/dtos/AppData';
 
-const ChatList = ({chat}) => {
+const ChatList = ({chat}: {chat: Chat}) => {
   return (
     <div>
 		  <h2>{chat.name}</h2>

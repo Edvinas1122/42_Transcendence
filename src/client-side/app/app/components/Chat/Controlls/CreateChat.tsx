@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react';
-import fetchWithToken from '@/app/network/fetchWithToken';
-import { CreateChatRequest } from '../../dtos/PostData';
-import { AuthorizedFetchContext } from '@/app/context/authContext';
+import { CreateChatRequest } from '@/app/dtos/PostData';
+import { AuthorizedFetchContext, AuthorizedFetchContextType } from '@/app/context/authContext';
 
 
 const CreateChat = () => {
-	const { fetchWithToken, Loading } = useContext(AuthorizedFetchContext);
+	const { fetchWithToken, loading } = useContext<AuthorizedFetchContextType>(AuthorizedFetchContext);
 	const [name, setName] = useState("");
 	const [isPrivate, setIsPrivate] = useState(false);
 	const [password, setPassword] = useState("");
 
   
-	const handleSubmit = (e) => {
+	const handleSubmit = (e: React.FormEvent) => {
 	  e.preventDefault();
 	  const chatData: CreateChatRequest = { name, private: isPrivate, password };
   

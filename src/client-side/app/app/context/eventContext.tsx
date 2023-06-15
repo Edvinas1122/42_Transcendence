@@ -1,15 +1,26 @@
+"use client";
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { TokenContext } from './authContext';
+import { AuthorizedFetchContext } from './authContext';
 // Create a new Context
-export const EventSourceContext = createContext();
+
+export type EventSourceContextType = EventSource | null;
+
+export const EventSourceContext = createContext<EventSourceContextType>(null);
+
+interface EventSourceProviderProps {
+	fetchChats: () => void;
+	fetchInvitations: () => void;
+	children: React.ReactNode;
+}
 
 // Create a provider for components to consume and subscribe to changes
-export const EventSourceProvider = ({ fetchChats, fetchInvitations, children }) => {
-	const [token, loading] = useContext(TokenContext);
-	const [eventSource, setEventSource] = useState(null);
+export const EventSourceProvider = ({ fetchChats, fetchInvitations, children }: EventSourceProviderProps) =>  {
+	const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
+	const [eventSource, setEventSource] = useState<EventSource | null>(null);
 
 	useEffect(() => {
-		if (loading) {
+		if (loading || !token) {
 			return () => {};
 		}
 		console.log("EventSourceProvider useEffect ", token.accessToken as string);
@@ -44,7 +55,7 @@ export const EventSourceProvider = ({ fetchChats, fetchInvitations, children }) 
 		// Close EventSource connection when component unmounts
 		es.close();
 	}
-	}, [loading, token]); // re-run effect when token changes
+	}, [token, fetchChats, fetchInvitations, loading]); // re-run effect when token changes
 
 	
 

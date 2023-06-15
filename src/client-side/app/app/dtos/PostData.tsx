@@ -13,4 +13,4 @@ class SendMessageDto {
 	password?: string;
 }
 
-export { CreateChatRequest, SendMessageDto };
+export type { CreateChatRequest, SendMessageDto };
