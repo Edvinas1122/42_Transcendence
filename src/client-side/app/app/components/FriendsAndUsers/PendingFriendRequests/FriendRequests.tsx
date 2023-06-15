@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+ import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import fetchWithToken from '@/app/network/fetchWithToken';
-import { TokenContext } from '@/app/context/tokenContext';
+import { AuthorizedFetchContext } from '@/app/context/authContext';
+import { UsersContext } from '@/app/context/appDataProvider';
 
 const FriendRequestCard = ({ friend, onAccept, onDeny }) => {
 
@@ -26,24 +27,25 @@ const FriendRequestCard = ({ friend, onAccept, onDeny }) => {
 
 const FriendRequestsMenu = () => {
 
-    const [token, setToken] = useContext(TokenContext);
-    const [friendRequests, setFriendRequests] = useState([]);
+    const { fetchWithToken } = useContext(AuthorizedFetchContext);
+    // const [friendRequests, setFriendRequests] = useState([]);
+    const { friendInvites } = useContext(UsersContext);
 
-    useEffect(() => {
-        fetchFriendRequests();
-    }, []);
+    // useEffect(() => {
+    //     fetchFriendRequests();
+    // }, []);
 
-    const fetchFriendRequests = async () => {
-        try {
-            const response = await fetchWithToken('/users/manage/get-all-pending-friend-request', token);
-            const friendRequestsData = await response.json();
+    // const fetchFriendRequests = async () => {
+    //     try {
+    //         const response = await fetchWithToken('/users/manage/get-all-pending-friend-request', token);
+    //         const friendRequestsData = await response.json();
 
-            setFriendRequests(friendRequestsData);
-            console.log(friendRequestsData);
-        } catch (error) {
-            console.error('Error fetching friend requests: ', error);
-        }
-    };
+    //         setFriendRequests(friendRequestsData);
+    //         console.log(friendRequestsData);
+    //     } catch (error) {
+    //         console.error('Error fetching friend requests: ', error);
+    //     }
+    // };
 
     const handleAcceptRequest = async (friendRequestId) => {
         try {
@@ -74,8 +76,8 @@ const FriendRequestsMenu = () => {
     return (
         <div className="friend-requests">
             <h1>Friend Requests</h1>
-            {friendRequests.length <= 0 && <p>No pending friend requests</p>}
-            {friendRequests?.map((friend) => (
+            {friendInvites.length <= 0 && <p>No pending friend requests</p>}
+            {friendInvites?.map((friend) => (
                 <FriendRequestCard
                     key={friend.id}
                     friend={friend} 

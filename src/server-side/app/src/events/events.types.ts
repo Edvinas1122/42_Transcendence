@@ -11,3 +11,16 @@ export class SseMessage {
 	timestamp: number;
 }
 
+export class MessageEvent {
+	constructor(messge: SseMessage)
+	{
+		this.data = messge.payload;
+		this.id = "15";
+		this.type = messge.type;
+		this.retry = 1000;
+	}
+	data: string | object;
+	id?: string;
+	type?: string;
+	retry?: number;
+  }

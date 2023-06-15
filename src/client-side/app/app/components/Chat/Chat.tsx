@@ -1,11 +1,10 @@
 	"use client"; // This file is client-side only
 
-	import React, { useState, useEffect } from 'react';
-	import { GroupChat } from '@/app/dtos/AppData';
+	import React, { useState, useEffect, useContext } from 'react';
 	import CreateChat from './Controlls/CreateChat';
-	import Chat from './Chat'
 	import ChatList from './ChatList';
 	import SendMessage from './SendMessage';
+	import { ChatsContext } from '@/app/context/appDataProvider';
 
 	const Messages = ({chatProp}: {chatProp: Chat}) => {
 		const chat: Chat = chatProp;
@@ -25,21 +24,24 @@
 		);
 	}
 
-	const Chats = ({props}: {props: Chat[]}) => {
+	const Chats = () => {
 		const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+		const {chatList, fetchChats, getChats} = useContext(ChatsContext);
 
 		const handleChatBoxClick = (chat: Chat) => {
 			console.log("in handleChatBoxClick: " + chat.name);
 			setSelectedChat(chat);
 		};
 
-		const chats: Chat[] = props;
-		// console.log("in chats: " + chats[0].name);
+		// useEffect(() => {
+		// 	fetchChats();
+		// }, []);
+
 		return (
 			<>
 			<div>
-				{!chats ? <h1>No chats available</h1> : <h1>Available Chats</h1>}
-				{chats?.map((chat) => 
+				{!chatList ? <h1>No chats available</h1> : <h1>Available Chats</h1>}
+				{chatList?.map((chat) => 
 					<li key={chat._id} onClick={() => 
 					handleChatBoxClick(chat)}><ChatList chat={chat}/></li>)}
 				<CreateChat />

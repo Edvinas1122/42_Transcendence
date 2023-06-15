@@ -23,47 +23,48 @@ export class ChatService {
 		private readonly chatEventGateway: ChatEventGateway,
 	) {}
 
-	async getAllChats(): Promise<Chat[]> {
-		return this.chatRepository.find();
+	async getAllUserChats(userId: number): Promise<ChatDto[]> {
+		const chats = await this.chatRepository.find();
+		return this.returnChatDto(chats, userId);
 	}
 
 	async getChat(chatId: number): Promise<Chat | null> {
 		return this.chatRepository.findOne({where: {id: chatId}});
 	}
 
-	async getUserChats(userId: number): Promise<ChatDto[]> {
-		const userRoles = await this.roleService.getAvailableUserRoles(userId);
-		const chats = userRoles.map(role => role.chat);
+	// async getUserChats(userId: number): Promise<ChatDto[]> {
+	// 	const userRoles = await this.roleService.getAvailableUserRoles(userId);
+	// 	const chats = userRoles.map(role => role.chat);
 	
-		// mapping each chat to a Promise of ChatDto
-		const chatDtoPromises = chats.map(async (chat) => {
-			const owner = await this.usersService.getUserInfo(chat.ownerID);
-			let participants;
-			if (!chat.password || chat.password === '') {
-				participants = await this.roleService.getChatRelatives(chat);
-				// const messages = await this.messageService.getChatMessages(chat);
-			}
-			else {
-				participants = [];
-				// const messages = [];
-			}
-			if (!chat.personal) {
-				const groupChatDto = new GroupChatDto(chat, owner, participants);
-				// populate the GroupChatDto instance with data from the chat entity
-				groupChatDto.privileged = await this.roleService.isPrivileged(userId, chat.id);
-				return groupChatDto;
-			} else {
-				const personalChatDto = new PersonalChatDto(chat, participants[0]);
-				// populate the PersonalChatDto instance with data from the chat entity
-				return personalChatDto;
-			}
-		});
+	// 	// mapping each chat to a Promise of ChatDto
+	// 	const chatDtoPromises = chats.map(async (chat) => {
+	// 		const owner = await this.usersService.getUserInfo(chat.ownerID);
+	// 		let participants;
+	// 		if (!chat.password || chat.password === '') {
+	// 			participants = await this.roleService.getChatRelatives(chat);
+	// 			// const messages = await this.messageService.getChatMessages(chat);
+	// 		}
+	// 		else {
+	// 			participants = [];
+	// 			// const messages = [];
+	// 		}
+	// 		if (!chat.personal) {
+	// 			const groupChatDto = new GroupChatDto(chat, owner, participants);
+	// 			// populate the GroupChatDto instance with data from the chat entity
+	// 			groupChatDto.privileged = await this.roleService.isPrivileged(userId, chat.id);
+	// 			return groupChatDto;
+	// 		} else {
+	// 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
+	// 			// populate the PersonalChatDto instance with data from the chat entity
+	// 			return personalChatDto;
+	// 		}
+	// 	});
 	
-		// waiting for all Promises of ChatDto to resolve
-		const chatDtos = await Promise.all(chatDtoPromises);
+	// 	// waiting for all Promises of ChatDto to resolve
+	// 	const chatDtos = await Promise.all(chatDtoPromises);
 	
-		return chatDtos;
-	}
+	// 	return chatDtos;
+	// }
 
 	async createGroupChat(createChatDto: CreateChatDto): Promise<Chat> {
 		const chat = new Chat();
@@ -165,6 +166,23 @@ export class ChatService {
 		await this.roleService.editRole(role, RoleType.Participant);
 		return true;
 	}
+
+	private async returnChatDto(chat: Chat[], userId: number): Promise<ChatDto[]> {
+		return Promise.all(chat.map(async (chat) => {
+			const participants = await this.roleService.getChatRelatives(chat);
+			/// learn if participant of a chat
+			const isParticipant = await this.roleService.isParticipant(userId, chat.id);
+			if (!chat.personal) {
+				const owner = await this.usersService.getUserInfo(chat.ownerID);
+				const groupChatDto = new GroupChatDto(chat, owner, isParticipant, participants);
+				return groupChatDto;
+			} else {
+				const personalChatDto = new PersonalChatDto(chat, participants[0]);
+				return personalChatDto;
+			}
+		}));
+	}
+
 
 	private async updateEvent(chat: Chat, eventType: RoomEventType): Promise<void> {
 		if (!chat.private) {

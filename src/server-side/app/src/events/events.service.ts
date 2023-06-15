@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event, EventType } from './entities/event.entity';
-import { SseMessage } from './events.types';
+import { SseMessage, MessageEvent } from './events.types';
 import { Subject } from 'rxjs';
 import { User } from '../users/entities/user.entity';
 
@@ -29,7 +29,7 @@ export class EventService {
 		console.log('sendEventToUser', userId, data);
 		const subject = this.eventSubjects.get(userId);
 		if (subject) {
-			subject.next({ data });
+			subject.next(new MessageEvent(data));
 			return true; // User is online.
 		}
 		else {
@@ -52,7 +52,7 @@ export class EventService {
 		await this.eventRepository.save(event);
 		
 		if (subject) {
-			subject.next({ data });
+			subject.next(new MessageEvent(data));
 			return true; // User is online.
 		} else {
 			return false; // User is offline.

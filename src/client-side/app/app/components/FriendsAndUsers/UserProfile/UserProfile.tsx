@@ -3,19 +3,24 @@ import fetchWithToken from '@/app/network/fetchWithToken';
 import { useParams } from 'react-router-dom';
 import sendFriendRequest from '../../Global/SendFriendRequest.module';
 import blockUser from '../../Global/BlockUser.module';
-import { TokenContext } from '@/app/context/tokenContext';
+import { AuthorizedFetchContext } from '@/app/context/authContext';
 
 const UserProfile = () => {
-    const [token, setToken] = useContext(TokenContext)
     const { userId } = useParams();
     const [user, setUser] = useState(null);
+    const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
 
     const handleSendFriendRequest = () => {
-        try {
-            sendFriendRequest(userId, token);
-        } catch (error) {
-            console.error("Send Friend request failed: ", error);
-        }
+        const sendFriendRequest = async () => {
+            try {
+                const response = await fetchWithToken(`/users/manage/send-friend-request/${user._id}`, {
+                    method: 'POST',
+                });
+
+            } catch (error) {
+                console.error("Send Friend request failed: ", error);
+            }
+        };
     };
 
     const handleBlockUser = () => {
@@ -26,15 +31,15 @@ const UserProfile = () => {
         }
     };
 
-    useEffect(() =>{
-        fetchUser();
+    useEffect(() => {
+        if (!loading)
+            fetchUser();
     }, []);
 
     const fetchUser = async () => {
         try {
             const response = await fetchWithToken(`/users/profile/${userId}`, token); 
             const userProfile = await response.json();
-
             setUser(userProfile);
             console.log("user profile fetched");
 

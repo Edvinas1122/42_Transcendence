@@ -3,60 +3,29 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UserProfile } from '@/app/dtos/AppData';
 import FileUpload from './Upload/UploadFile';
-import sendFriendRequest from '../Global/SendFriendRequest.module';
-import blockUser from '../Global/BlockUser.module';
-import { TokenContext } from '@/app/context/tokenContext';
-import fetchWithToken from '@/app/network/fetchWithToken';
+import { AuthorizedFetchContext } from '@/app/context/authContext';
 
 const PersonalProfile = () => {
 
-    const [token, setToken] = useContext(TokenContext)
-    const [Profile, setProfile] = useState<UserProfile>({
-        _id: '',
-        name: '',
-        avatar: ''
-    });
+    const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
+    const [ProfileData, setProfileData] = useState<UserProfile>({} as UserProfile);
 
-    const fetchProfile = async () => {
-        try {
-            const response = await fetchWithToken('/users/me', token);
-            const profileData = await response.json();
-
-            setProfile(profileData);
-            console.log("Fetch profile ok");
-        } catch (error) {
-            console.error('Error fetching profile: ', error);
-        }
-    };
+    const fetchProfileData = async () => {
+        const personalProfileData = await fetchWithToken(`/users/profile/${token.id}`, {});
+        const personalProfile = await personalProfileData.json();
+        setProfileData(personalProfile);
+    }
 
     useEffect(() => {
-        fetchProfile();
-    }, []);
-
-    const handleSendFriendRequest = () => {
-        try {
-            console.log("sending request: ", token);
-            sendFriendRequest(Profile._id, token);
-        } catch (error) {
-            console.error("Send Friend request failed: ", error);
-        }
-    }; 
-
-    const handleBlockUser = () => {
-        try {
-            blockUser(Profile._id);
-        } catch (error) {
-            console.error("Failed to block user: ", error);
-        }
-    }; //Remove later lmao, testing functions 
+        if (!loading)
+            fetchProfileData();
+    });
 
     return (
         <div>
-            <h1>{Profile.name}</h1>
-            <img src={Profile.avatar} alt={`${Profile.name} avatar`} />
+            <h1>{ProfileData.name}</h1>
+            <img src={ProfileData.avatar} alt={`${ProfileData.name} avatar`} />
             <FileUpload />
-            <button onClick={handleSendFriendRequest}>Send friend request</button>
-            <button onClick={handleBlockUser}>Block User</button>
         </div>
     );
 }

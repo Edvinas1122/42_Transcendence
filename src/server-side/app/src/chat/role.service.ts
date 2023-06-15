@@ -138,25 +138,13 @@ export class RoleService {
 		});
 		return !!relative;
 	}
-	// async userOwnerOfChat(userId: number, chatId: number): Promise<boolean> {
-	// 	const relative = await this.roleRepository.findOne({
-	// 		where: { user: { id: userId }, type: RoleType.Owner, chat: { id: chatId } },
-	// 	});
-	// 	return !!relative;
-	// }
 
-	// async editRole(chat: Chat, user: User, role: RoleType): Promise<boolean> {
-
-	// 	const relative = await this.roleRepository.findOne({
-	// 		where: { chat: {id: chat.id}, user: {id: user.id} },
-	// 	});
-	// 	if (!relative) {
-	// 		throw new NotFoundException('Relative not found');
-	// 	}
-	// 	relative.type = role;
-	// 	await this.roleRepository.save(relative);
-	// 	return true;
-	// }
+	async isParticipant(userId: number, chatId: number): Promise<boolean> {
+		const relative = await this.roleRepository.findOne({
+			where: { user: { id: userId }, type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant]), chat: { id: chatId } },
+		});
+		return !!relative;
+	}
 
 	async editRole(role: Role, roleType: RoleType): Promise<boolean> {
 		role.type = roleType;
