@@ -51,9 +51,9 @@ export const AppDataProvider = ({ children }: { children?: ReactNode }) => {
 
 	useEffect(() => {
 		if (!authLoading) { // Ensures token is available and loading is done
-		  fetchChats();
-		  setLoading(false);
-		  console.log("Fetch users ok");
+			fetchChats();
+			setLoading(false);
+			console.log("Fetch users ok");
 		}
 		console.log("Fetch users cancelled");
 	  }, [authLoading, fetchChats, fetchInvitations, fetchWithToken]);
