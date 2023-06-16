@@ -1,16 +1,20 @@
-import React from 'react';
-import dynamic from 'next/dynamic';
-
-/*
-	Declare the Root component as client-side only.
-*/
-const DynamicComponent = dynamic(
-	() => import('@/app/Routes'),
-	{ ssr: false }
-);
-
-function Home() {
-	return <DynamicComponent />;
+import { Metadata } from 'next'
+import { cookies } from 'next/headers'
+// import https from 'https';
+import PersonalProfile from './components/UserProfile/Profiles';
+import '@/public/globals.css'
+ 
+export const metadata: Metadata = {
+	title: 'My Page Title',
 }
 
-export default Home;
+export default function Page() {
+
+
+	return (
+		<div>
+		<h1>My Page</h1>
+		<PersonalProfile />
+		</div>
+	);
+}

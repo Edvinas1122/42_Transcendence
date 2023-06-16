@@ -30,8 +30,6 @@ services:
       - 3030:3030
     volumes:
       - ./src/client-side/app/app:/app/app
-      - ./src/client-side/app/components:/app/components
-      - ./src/client-side/app/pages:/app/pages
       - file_storage:/app/public/avatar
 
   nest-app:

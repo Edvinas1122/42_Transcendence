@@ -32,8 +32,9 @@ const Chats = () => {
 	};
 
 	useEffect(() => {
-		fetchChats();
-	}, [fetchChats]);
+		if (!loading)
+			fetchChats();
+	}, [fetchChats, loading]);
 
 	if (loading)
 		return (<p>Loading...</p>);

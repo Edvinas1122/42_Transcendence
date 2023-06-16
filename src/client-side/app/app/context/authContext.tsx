@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import https from 'https';
 // import Cookies from 'js-cookie';
 
 class tokenObject {
@@ -65,15 +66,20 @@ export const AuthProvider = ({ children }: { children?: ReactNode }) => {
 
 	const fetchWithToken = useCallback(async (service: string, requestOptions: RequestInit = {}): Promise<Response> => {
 		if (!token) {
-			throw new Error('Token not found');
+			throw new Error('No token found');
 		}
 
+		// const agent = new https.Agent({
+		// 	rejectUnauthorized: false
+		// });
 		const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}${service}`, {
 			...requestOptions, // spread in requestOptions
 			headers: {
 				...requestOptions.headers, // spread in existing headers
 				'Authorization': `Bearer ${token.accessToken}`
-			}
+			},
+			// body: null,
+			// agent: agent
 		});
 	
 		if (!response.ok) {

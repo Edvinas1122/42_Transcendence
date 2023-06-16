@@ -1,13 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
 // import blockUser from '../../Global/BlockUser.module';
 import { AuthorizedFetchContext } from '@/app/context/authContext';
 import { User } from '@/app/dtos/AppData';
 
-const UserProfile = () => {
-    const { userId } = useParams();
+const UserProfile = ({userId}: {userId: string}) => {
     const [user, setUser] = useState<User | null>(null);
     const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
 

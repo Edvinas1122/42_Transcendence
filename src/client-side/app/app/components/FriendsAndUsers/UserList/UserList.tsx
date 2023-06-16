@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'next/link';
 import Image from 'next/image';
 import { User } from '@/app/dtos/AppData';
 
@@ -42,7 +42,7 @@ const UserList = ({users}: {users: User[]} ) => {
                 <div key={user._id}>
                     {/* <img src={user.avatar} width="50" height="50"/> */}
                     <h1>{user.name}</h1>
-                    <Link to={`/users/${user._id}`}>View Profile</Link>
+                    {/* <Link to={`/users/${user._id}`}>View Profile</Link> */}
                 </div>
             ))}
         </div>
