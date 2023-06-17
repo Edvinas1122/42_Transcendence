@@ -26,7 +26,7 @@ const PersonalProfile = () => {
 	return (
 		<div>
 			<h1>{ProfileData.name}</h1>
-			{/* <img src={ProfileData.avatar} alt={`${ProfileData.name} avatar`} /> */}
+
 			<FileUpload />
 		</div>
 	);

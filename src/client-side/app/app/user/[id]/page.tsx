@@ -1,11 +1,14 @@
 import { cookies } from 'next/headers';
 import { User } from '@/app/dtos/AppData';
 
-async function getData({ id }: { id: string }) {
+async function getData({ id }: { id: string }): Promise<User> {
     const fullUrl = "http://nest-app:3000" + `/users/profile/${id}`;
 	const cookieStore = cookies();
 	const cookie = cookieStore.get('access_token');
 
+	if (!cookie) {
+		throw new Error('No cookie found');
+	}
 	const headers = {
 		'Authorization': `Bearer ${cookie.value}`, // set 'Cookie' header to a string
 	};
@@ -20,8 +23,7 @@ async function getData({ id }: { id: string }) {
 
 const UserPage = async ({ params }: { params: { id: string } }) => {
 
-	const waitingUser = getData(params);
-	const user: User = await waitingUser;
+	const user: User = await getData(params);
 	return (
 		<div>
 			<h1>User Profile {params.id} </h1>
