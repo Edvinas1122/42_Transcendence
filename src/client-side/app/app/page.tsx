@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
 import { cookies } from 'next/headers'
-// import https from 'https';
 import PersonalProfile from './components/UserProfile/Profiles';
 import '@/public/globals.css'
  

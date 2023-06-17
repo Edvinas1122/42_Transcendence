@@ -7,21 +7,6 @@ import ChatList from './ChatList';
 import { ChatsContext, ChatsContextType } from '@/app/context/appDataProvider';
 import { Chat } from '@/app/dtos/AppData';
 
-// const Messages = ({chatProp}: {chatProp: Chat}) => {
-// 	const chat: Chat = chatProp;
-
-// 	if (!chat) {
-// 		return <div>Loading...</div>;
-// 	}
-
-// 	return (
-// 		<div>
-// 			<h2>{chat.name}</h2>
-// 			<p>{chat.id}</p>
-// 		</div>
-// 	);
-// }
-
 const Chats = () => {
 	const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
 	const {chatList, fetchChats, loading} = useContext<ChatsContextType>(ChatsContext);

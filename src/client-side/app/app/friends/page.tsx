@@ -1,4 +1,3 @@
-// import { cookies } from 'next/headers';
 import fetchWithToken from '@/lib/fetch.util';
 import { User } from '@/app/dtos/AppData';
 import Link from 'next/link';
