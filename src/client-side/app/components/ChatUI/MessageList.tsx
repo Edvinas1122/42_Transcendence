@@ -1,12 +1,14 @@
 import { Message } from "@/lib/DTO/AppData";
+import "@/public/layout.css";
+import "./Chat.css";
 
 interface MessageListProps {
-	messages: Message[];
+    messages: Message[];
 }
 
 const MessageList = ({ messages }: MessageListProps) => {
     return (
-        <div>
+        <div className="List MessageList">
             {messages && messages.map((message) => (
                 <MessageBox key={message._id} message={message} />
             ))}
@@ -15,11 +17,19 @@ const MessageList = ({ messages }: MessageListProps) => {
 }
 
 const MessageBox = ({ message }: { message: Message }) => {
-	return (
-		<div>
-			<p>{message.content}</p>
-		</div>
-	);
+
+    const messageClass = message.myMessage ? 'Message user' : 'Message';
+    const messageSpace = "MessageSpace";
+
+    return (
+        <div className="MessageArea">
+            <div className={messageSpace}></div>
+            <div className={messageClass}>
+                <p>{message.content}</p>
+            </div>
+            <div className={messageSpace}></div>
+        </div>
+    );
 }
 
 export default MessageList;

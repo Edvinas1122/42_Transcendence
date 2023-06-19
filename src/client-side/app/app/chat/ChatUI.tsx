@@ -7,7 +7,7 @@ import CreateChatBox from "@/components/ChatUI/CreateChat";
 
 const ChatUI: Function = async () => {
 
-	const ChatsAvailable: Chat[] = await fetchWithToken<Chat[]>("/chat/available", 30);
+	const ChatsAvailable: Chat[] = await fetchWithToken<Chat[]>("/chat/available");
 
 	return (
 		<div>

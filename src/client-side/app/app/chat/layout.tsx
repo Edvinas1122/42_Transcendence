@@ -1,3 +1,4 @@
+import "@/public/layout.css";
 import ChatUI from "./ChatUI";
 
 export default function	ChatsLayout({
@@ -8,8 +9,12 @@ export default function	ChatsLayout({
 {
 	return (
 		<section>
-			<ChatUI />
-			{children}
+			<div className="LeftSection">
+				<ChatUI />
+			</div>
+			<div className="MainSection">
+				{children}
+			</div>
 		</section>
 	);
 }

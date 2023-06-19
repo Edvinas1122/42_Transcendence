@@ -1,3 +1,5 @@
+import "@/public/layout.css"
+
 export default function  ChatsLayout({
 	children,
 }: {
@@ -5,8 +7,8 @@ export default function  ChatsLayout({
 })
 {
 	return (
-		<section>
+		<div>
 			{children}
-		</section>
+		</div>
 	);
 }

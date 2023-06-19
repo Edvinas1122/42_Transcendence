@@ -4,6 +4,7 @@ import { Message } from "@/lib/DTO/AppData";
 import { SendMessageDto } from "@/lib/DTO/PostData";
 import React, { useState, useContext } from "react";
 import { AuthorizedFetchContext } from "../ContextProviders/authContext";
+import "./Chat.css"
 
 const MessagePostController = ({chatId, password}: {chatId: string, password?: string}) => {
 
@@ -26,12 +27,12 @@ const MessagePostController = ({chatId, password}: {chatId: string, password?: s
 	}
 
 	return (
-		<div>
-			<form onSubmit={sendMessage}>
-				<input type="text" value={message} onChange={e => setMessage(e.target.value)} />
-				<input type="submit" value="Send" />
-			</form>
-		</div>
+        <div>
+            <form onSubmit={sendMessage} className="MessageForm">
+                <input type="text" value={message} placeholder="Write message..." onChange={e => setMessage(e.target.value)} />
+                <input type="submit" value="Send" />
+            </form>
+        </div>
 	);
 }
 

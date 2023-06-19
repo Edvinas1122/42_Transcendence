@@ -3,6 +3,7 @@ import { CreateChatRequest } from '@/lib/DTO/PostData';
 import React, { useContext } from 'react';
 // import fetchWithToken from '@/lib/fetch.util';
 import { AuthorizedFetchContext } from '../ContextProviders/authContext';
+import "./Chat.css"
 
 
 const CreateChatBox = () => {

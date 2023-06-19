@@ -69,7 +69,7 @@ export class ChatService {
 	async createGroupChat(createChatDto: CreateChatDto): Promise<Chat> {
 		const chat = new Chat();
 		chat.name = createChatDto.name;
-		chat.private = createChatDto.private;
+		chat.private = createChatDto.isPrivate;
 		chat.password = createChatDto.password;
 		chat.ownerID = createChatDto.ownerID;
 		const owner = await this.usersService.findUser(createChatDto.ownerID);
@@ -83,7 +83,7 @@ export class ChatService {
 		await this.roleService.addRelativeToChat(RoleType.Owner, savedChat, owner);
 		
 		// send event to all users that are online unless the chat is private then send to participants only
-		await this.updateEvent(savedChat, RoomEventType.NewAvailable);
+		await this.updateEvent(savedChat, RoomEventType.NewAvailable, "Group chat " + savedChat.name + " that is " + (savedChat.private ? "private" : "public") + " has been created");
 	
 		return savedChat;
 	}
@@ -184,12 +184,12 @@ export class ChatService {
 	}
 
 
-	private async updateEvent(chat: Chat, eventType: RoomEventType): Promise<void> {
+	private async updateEvent(chat: Chat, eventType: RoomEventType, moreInfo?: string): Promise<void> {
 		if (!chat.private) {
-			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType);
+			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, moreInfo);
 		}
 		else {
-			await this.chatEventGateway.updateParticipantsOfRoomEvent(chat, eventType);
+			await this.chatEventGateway.updateParticipantsOfRoomEvent(chat, eventType, false, moreInfo);
 		}
 	}
 }

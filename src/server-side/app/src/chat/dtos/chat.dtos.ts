@@ -9,7 +9,7 @@ export class CreateChatDto {
 	name: string;
 
 	@IsBoolean()
-	private: boolean;
+	isPrivate: boolean;
 
 	@IsOptional()
 	@IsInt()

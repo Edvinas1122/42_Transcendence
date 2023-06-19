@@ -1,7 +1,9 @@
 import '@/public/globals.css'
+import '@/public/layout.css'
 import { Inter } from 'next/font/google'
 import { Providers } from '@/components/Providers'
-import Sidebar from './Sidebar'
+import Sidebar from '../components/GeneralUI/Sidebar'
+import EventPopUp from '@/components/EventsInfoUI/EventsInfo'
 
 
 const inter = Inter({ 
@@ -19,8 +21,14 @@ export default function RootLayout({ children }: { children: React.ReactNode })
 		<html lang="en">
 			<body className={inter.className}>
 				<Providers>
-				<Sidebar />
-					{children}
+					<div className="MainWrapper">
+						<div className="Sidebar">
+							<Sidebar />
+						</div>
+						<div className="MainDisplay">
+							{children}
+						</div>
+					</div>
 				</Providers>
 			</body>
 		</html>

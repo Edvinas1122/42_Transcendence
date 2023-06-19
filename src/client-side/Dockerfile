@@ -20,6 +20,12 @@ RUN npm install --save @types/js-cookie
 RUN npm install @types/react @types/react-dom @types/node
 RUN npm install axios
 
+#GRAPHICS RELATED modules
+	#functional
+RUN npm install react-notifications-component
+	#styling
+RUN npm install @fortawesome/react-fontawesome @fortawesome/free-solid-svg-icons
+# RUN npm install -D tailwindcss postcss autoprefixer
 
 # Copy the rest of the application
 COPY app/ ./

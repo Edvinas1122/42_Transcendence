@@ -52,6 +52,7 @@ interface Message {
 	_id: number;
 	content: string;
 	user: User;
+	myMessage?: boolean;
 }
 
 enum RoleType {
