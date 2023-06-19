@@ -1,19 +1,21 @@
 import { Metadata } from 'next'
 import { cookies } from 'next/headers'
-import PersonalProfile from './components/UserProfile/Profiles';
-import '@/public/globals.css'
- 
+import fetchWithToken from '@/lib/fetch.util'
+import UserProfileInfo from '@/components/UserUI/UserProfileDisplay'
+import { User } from '@/lib/DTO/AppData'
+
 export const metadata: Metadata = {
-	title: 'My Page Title',
+	title: 'Profile',
+	description: 'User Profile'
 }
 
-export default function Page() {
+const Page = async () => {
 
+	const user: User = await fetchWithToken<User>(`/users/me`);
 
 	return (
-		<div>
-		<h1>My Page</h1>
-		<PersonalProfile />
-		</div>
+		<UserProfileInfo UserInfo={user} />
 	);
 }
+
+export default Page;

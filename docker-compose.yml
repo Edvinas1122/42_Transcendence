@@ -31,6 +31,7 @@ services:
     volumes:
       - ./src/client-side/app/app:/app/app
       - ./src/client-side/app/lib:/app/lib
+      - ./src/client-side/app/components:/app/components
       - file_storage:/app/public/avatar
 
   nest-app:

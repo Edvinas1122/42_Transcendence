@@ -1,6 +1,4 @@
-import ChatUI from "./ChatUI";
-
-export default function	ChatsLayout({
+export default function  ChatsLayout({
 	children,
 }: {
 	children: React.ReactNode
@@ -8,7 +6,6 @@ export default function	ChatsLayout({
 {
 	return (
 		<section>
-			<ChatUI />
 			{children}
 		</section>
 	);

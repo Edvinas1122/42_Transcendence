@@ -1,4 +1,4 @@
-import FriendsAndUsers from "@/app/components/FriendsAndUsers/FriendsAndUsers";
+// import FriendsAndUsers from "@/app/components/FriendsAndUsers/FriendsAndUsers";
 
 export default function FriendsLayout({
 	children,
@@ -8,7 +8,7 @@ export default function FriendsLayout({
 {
 	return (
 		<section>
-			<FriendsAndUsers />
+			{/* <FriendsAndUsers /> */}
 			{children}
 		</section>
 	);
