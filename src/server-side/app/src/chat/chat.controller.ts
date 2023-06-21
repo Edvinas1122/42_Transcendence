@@ -18,8 +18,6 @@ export class ChatController {
 	@Get('available')
 	async findAvailableChats(@UserId() UserId: number): Promise<ChatDto[]> {
 		const chats = await this.chatService.getAllUserChats(UserId);
-		// const chats = await this.chatService.getAllChats();
-		console.log("getting chats", chats);
 		return chats;
 	}
 

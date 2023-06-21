@@ -9,16 +9,6 @@ interface SidebarElementProps {
 	icon: any;
 }
 
-const SidebarElement = (props: SidebarElementProps) => {
-	return (
-		<div className="Entity">
-		<Link href={props.link}>
-			<span><FontAwesomeIcon icon={props.icon} size="1x" /> {props.name}</span>
-		</Link>
-		</div>
-	);
-}
-
 const SidebarContent: SidebarElementProps[] = [
 {
 	name: 'Personal Profile',
@@ -42,17 +32,27 @@ const SidebarContent: SidebarElementProps[] = [
 }
 ];
 
+const SidebarElement = (props: SidebarElementProps) => {
+	return (
+		<div className="Entity">
+		<Link href={props.link}>
+			<span><FontAwesomeIcon icon={props.icon} size="1x" /> {props.name}</span>
+		</Link>
+		</div>
+	);
+}
+
 const Sidebar = () => {
 	return (
-		<div>
-		{SidebarContent.map((element, index) => (
-			<SidebarElement
-			key={index}
-			name={element.name}
-			link={element.link}
-			icon={element.icon}
-			/>
-		))}
+		<div className="Sidebar">
+			{SidebarContent.map((element, index) => (
+				<SidebarElement
+				key={index}
+				name={element.name}
+				link={element.link}
+				icon={element.icon}
+				/>
+			))}
 		</div>
 	);
 };

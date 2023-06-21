@@ -70,7 +70,7 @@ export class ProfileManagementController {
 		return this.profileManagementService.getLastPendingFriendRequest(currentUserId);
 	}
 
-	@Get('get-all-friends')
+	@Get('friends')
 	async getAllFriends(@UserId() currentUserId: number): Promise<UserInfo[]> 
 	{
 		return this.profileManagementService.getAllFriends(currentUserId);

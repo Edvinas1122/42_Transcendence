@@ -1,5 +1,5 @@
 import "@/public/layout.css";
-import ChatUI from "./ChatUI";
+import ChatRoomsUI from "@/components/ChatUI/ChatRoomsUI";
 
 export default function	ChatsLayout({
 	children,
@@ -8,13 +8,11 @@ export default function	ChatsLayout({
 })
 {
 	return (
-		<section>
-			<div className="LeftSection">
-				<ChatUI />
+		<section className="Display">
+			<div className="Segment">
+				<ChatRoomsUI />
 			</div>
-			<div className="MainSection">
 				{children}
-			</div>
 		</section>
 	);
 }

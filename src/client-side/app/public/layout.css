@@ -1,5 +1,5 @@
 .MainWrapper {
-	display: flex;
+	/* display: flex; */
 }
 
 .Sidebar {
@@ -21,70 +21,51 @@
 
 .MainDisplay {
 	margin-left: 100px;
-	/* display: flex; */
 	position: fixed;
-	/* flex-direction: column; */
-	/* justify-content: center; */
-	/* align-items: center; */
-	/* height: 100vh; */
 	width: 100%;
 }
 
-.List {
-	/* make scrollable 70% height box of list elements */
-	overflow-y: scroll;
-	height: 70vh;
+.Display {
+	display: flex;	
+	flex-direction: row;
+	width: 100%;
+	height: 100vh;
 }
 
-section {
-	display: flex;
-	height: 100vh; /* This ensures your section takes up the full height of the viewport */
-  }
-  
-
-.LeftSection, .MainSection {
-	/* flex: 1; */
-	height: 100%;
-	overflow: auto;
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	padding: 0;
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+.Segment
+{
+	flex-grow: 1;
+	/* display: flex; */
 	background-color: #fff;
-	z-index: 1;
+	border: 1px solid #e6e6e6;
+	border-radius: 3px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	width: 100%;	
 }
 
-.LeftSection {
-	border-right: 1px solid #e6e6e6;
-	flex: 1;
+.Component {
+	
 }
 
-.MainSection {
-	flex: 3;
+.List {
+	overflow-y: scroll;
+	/* height: 100vh; */
 }
 
-.MainSection {
-	display: flex;
-	/* flex-direction: row; If you want to split horizontally */
-	/* width: 60%; */
+.Form {
+	/* display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	border-top: 1px solid #e6e6e6;
+	padding: 10px;
+	background-color: #f5f5f5;
+	width: 100%;
+	left: 0;
+	bottom: 0; */
 }
 
-.MainSubsection1, .MainSubsection2 {
-	/* flex: 2; */
-	overflow: auto;
-	/* apply other styles as needed */
-}
-
-
-.MainSubsection1 {
-	flex: 3; /* takes up 75% of the space */
-}
-
-.MainSubsection2 {
-	flex: 1; /* takes up 25% of the space */
+.Form div {
+	display: contents;
 }
 
 .Entity {

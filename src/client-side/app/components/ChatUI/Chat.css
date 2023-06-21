@@ -1,6 +1,22 @@
-.MessageList {
-    /* height: 80vh !important; */
+.AvailableChats {
+    height: 80vh !important;
+}
 
+.MessageComponent {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    /* justify-content: space-between; */
+}
+
+
+.MessageComponent .List {
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.MessageComponent .Form {
+    flex-shrink: 0;
 }
 
 .MessageArea {

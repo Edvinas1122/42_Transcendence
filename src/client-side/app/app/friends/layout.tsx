@@ -8,7 +8,6 @@ export default function FriendsLayout({
 {
 	return (
 		<section>
-			{/* <FriendsAndUsers /> */}
 			{children}
 		</section>
 	);

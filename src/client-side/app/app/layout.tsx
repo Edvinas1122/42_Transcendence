@@ -22,9 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode })
 			<body className={inter.className}>
 				<Providers>
 					<div className="MainWrapper">
-						<div className="Sidebar">
-							<Sidebar />
-						</div>
+						<Sidebar />
 						<div className="MainDisplay">
 							{children}
 						</div>

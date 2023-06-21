@@ -7,7 +7,7 @@ export default function  ChatsLayout({
 })
 {
 	return (
-		<div>
+		<div className="Segment">
 			{children}
 		</div>
 	);

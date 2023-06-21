@@ -1,11 +1,12 @@
 import React from "react";
 import fetchWithToken from "@/lib/fetch.util";
 import { Chat } from "@/lib/DTO/AppData";
+import "@/public/layout.css";
 
 const ChatPage = () => {
 	
 	return (
-	  <div>
+	  <div className="Segment">
 		<h1>Chat Page</h1>
 	  </div>
 	);
