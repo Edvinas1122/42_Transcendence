@@ -44,12 +44,19 @@ export const AppDataProvider = ({ children }: { children?: ReactNode }) => {
 		setChatList(chats);
 	}, [fetchWithToken]);
 
-	const fetchInvitations = useCallback(async () => {
+	// const fetchInvitations = useCallback(async () => {
+	// 	if (authLoading) return;
+	// 	const friendInvites = await fetchWithToken('/users/manage/get-all-pending-friend-request');
+	// 	const invites = await friendInvites.json();
+	// 	setFriendInvites(invites);
+	// }, [fetchWithToken]);
+
+	const fetchInvitations = async () => {
 		if (authLoading) return;
 		const friendInvites = await fetchWithToken('/users/manage/get-all-pending-friend-request');
 		const invites = await friendInvites.json();
 		setFriendInvites(invites);
-	}, [fetchWithToken]);
+	};
 
 	useEffect(() => {
 		if (authLoading) { // Ensures token is available and loading is done
@@ -57,6 +64,7 @@ export const AppDataProvider = ({ children }: { children?: ReactNode }) => {
 		} else {
 			setLoading(false);
 		}
+		fetchInvitations();
 	}, [authLoading, fetchWithToken]);
 
 	return (

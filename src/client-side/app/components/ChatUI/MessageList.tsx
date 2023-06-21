@@ -6,16 +6,6 @@ interface MessageListProps {
     messages: Message[];
 }
 
-const MessageList = ({ messages }: MessageListProps) => {
-    return (
-        <div className="List MessageList">
-            {messages && messages.map((message) => (
-                <MessageBox key={message._id} message={message} />
-            ))}
-        </div>
-    );
-}
-
 const MessageBox = ({ message }: { message: Message }) => {
 
     const messageClass = message.myMessage ? 'Message user' : 'Message';
@@ -28,6 +18,16 @@ const MessageBox = ({ message }: { message: Message }) => {
                 <p>{message.content}</p>
             </div>
             <div className={messageSpace}></div>
+        </div>
+    );
+}
+
+const MessageList = ({ messages }: MessageListProps) => {
+    return (
+        <div className="List MessageList">
+            {messages && messages.map((message) => (
+                <MessageBox key={message._id} message={message} />
+            ))}
         </div>
     );
 }
