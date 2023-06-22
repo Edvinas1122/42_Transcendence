@@ -1,10 +1,8 @@
 import { Injectable, Inject, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-// import { User } from '../entities/user.entity';
 import { Relationship, RelationshipStatus } from './entities/relationship.entity';
 import { User } from '../entities/user.entity';
 import { Repository, Not } from 'typeorm';
-// import { RelationshipNotificationMessage } from './utils/messages.types';
 import { UserInfo } from '../dtos/user.dto';
 import { UserEventGateway, RelationshipType } from '../user-event.gateway';
 

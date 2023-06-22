@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation'
 
-async function fetchWithToken<T>(uri: string, revalidate_interval: number | null = null): Promise<T> {
+async function fetchWithToken<T>(uri: string, revalidate_interval: number | null = null, params: {}, method: "GET" | "POST" = "GET"): Promise<T> {
     const fullUrl = "http://nest-app:3000" + uri;
     const cookieStore = cookies();
     const cookie = cookieStore.get('access_token');
@@ -12,9 +12,10 @@ async function fetchWithToken<T>(uri: string, revalidate_interval: number | null
     }
     const headers = {
         'Authorization': `Bearer ${cookie.value}`,
+        ...params
     };
 
-    let options: RequestInit = { headers: headers };
+    let options: RequestInit = { headers: headers, method: method };
 
     if (revalidate_interval === null) {
         options = { ...options, cache: 'no-store' };
@@ -27,6 +28,7 @@ async function fetchWithToken<T>(uri: string, revalidate_interval: number | null
         if (response.status === 401) {
             throw new Error('Unauthorized');
         }
+        console.log(response);
         throw new Error('Failed to fetch data')
     }
     return response.json();

@@ -12,6 +12,9 @@ const nextConfig = {
 	// 		}
 	// 	]
 	// },
+	experimental: {
+		serverActions: true,
+	},
 	serverRuntimeConfig: {
 		// Will only be available on the server side
 		backend_api_url: process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL,

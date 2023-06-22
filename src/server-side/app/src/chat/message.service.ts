@@ -24,18 +24,17 @@ export class MessageService {
 		private readonly chatEventGateway: ChatEventGateway,
 	) {}
 
-	async getChatMessages(chatId: number): Promise<MessageDto[]> {
-		console.log('getChatMessages');
+	async getChatMessages(chatId: number, userId?: number): Promise<MessageDto[]> {
 		const chat = await this.chatService.getChat(chatId);
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
 		console.log(chat);
-		console.log('returning messages');
-		const messages = await this.messagesRepository.find({where: { chat: chat }});
+		const messages = await this.messagesRepository.find({where: { chatID: chat.id }});
 		console.log(messages);
 		// Map each Message to a MessageDto
-		const messageDtos = messages.map(message => new MessageDto(message));
+		const messageOwner = await this.usersService.findUser(userId);
+		const messageDtos = messages.map(message => new MessageDto(message, userId, messageOwner));
 		return messageDtos;
 	}
 
@@ -46,12 +45,9 @@ export class MessageService {
 		if (!chat || !sender) {
 			throw new NotFoundException('Chat or sender not found');
 		}
-		if (chat.password && chat.password !== password || chat.password === '' && password !== '') {
-			throw new UnauthorizedException('Wrong password');
-		}
-
 		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
-		const returnedMessage: MessageDto = new MessageDto(message);
+		const returnedMessage: MessageDto = new MessageDto(message, senderId);
+		console.log('sendMessageToChat2', returnedMessage);
 		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
 		return returnedMessage;
 	}

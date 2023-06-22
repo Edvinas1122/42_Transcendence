@@ -1,6 +1,7 @@
 import { Message, User } from "@/lib/DTO/AppData";
 import UIListBox from "../GeneralUI/GenericList";
 import GenericForm from "../GeneralUI/GenericForm";
+import LiveMessages from "./Live/LiveMessages";
 import fetchWithToken from "@/lib/fetch.util";
 import "@/public/layout.css";
 import "./Chat.css";
@@ -62,21 +63,21 @@ const DummyParticipants: User[] = [
 	}
 ];
 
-const MessageBox = ({ item, style }: { item: Message, style?: string }) => {
+// const MessageBox: Function = ({ item, style }: { item: Message, style?: string }) => {
 
-	const messageClass = item.myMessage ? 'Message user' : 'Message';
-	const messageSpace = "MessageSpace";
+// 	const messageClass = item.myMessage ? 'Message user' : 'Message';
+// 	const messageSpace = "MessageSpace";
 
-	return (
-		<div className="MessageArea">
-			<div className={messageSpace}></div>
-			<div className={messageClass}>
-				<p>{item.content}</p>
-			</div>
-			<div className={messageSpace}></div>
-		</div>
-	);
-}
+// 	return (
+// 		<div className="MessageArea">
+// 			<div className={messageSpace}></div>
+// 			<div className={messageClass}>
+// 				<p>{item.content}</p>
+// 			</div>
+// 			<div className={messageSpace}></div>
+// 		</div>
+// 	);
+// }
 
 const ParticipantBox = ({ item }: { item: User }) => {
 	return (
@@ -96,19 +97,19 @@ const SendMessageBox: Function = ({id}: {id: string}) => {
 			endpoint={`/chat/messages/${id}`}
 			method="POST"
 			fields={[
-				{ name: 'message', value: '', type: 'text', placeholder: 'Type your message here...' },
+				{ name: 'content', value: '', type: 'text', placeholder: 'Type your message here...' },
 			]}
 			className="MessageForm"
+			resetAfterSubmit = {true}
 		/>
 	);
 }
 
 const MessangerUI: Function = async ({ params }: { params: { id: string } }) => {
 
-	const ChatMessages: Message[] = MessagesDummy;
-	// const ChatMessages: Message[] = await fetchWithToken<Message[]>(`/chat/messages/${params.id}`);
-	const ChatParticipants: User[] = DummyParticipants;
-	// const ChatParticipants: User[] = await fetchWithToken<User[]>(`/chat/participants/${params.id}`);
+	const AccessChat: boolean = await fetchWithToken<boolean>(`/chat/roles/${params.id}/join`, null, {}, "POST");
+	const ChatMessages: Message[] = await fetchWithToken<Message[]>(`/chat/messages/${params.id}`);
+	const ChatParticipants: User[] = await fetchWithToken<User[]>(`/chat/roles/${params.id}/Any`);
 
 	return (
 		<section className="Display">
@@ -117,7 +118,8 @@ const MessangerUI: Function = async ({ params }: { params: { id: string } }) => 
 					<h1>
 						Messages Display
 					</h1>
-					<UIListBox Items={ChatMessages} BoxComponent={MessageBox} ListStyle={"MessageList"} />
+					{/* <UIListBox Items={ChatMessages} BoxComponent={MessageBox} ListStyle={"MessageList"} /> */}
+					<LiveMessages serverMessages={ChatMessages} chatID={params.id} />
 					<SendMessageBox id={params.id} />
 				</div>
 			</div>
@@ -126,7 +128,7 @@ const MessangerUI: Function = async ({ params }: { params: { id: string } }) => 
 					<h1>
 						Particaipants Display
 					</h1>
-					<UIListBox Items={DummyParticipants} BoxComponent={ParticipantBox} />
+					<UIListBox Items={ChatParticipants} BoxComponent={ParticipantBox} />
 				</div>
 			</div>
 	  	</section>

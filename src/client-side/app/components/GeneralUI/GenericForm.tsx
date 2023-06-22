@@ -21,8 +21,11 @@ interface GenericFormProps {
     className?: string; // Optional
 }
 
-const GenericForm = ({ endpoint, method, fields, className }: GenericFormProps) => {
+const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = false }: GenericFormProps) => {
+	
 	const { fetchWithToken } = useContext(AuthorizedFetchContext);
+
+	const initialFormState = fields.reduce((acc, { name, value }) => ({ ...acc, [name]: value }), {});
 	const [formState, setFormState] = useState<{ [key: string]: string | number | boolean | undefined }>(
 		fields.reduce((acc, { name, value }) => ({ ...acc, [name]: value }), {})
 	);
@@ -32,18 +35,20 @@ const GenericForm = ({ endpoint, method, fields, className }: GenericFormProps) 
 		setFormState({ ...formState, [name]: type === 'checkbox' ? checked : value });
 	};
 
+	const resetForm = () => setFormState(initialFormState);
+
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		try {
 			const requestData = JSON.stringify(formState);
-			console.log('Form state:', requestData);
+			// console.log('Form state:', requestData);
 			const response = await fetchWithToken(endpoint, {
 				method,
 				body: JSON.stringify(formState),
 				headers: { 'Content-Type': 'application/json' },
 			});
 			const data = await response.json();
-			console.log(data);
+			if (resetAfterSubmit) resetForm();
 		} catch (error) {
 			console.error('Error:', error);
 		}

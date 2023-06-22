@@ -11,14 +11,14 @@ import { UserId } from '../utils/user-id.decorator';
 export class MessagesController {
 	constructor(private readonly messageService: MessageService) {}
 
-	@UseGuards(PermitedChatGuard)
+	// @UseGuards(PermitedChatGuard)
 	@Get(':chatId')
 	async getChatMessages(@UserId() userId: number, @Param('chatId', new ParseIntPipe()) chatId: number): Promise<MessageDto[]>
 	{
-		return await this.messageService.getChatMessages(chatId);
+		return await this.messageService.getChatMessages(chatId, userId);
 	}
 
-	@UseGuards(PermitedChatGuard)
+	// @UseGuards(PermitedChatGuard)
 	@Post(':chatId')
 	async sendMessage(@UserId() userId: number, @Param('chatId', new ParseIntPipe()) chatId: number, @Body(new ValidationPipe({ transform: true })) message: SendMessageDto): Promise<MessageDto>
 	{

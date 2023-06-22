@@ -159,11 +159,21 @@ export class ChatService {
 
 	async joinChat(userId: number, chatId: number, password?: string): Promise<boolean>
 	{
-		const role = await this.roleService.getRole(chatId, userId);
-		if (role.type !== RoleType.Invited) {
-			throw new BadRequestException('User not an invitee');
+		console.log("joinChat");
+		const chat = await this.chatRepository.findOne({where: {id: chatId}});
+		if (!chat) {
+			throw new NotFoundException('Chat not found');
 		}
-		await this.roleService.editRole(role, RoleType.Participant);
+		try {
+			const role = await this.roleService.getRole(chatId, userId);
+			if (chat?.private && role.type !== RoleType.Invited) {
+				throw new BadRequestException('User not an invitee');
+			}
+			await this.roleService.editRole(role, RoleType.Participant);
+		} catch	(e) {
+			const user = await this.usersService.findUser(userId);
+			await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);
+		}
 		return true;
 	}
 

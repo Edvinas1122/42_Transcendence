@@ -52,7 +52,8 @@ interface Message {
 	_id: number;
 	content: string;
 	user: User;
-	myMessage?: boolean;
+	me?: boolean;
+	chatID?: number; // experimanetal
 }
 
 enum RoleType {

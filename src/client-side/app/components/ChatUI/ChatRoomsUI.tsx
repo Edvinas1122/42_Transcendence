@@ -1,7 +1,6 @@
 import React from "react";
 import fetchWithToken from "@/lib/fetch.util";
 import { Chat } from "@/lib/DTO/AppData";
-// import Chats from "@/app/components/Chat/Chat";
 import UIListBox from "@/components/GeneralUI/GenericList";
 import GenericForm from "@/components/GeneralUI/GenericForm";
 import Link from "next/link";

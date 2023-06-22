@@ -110,7 +110,6 @@ export const AuthProvider = ({ children }: { children?: ReactNode }) => {
 			},
 		});
 	
-		console.log(token.accessToken);
 		if (!response.ok) {
 			if (response.status === 401) {
 				Router.push('/auth'); 

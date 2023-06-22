@@ -29,9 +29,11 @@ export class RolesController {
 		@Param('role', new ParseEnumPipe(RoleType)) role: RoleType
 	): Promise<UserInfo[]>
 	{
+		console.log('getChatRelatives: Any');
 		const chat = new Chat();
 		chat.id = chatId;
 		if (role === RoleType.Any) {
+			console.log('getChatRelatives: Any');
 			return await this.roleService.getChatRelatives(chat);
 		}
 		return await this.roleService.getChatRoleRelatives(chat, role);
@@ -40,7 +42,7 @@ export class RolesController {
 	@Post(':chatId/join')
 	async joinChat(
 		@UserId() UserId: number,
-		@Param() chatId,
+		@Param('chatId', new ParseIntPipe()) chatId,
 		@Body(new ValidationPipe({ transform: true })) body: JoinChatDto
 	): Promise<boolean>
 	{
@@ -51,7 +53,7 @@ export class RolesController {
 	@Post(':chatId/leave')
 	async leaveChat(
 		@UserId() UserId: number,
-		@Param() chatId,
+		@Param('chatId', new ParseIntPipe()) chatId,
 	): Promise<boolean>
 	{
 		// is an owner?

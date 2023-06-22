@@ -67,6 +67,7 @@ export class RoleService {
 			newRole.chat = chat;
 
 			await this.roleRepository.save(newRole);
+			console.log('New role', newRole);
 			return true;
 		} catch (error) {
 			console.error(error);
@@ -110,8 +111,8 @@ export class RoleService {
 
 	async getRole(chatId: number, userId: number): Promise<Role> {
 		const role = await this.roleRepository.findOne({
-				where: { chat: { id: chatId }, user: { id: userId }}
-			});
+			where: { chat: { id: chatId }, user: { id: userId }}
+		});
 		if (!role) {
 			throw new NotFoundException('Role not found');
 		}
