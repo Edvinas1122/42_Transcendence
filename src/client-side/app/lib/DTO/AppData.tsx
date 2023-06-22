@@ -36,6 +36,7 @@ interface Chat {
 	name: string;
 	messages: Message[];
 	personal: boolean;
+	mine?: boolean;
 }
 
 interface PersonalChat extends Chat {

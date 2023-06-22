@@ -46,7 +46,7 @@ export class MessageService {
 			throw new NotFoundException('Chat or sender not found');
 		}
 		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
-		const returnedMessage: MessageDto = new MessageDto(message, senderId);
+		const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
 		console.log('sendMessageToChat2', returnedMessage);
 		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
 		return returnedMessage;
@@ -67,7 +67,7 @@ export class MessageService {
 	
 		// Now we have a chat, either found or newly created, so we can send the message
 		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
-		const returnedMessage: MessageDto = new MessageDto(message);
+		const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
 		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
 		return returnedMessage;
 	}

@@ -21,15 +21,15 @@ import { Message } from "@/lib/DTO/AppData";
 	Example:
 		LiveMessages.tsx
 */
-interface EntityButton {
+export interface EntityButton {
 	name: string,
 	onClick: Function,
 	dependency?: (item: any) => boolean,
 }
 
-interface EntityBoxInterface {
-	interactItemEntityCallbackEffects: EntityButton[],
-	removeItemEntityCallbackEffects: EntityButton[],
+export interface EntityBoxInterface {
+	interactItemEntityCallbackEffects?: EntityButton[],
+	removeItemEntityCallbackEffects?: EntityButton[],
 }
 
 interface UIClientListBoxProps {
@@ -82,6 +82,7 @@ const UIClientListBox: Function = ({
 						style={BoxStyle}
 						BoxComponent={BoxComponent}
 						entityInterface={entityInterface}
+						removeItemFromList={removeItemFromList}
 					/>
                 );
             })}
@@ -94,7 +95,8 @@ interface EntityBoxProps {
     item: any,
     BoxComponent: Function,
     style?: string,
-	entityInterface: EntityBoxInterface,
+	entityInterface?: EntityBoxInterface,
+	removeItemFromList: Function,
 }
 
 const EntityBox: Function = ({
@@ -102,6 +104,7 @@ const EntityBox: Function = ({
 	BoxComponent,
 	style,
 	entityInterface,
+	removeItemFromList,
 }: EntityBoxProps) => {
 
 	return (
@@ -110,18 +113,18 @@ const EntityBox: Function = ({
 				item={item}
 				style={style}
 			/>
-			{entityInterface?.interactItemEntityCallbackEffects.map((button, index) => {
+			{entityInterface?.interactItemEntityCallbackEffects?.map((button, index) => {
 				if (!button.dependency || button.dependency(item)) {
 					return <button key={index} onClick={() => button.onClick(item)}>{button.name}</button>
 				}
 				return null;
 			})}
-			{entityInterface?.removeItemEntityCallbackEffects.map((button, index) => {
+			{entityInterface?.removeItemEntityCallbackEffects?.map((button, index) => {
 				if (!button.dependency || button.dependency(item)) {
 					return <button 
 								key={index}
 								onClick={async () => {
-									if (button.onClick instanceof AsyncFunction) {
+									if (isAsync(button.onClick)) {
 										await button.onClick(item);
 									} else {
 										button.onClick(item);
@@ -135,4 +138,9 @@ const EntityBox: Function = ({
 		</div>
 	);
 }
+
+function isAsync(fn: Function) {
+    return Object.prototype.toString.call(fn) === '[object AsyncFunction]';
+}
+
 export default UIClientListBox;

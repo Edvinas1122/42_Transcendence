@@ -184,7 +184,8 @@ export class ChatService {
 			const isParticipant = await this.roleService.isParticipant(userId, chat.id);
 			if (!chat.personal) {
 				const owner = await this.usersService.getUserInfo(chat.ownerID);
-				const groupChatDto = new GroupChatDto(chat, owner, isParticipant, participants);
+				const isOwner = chat.ownerID === userId;
+				const groupChatDto = new GroupChatDto(chat, owner, isOwner, isParticipant, participants);
 				return groupChatDto;
 			} else {
 				const personalChatDto = new PersonalChatDto(chat, participants[0]);
@@ -192,6 +193,25 @@ export class ChatService {
 			}
 		}));
 	}
+
+	// private async returnChatDto(chat: Chat[], userId: number): Promise<ChatDto[]> {
+	// 	return Promise.all(chat.map(async (chat) => {
+	// 		const participants = await this.roleService.getChatRelatives(chat);
+	// 		/// learn if participant of a chat
+	// 		const isParticipant = await this.roleService.isParticipant(userId, chat.id);
+	// 		const role = await this.roleService.getRole(chat.id, userId);
+	// 		if (!chat.personal) {
+	// 			const owner = await this.usersService.getUserInfo(chat.ownerID);
+	// 			const isOwner = chat.ownerID === userId;
+	// 			const privileged = isOwner || role.type === RoleType.Admin;
+	// 			const groupChatDto = new GroupChatDto(chat, owner, isParticipant, isOwner, participants);
+	// 			return groupChatDto;
+	// 		} else {
+	// 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
+	// 			return personalChatDto;
+	// 		}
+	// 	}));
+	// }
 
 
 	private async updateEvent(chat: Chat, eventType: RoomEventType, moreInfo?: string): Promise<void> {

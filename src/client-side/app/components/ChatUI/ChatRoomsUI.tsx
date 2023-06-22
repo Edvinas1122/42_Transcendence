@@ -3,9 +3,9 @@ import fetchWithToken from "@/lib/fetch.util";
 import { Chat } from "@/lib/DTO/AppData";
 import UIListBox from "@/components/GeneralUI/GenericList";
 import GenericForm from "@/components/GeneralUI/GenericForm";
-import GenericButton from "../GeneralUI/GenericButton";
 import Link from "next/link";
 import "./Chat.css";
+import ChatRoomsLive from "./Live/ChatRooms.live";
 
 const ChatRoomBox: Function = ({ item, style }: { item: Chat, style?: string }) => {
 	return (
@@ -41,7 +41,8 @@ const ChatRoomsUI: Function = async () => {
 	return (
 		<div className="Component">
 			<h1>Available Chat Rooms</h1>
-			<UIListBox Items={ChatsAvailable} BoxComponent={ChatRoomBox} ListStyle="AvailableChats" />
+			{/* <UIListBox Items={ChatsAvailable} BoxComponent={ChatRoomBox} ListStyle="AvailableChats" /> */}
+			<ChatRoomsLive serverChats={ChatsAvailable} />
 			<CreateChatBox />
 		</div>
 	);
