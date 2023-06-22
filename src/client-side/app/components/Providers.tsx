@@ -1,16 +1,16 @@
 'use client'
  
 // import { ThemeProvider } from 'acme-theme'
-import { AuthProvider } from '@/components/ContextProviders/authContext'
-import { AppDataProvider } from '@/components/ContextProviders/appDataProvider'
+import { EventSourceProvider } from './ContextProviders/eventContext'
+import { AuthProvider } from './ContextProviders/authContext'
  
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     // <ThemeProvider>
       	<AuthProvider>
-			<AppDataProvider>
+			<EventSourceProvider>
 				{children}
-			</AppDataProvider>
+			</EventSourceProvider>
 		</AuthProvider>
     // </ThemeProvider>
   )

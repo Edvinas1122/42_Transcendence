@@ -7,13 +7,12 @@ import { Message, User } from '@/lib/DTO/AppData';
 
 // export type EventSourceContextType = EventSource | null;
 export type EventSourceContextType = Message | null;
+// export type EventSourceContextType = {newMessage: Message | null, newParticipant: User | null}
 
 
 export const EventSourceContext = createContext<EventSourceContextType>(null);
 
 interface EventSourceProviderProps {
-	fetchChats: () => void;
-	fetchInvitations: () => void;
 	children: React.ReactNode;
 }
 
@@ -31,7 +30,7 @@ interface EventSourceData {
 	retry: number;
 }
 
-export const EventSourceProvider = ({ fetchChats, fetchInvitations, children }: EventSourceProviderProps) =>  {
+export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  {
 	const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
 	const [eventSource, setEventSource] = useState<EventSource | null>(null);
 	const [newMessage, setNewMessage] = useState<Message | null>(null);
@@ -41,22 +40,18 @@ export const EventSourceProvider = ({ fetchChats, fetchInvitations, children }: 
 		if (loading || !token) {
 			return () => {};
 		}
-		// console.log("EventSourceProvider useEffect ", token.accessToken as string);
 		let es = new EventSource(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/events/sse/?token=${token.accessToken}`);
 
 		es.onmessage = (event) => {
 			const parsedData: EventSourceData = JSON.parse(event.data);
 
-			// console.log('New message:', parsedData);
 			switch (parsedData.type) {
 				case 'chat':
-					// console.log("EventSourceProvider useEffect chat");
 					switch (parsedData.data.event) {
 						case 'room':
 							switch (parsedData.data.subType) {
 								case 'new-available':
 									DisplayPopUp("New Chat Available", parsedData.data.data as string);
-									fetchChats();
 									break;
 								case 'added':
 									DisplayPopUp("New Chat", "You have been added to a new chat");
@@ -75,8 +70,6 @@ export const EventSourceProvider = ({ fetchChats, fetchInvitations, children }: 
 							break;
 					}
 				case 'user':
-					// console.log("EventSourceProvider useEffect user");
-					fetchInvitations();
 					switch (parsedData.data.event) {}
 					break;
 				// case 'message':
@@ -100,14 +93,14 @@ export const EventSourceProvider = ({ fetchChats, fetchInvitations, children }: 
 		// Close EventSource connection when component unmounts
 		es.close();
 	}
-	}, [token, fetchChats, fetchInvitations, loading]); // re-run effect when token changes
+	}, [token, loading]); // re-run effect when token changes
 
 	
 
 	return (
-	<EventSourceContext.Provider value={newMessage} value2={newParticipant}>
-	<DisplayComponent/>
-		{children}
-	</EventSourceContext.Provider>
+		<EventSourceContext.Provider value={newMessage}>
+		<DisplayComponent/>
+			{children}
+		</EventSourceContext.Provider>
 	);
 };

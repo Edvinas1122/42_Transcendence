@@ -19,6 +19,7 @@ interface GenericFormProps {
     method: string;
     fields: GenericField[];
     className?: string; // Optional
+	resetAfterSubmit?: boolean; // Optional
 }
 
 const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = false }: GenericFormProps) => {

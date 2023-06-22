@@ -1,17 +1,24 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation'
+import { getToken } from './token.util';
+import { GetDevToken } from './token.dev.util';
 
-async function fetchWithToken<T>(uri: string, revalidate_interval: number | null = null, params: {}, method: "GET" | "POST" = "GET"): Promise<T> {
+async function fetchWithToken<T>(uri: string, revalidate_interval: number | null = null, params?: {}, method: "GET" | "POST" = "GET"): Promise<T> {
+
     const fullUrl = "http://nest-app:3000" + uri;
-    const cookieStore = cookies();
-    const cookie = cookieStore.get('access_token');
+    let cookie;
+    if (process.env.NEXT_PUBLIC_DEV === 'true') {
+        cookie = getToken();
+    } else {
+        cookie = getToken();
+    }
 
     if (!cookie) {
         redirect('/auth');
         // throw new Error('Unauthorized');
     }
     const headers = {
-        'Authorization': `Bearer ${cookie.value}`,
+        'Authorization': `Bearer ${cookie}`,
         ...params
     };
 

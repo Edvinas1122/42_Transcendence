@@ -16,7 +16,7 @@ const MessagesDummy: Message[] = [
 			name: "test",
 			avatar: "",
 		},
-		myMessage: true,
+		me: true,
 	},
 	{
 		_id: 2,
@@ -26,7 +26,7 @@ const MessagesDummy: Message[] = [
 			name: "test",
 			avatar: "",
 		},
-		myMessage: true,
+		me: true,
 	},
 	{
 		_id: 3,
@@ -36,7 +36,7 @@ const MessagesDummy: Message[] = [
 			name: "test",
 			avatar: "",
 		},
-		myMessage: true,
+		me: true,
 	},
 	{
 		_id: 4,
@@ -46,7 +46,7 @@ const MessagesDummy: Message[] = [
 			name: "alan",
 			avatar: "",
 		},
-		myMessage: false,
+		me: false,
 	}
 ];
 
@@ -63,6 +63,7 @@ const DummyParticipants: User[] = [
 	}
 ];
 
+// Is being used in LiveMessages.tsx
 // const MessageBox: Function = ({ item, style }: { item: Message, style?: string }) => {
 
 // 	const messageClass = item.myMessage ? 'Message user' : 'Message';
@@ -78,6 +79,13 @@ const DummyParticipants: User[] = [
 // 		</div>
 // 	);
 // }
+
+// const ParticipantInteface: Function = ({ id }: { id: string }) => {
+// 	return (
+// 		<GenericForm 
+			
+// 		/>
+// 	);
 
 const ParticipantBox = ({ item }: { item: User }) => {
 	return (

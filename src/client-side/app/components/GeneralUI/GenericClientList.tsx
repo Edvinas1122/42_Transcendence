@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import "@/public/layout.css";
 
-const UIClientListBox: React.FC = ({ Items, BoxComponent, ListStyle, BoxStyle }: { Items: any[], BoxComponent: Function, ListStyle?: string, BoxStyle?: string}) => {
+const UIClientListBox: Function = ({ Items, BoxComponent, ListStyle, BoxStyle }: { Items: any[], BoxComponent: Function, ListStyle?: string, BoxStyle?: string}) => {
 
     const endOfListRef = useRef<HTMLDivElement | null>(null);
 

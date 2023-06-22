@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children?: ReactNode }) => {
 				setLoading(false);
 			});
 		}
-	}, [token, Login]);
+	}, [token, Login, fetchToken]);
 
 
 	const fetchWithToken = useCallback(async (service: string, requestOptions: RequestInit = {}): Promise<Response> => {

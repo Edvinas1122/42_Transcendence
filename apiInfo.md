@@ -1,9 +1,10 @@
 api fetch endpoints
 
 users/
-	me/ - UserProfile - personal profile of token bearer
-	profile/:id - UserProfile - id owners personal profile
+	<!-- me/ - UserProfile - personal profile of token bearer -->
+	profile/:id - UserProfile - id owners personal profile <--- only this
 	all/ - get all profiles (except blocked)
+	:id/all <-- 
 	
 	manage/
 		send-friend-request/:receiverId (POST)
