@@ -72,18 +72,6 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 				case 'user':
 					switch (parsedData.data.event) {}
 					break;
-				// case 'message':
-				// 	console.log("EventSourceProvider useEffect message");
-				// 	switch (parsedData.data.event) {
-				// 		case 'new':
-				// 			console.log("EventSourceProvider useEffect message new");
-				// 			setNewMessage(parsedData.data.data as Message);
-				// 			break;
-				// 	}
-				// 	break;
-				// default:
-				// 	DisplayPopUp("New Event", parsedData.type);
-				// 	break;
 			}
 		};
 

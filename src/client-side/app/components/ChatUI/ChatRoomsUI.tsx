@@ -3,6 +3,7 @@ import fetchWithToken from "@/lib/fetch.util";
 import { Chat } from "@/lib/DTO/AppData";
 import UIListBox from "@/components/GeneralUI/GenericList";
 import GenericForm from "@/components/GeneralUI/GenericForm";
+import GenericButton from "../GeneralUI/GenericButton";
 import Link from "next/link";
 import "./Chat.css";
 
