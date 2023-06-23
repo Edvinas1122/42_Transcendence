@@ -3,6 +3,7 @@ import fetchWithToken from '@/lib/fetch.util';
 import UserProfileInfo from '@/components/UserUI/UserProfileDisplay';
 import { User } from '@/lib/DTO/AppData';
 import CurrentUserId from '@/lib/token.dev.util';
+import UserProfileUI from '@/components/UserUI/UserProfileUI';
 
 export const metadata: Metadata = {
 	title: 'Profile',
@@ -16,7 +17,7 @@ const Page: Function = async () => {
 
 
 	return (
-		<UserProfileInfo UserInfo={user} />
+		<UserProfileUI UserInfo={user} />
 	);
 }
 

@@ -1,3 +1,4 @@
+import "@/public/layout.css";
 export default function UserLayout({
 	children,
 }: {
@@ -5,8 +6,7 @@ export default function UserLayout({
 })
 {
 	return (
-		<section>
-			<h1>UserPage</h1>
+		<section className="Display">
 			{children}
 		</section>
 	);

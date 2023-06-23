@@ -1,11 +1,11 @@
 "use client";
 
-interface MachHistory {
+interface MatchHistory {
 	_id: string;
-	opeonent: string;
+	opponent: string;
 	userScore: number;
-	oponentScore: number;
-	created: Date;
+	opponentScore: number;
+	created?: Date;
 	completed: boolean;
 }
 
@@ -13,8 +13,10 @@ interface Achievement {
 	_id: string;
 	name: string;
 	description: string;
-	achievedOn: Date;
+	achievedOn?: Date;
 }
+
+// added ? to date because it was causing problems in testing, can be deleted later
 
 interface User {
 	_id: string;
@@ -27,7 +29,7 @@ interface User {
 }
 
 interface UserProfile extends User {
-	MachHistory: MachHistory[];
+	MatchHistory: MatchHistory[];
 	Achievements: Achievement[];
 }
 
@@ -69,4 +71,4 @@ interface AppData {
 }
 
 export default AppData;
-export type { User, UserProfile, MachHistory, Chat, Achievement, PersonalChat, GroupChat, Message, RoleType };
+export type { User, UserProfile, MatchHistory, Chat, Achievement, PersonalChat, GroupChat, Message, RoleType };
