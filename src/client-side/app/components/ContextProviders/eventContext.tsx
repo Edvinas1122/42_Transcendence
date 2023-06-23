@@ -1,9 +1,10 @@
 "use client";
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { AuthorizedFetchContext } from './authContext';
+import { AuthorizedFetchContext, AuthorizedFetchContextType } from './authContext';
 import DisplayPopUp, {DisplayComponent} from '../EventsInfoUI/EventsInfo';
 import { Message, User } from '@/lib/DTO/AppData';
+import { useRouter } from 'next/router';
 
 // export type EventSourceContextType = EventSource | null;
 export type EventSourceContextType = Message | null;
@@ -31,7 +32,7 @@ interface EventSourceData {
 }
 
 export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  {
-	const { fetchWithToken, loading, token } = useContext(AuthorizedFetchContext);
+	const { fetchWithToken, loading, token } = useContext<AuthorizedFetchContextType>(AuthorizedFetchContext);
 	const [eventSource, setEventSource] = useState<EventSource | null>(null);
 	const [newMessage, setNewMessage] = useState<Message | null>(null);
 	const [newParticipant, setNewParticipant] = useState<User | null>(null);
@@ -63,6 +64,7 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 								case 'new':
 									let newMessage: Message = parsedData.data.data as unknown as Message;
 									newMessage.chatID = parseInt(parsedData.data.roomId);
+									newMessage.me =  (newMessage.user._id == token.id) ? true : false;
 									setNewMessage(newMessage);
 									break;
 							}
@@ -72,18 +74,6 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 				case 'user':
 					switch (parsedData.data.event) {}
 					break;
-				// case 'message':
-				// 	console.log("EventSourceProvider useEffect message");
-				// 	switch (parsedData.data.event) {
-				// 		case 'new':
-				// 			console.log("EventSourceProvider useEffect message new");
-				// 			setNewMessage(parsedData.data.data as Message);
-				// 			break;
-				// 	}
-				// 	break;
-				// default:
-				// 	DisplayPopUp("New Event", parsedData.type);
-				// 	break;
 			}
 		};
 

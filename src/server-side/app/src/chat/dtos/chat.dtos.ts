@@ -84,7 +84,7 @@ export class PersonalChatDto extends ChatDto {
 }
 
 export class GroupChatDto extends ChatDto {
-	constructor(chat: Chat, owner: UserInfo, privileged: boolean, participants?: UserInfo[], messages?: MessageDto[]) {
+	constructor(chat: Chat, owner: UserInfo, privileged: boolean, mine?: boolean, participants?: UserInfo[], messages?: MessageDto[]) {
 		super(chat, false, messages);
 		this.owner = owner || null; // Assuming you can pass the owner during construction
 		this.participants = participants || []; // Assuming you can pass the participants during construction
@@ -94,4 +94,5 @@ export class GroupChatDto extends ChatDto {
 	participants: UserInfo[];
 	privileged: boolean;
 	passwordProtected: boolean;
+	mine?: boolean;
 }

@@ -1,6 +1,6 @@
 "use client";
 import UIClientListBox from "@/components/GeneralUI/GenericClientList";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { EventSourceContext } from "@/components/ContextProviders/eventContext";
 import { Message } from "@/lib/DTO/AppData";
 
@@ -23,17 +23,26 @@ const MessageBox: Function = ({ item, style }: { item: Message, style?: string }
 const LiveMessages: Function = ({ serverMessages, chatID }: { serverMessages: Message[], chatID: number }) => {
 	
 	const newMessage: Message | null = useContext(EventSourceContext);
-	const [Messages, setMessages] = useState<Message[]>(serverMessages);
 
-	useEffect(() => {
-		if (newMessage && newMessage.chatID == chatID) {
-			console.log("new message is mine", newMessage);
-			setMessages((prevMessages) => [...prevMessages, newMessage]);
-		}
-	}, [newMessage, chatID]);
+    const handleNewMessage = useCallback((setItems: Function) => {
+        if (newMessage && newMessage.chatID == chatID) {
+            console.log("new message is mine", newMessage);
+            setItems((prevMessages: Message[]) => [...prevMessages, newMessage]);
+        }
+    }, [newMessage, chatID]);
+
+	// example
+    const handleRemoveItem = useCallback((items: Message[], setItems: Function) => {
+        setItems(items.slice(1));
+    }, []);
 
 	return (
-		<UIClientListBox Items={Messages} BoxComponent={MessageBox} ListStyle="MessageList" />
+		<UIClientListBox
+			initialItems={serverMessages}
+			setItemsCallback={handleNewMessage}
+			BoxComponent={MessageBox}
+			ListStyle="MessageList"
+		/>
 	);
 }
 
