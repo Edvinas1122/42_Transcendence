@@ -1,20 +1,8 @@
 import React from 'react';
-import { UserProfile, Achievement, MatchHistory } from '@/lib/DTO/AppData';
+import { UserProfile, MatchHistory } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
 import GenericForm from '../GeneralUI/GenericForm';
-
-const AchievementDummy: Achievement[] = [
-	{
-		_id: "1",
-		name: "Won 69 Games!",
-		description: "lmao nice"
-	},
-	{
-		_id: "2",
-		name: "Lost a match!",
-		description: "too bad!"
-	},
-]
+import GenericAchievement from './DummyAchievements';
 
 const MatchHistoryDummy: MatchHistory[] = [
 	{
@@ -33,19 +21,6 @@ const MatchHistoryDummy: MatchHistory[] = [
 	},
 ]
 
-
-const AchievementBox = ({ item, style }: { item: Achievement, style?: string }) => {
-	return (
-		<div className={"Entity " + style}>
-			<p>
-				<strong>{item.name}</strong>
-				<span>{item.description}</span>
-				<p>{item.achievedOn}</p>
-			</p>
-		</div>
-	);
-}
-
 const UserInfoBox = ({ user }: { user: UserProfile }) => {
 	return (
 		<div className="Component">
@@ -59,11 +34,8 @@ const UserInfoBox = ({ user }: { user: UserProfile }) => {
 const MatchHistoryBox = ({ item, style }: { item: MatchHistory, style?: string }) => {
 	return (
 		<div className={"Entity " + style}>
-			<p>
-				<strong>{item.opponent}</strong>
-				<span>{item.userScore} | {item.opponentScore} </span>
-				<p>{item.created}</p>
-			</p>
+			<strong>{item.opponent}</strong>
+			<span>{item.userScore} | {item.opponentScore} </span>
 		</div>
 	);
 }
@@ -87,22 +59,32 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 			</div>
 			<div className="Component">
 				<h1>Achievements</h1>
-				<UIListBox Items={AchievementDummy} BoxComponent={AchievementBox} />
+				<GenericAchievement id='0' />
+				<GenericAchievement id='1' />
+				<GenericAchievement id='2' />
 			</div>
 		</div>
 	);
 }
 
-const PlaceholderClientComponent = () => {
+
+// ADD FUNCTIONALITY TO THESE
+const FriendInteractions = ({user}: {user: UserProfile}) => {
 	return (
 		<div className="Component">
-			<h1>Here is a thing</h1>
+			<strong>Remove Friend</strong>
+			<strong>Block User</strong>
 		</div>
 	);
 }
 
-const FriendInteractions = ({user}: {user: UserProfile}) => {
-
+const NonFriendInteractions = ({user}: {user: UserProfile}) => {
+	return (
+		<div className="Component">
+		<strong>Add Friend</strong>
+		<strong>Block User</strong>
+		</div>
+	);
 }
 
 const UserEdit = () => {
@@ -119,12 +101,22 @@ const UserEdit = () => {
 	);
 }
 
-const UserProfileUI: Function = ({UserInfo}: {UserInfo: UserProfile}) => {
+const UserProfileUI: Function = ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
+	var userInteraction;
+	const userStatus = isUser ? "user" : UserInfo.friend ? "friend" : "nonFriend";
+	if (userStatus === "user") {
+		userInteraction = <UserEdit />
+	} else if (userStatus === "friend") {
+		userInteraction = <FriendInteractions user={UserInfo} />
+	} else {
+		userInteraction = <NonFriendInteractions user={UserInfo} />
+	};
+
 	return (
 		<section className="Display">
 			<div className="Segment">
 				<UserInfoBox user={UserInfo} />
-				<UserEdit />
+				{userInteraction}
 			</div>
 			<div className="Segment">
                 <UserStats user={UserInfo} />

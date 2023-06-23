@@ -17,7 +17,7 @@ const Page: Function = async () => {
 
 
 	return (
-		<UserProfileUI UserInfo={user} />
+		<UserProfileUI UserInfo={user} isUser={true}/>
 	);
 }
 

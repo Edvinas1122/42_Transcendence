@@ -8,7 +8,7 @@ const UserPage = async ({ params }: { params: { id: string } }) => {
 	const user: User = await fetchWithToken<User>(`/users/profile/${params.id}`, 30);
 
 	return (
-		<UserProfileUI UserInfo={user} />
+		<UserProfileUI UserInfo={user} isUser={false}/>
 	);
 };
 

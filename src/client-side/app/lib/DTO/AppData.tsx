@@ -10,13 +10,16 @@ interface MatchHistory {
 }
 
 interface Achievement {
-	_id: string;
+	_id: number;
 	name: string;
 	description: string;
 	achievedOn?: Date;
+	icon?: any;
 }
 
 // added ? to date because it was causing problems in testing, can be deleted later
+// also added icon 
+// also changed id to number
 
 interface User {
 	_id: string;
