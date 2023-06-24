@@ -9,7 +9,7 @@ class NotificationDisplay {
 		this.message = message;
 		this.type = type ? type : "success";
 		this.insert = "top";
-		this.container = "top-right";
+		this.container = "bottom-right";
 		this.animationIn = ["animate__animated", "animate__fadeIn"];
 		this.animationOut = ["animate__animated", "animate__fadeOut"];
 		this.dismiss = {
@@ -30,10 +30,23 @@ class NotificationDisplay {
 	};
 }
 
-const DisplayPopUp: Function = (title: string, message: string, duration?: number, type?: "success"): void => {
-	const info = new NotificationDisplay(title, message, duration, type);
-	Store.addNotification(info);
-}
+// const DisplayPopUp: Function = (title: string, message: string, duration?: number, type?: "success"): void => {
+// 	const info = new NotificationDisplay(title, message, duration, type);
+// 	Store.addNotification(info);
+// }
+
+const DisplayPopUp = (() => {
+    let lastNotificationId: string | undefined;
+
+    return (title: string, message: string, duration?: number, type?: "success"): void => {
+        if (lastNotificationId) {
+            Store.removeNotification(lastNotificationId);
+        }
+
+        const info = new NotificationDisplay(title, message, duration, type);
+        lastNotificationId = Store.addNotification(info);
+    };
+})();
 
 const DisplayComponent = () => {
 	return (

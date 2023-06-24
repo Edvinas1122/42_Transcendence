@@ -4,21 +4,10 @@ import { Chat } from "@/lib/DTO/AppData";
 import UIListBox from "@/components/GeneralUI/GenericList";
 import GenericForm from "@/components/GeneralUI/GenericForm";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import "./Chat.css";
 import ChatRoomsLive from "./Live/ChatRooms.live";
 
-const ChatRoomBox: Function = ({ item, style }: { item: Chat, style?: string }) => {
-	return (
-		<div className={"Entity " + style}>
-			<Link href={`/chat/${item._id}`}>
-				<p>
-					<strong>{item.name}</strong>
-					<span>{item.personal}</span>
-				</p>
-			</Link>
-		</div>
-	);
-}
 
 const CreateChatBox: Function = () => {
     return (
@@ -30,6 +19,7 @@ const CreateChatBox: Function = () => {
                 { name: 'isPrivate', value: false, type: 'checkbox', optional: true, displayName: 'Private' },
                 { name: 'password', value: '', type: 'password', optional: true, placeholder: 'password... ' , displayName: 'Password' },
             ]}
+			resetAfterSubmit = {true}
         />
     );
 }

@@ -7,8 +7,7 @@ import { Message } from "@/lib/DTO/AppData";
     Generic client Entity list component
     
     Designed for dynamic lists modification:
-        - setItemsCallback: callback function to set items
-        - removeItemCallback: callback function to remove items
+        - editItemsCallback: callback function to set items
     
 	And for interactive entity boxes:
 		- entityInterface: interface for interactive entity boxes
@@ -37,8 +36,7 @@ interface UIClientListBoxProps {
     BoxComponent: Function,
     ListStyle?: string,
     BoxStyle?: string,
-    setItemsCallback?: Function
-    removeItemCallback?: Function,
+    editItemsCallback?: Function
 	entityInterface?: EntityBoxInterface,
 }
 
@@ -47,22 +45,18 @@ const UIClientListBox: Function = ({
     BoxComponent,
     ListStyle,
     BoxStyle,
-    setItemsCallback,
-    removeItemCallback,
+    editItemsCallback,
 	entityInterface,
 }: UIClientListBoxProps ) => {
 
-	console.log("LiveMessages", initialItems);
     const endOfListRef = useRef<HTMLDivElement | null>(null);
     const [Items, setItems] = useState<any[]>(initialItems);
 
-    useEffect(() => {
-        setItemsCallback && setItemsCallback(setItems);
-    }, [setItemsCallback]);
+	
 
     useEffect(() => {
-        removeItemCallback && removeItemCallback(Items, setItems);
-    }, [removeItemCallback, Items]);
+        editItemsCallback && editItemsCallback(setItems);
+    }, [editItemsCallback]);
     
     useEffect(() => {
         endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -108,7 +102,7 @@ const EntityBox: Function = ({
 }: EntityBoxProps) => {
 
 	return (
-		<div className={"EntityBox " + style}>
+		<div className={"Entity " + style}>
 			<BoxComponent
 				item={item}
 				style={style}
@@ -141,6 +135,47 @@ const EntityBox: Function = ({
 
 function isAsync(fn: Function) {
     return Object.prototype.toString.call(fn) === '[object AsyncFunction]';
+}
+
+/*
+	A hellper class to build the entity interface
+
+	Offers methods to add buttons to the entity interface
+		and a build method to return a frozen copy of the object
+		so to avoid encapsulation problems
+
+*/
+export class EntityInterfaceBuilder implements EntityBoxInterface {
+    public removeItemEntityCallbackEffects: EntityButton[] = [];
+    public interactItemEntityCallbackEffects: EntityButton[] = [];
+
+    addRemoveButton(name: string, onClick: Function, dependency?: (item: any) => boolean) {
+        const button: EntityButton = {
+            name,
+            onClick,
+            dependency
+        }
+        this.removeItemEntityCallbackEffects.push(button);
+        return this;
+    }
+
+    addInteractButton(name: string, onClick: Function, dependency?: (item: any) => boolean) {
+        const button: EntityButton = {
+            name,
+            onClick,
+            dependency
+        }
+        this.interactItemEntityCallbackEffects.push(button);
+        return this;
+    }
+
+    build(): EntityBoxInterface {
+        // return a "frozen" copy of the object
+        return Object.freeze({
+            removeItemEntityCallbackEffects: [...this.removeItemEntityCallbackEffects],
+            interactItemEntityCallbackEffects: [...this.interactItemEntityCallbackEffects]
+        });
+    }
 }
 
 export default UIClientListBox;

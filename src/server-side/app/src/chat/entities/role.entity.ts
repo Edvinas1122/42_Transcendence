@@ -33,8 +33,8 @@ id: number;
 type: RoleType;
 
 @ManyToOne(() => User, user => user.roles)
-user: User;
+	user: User;
 
-@ManyToOne(() => Chat, chat => chat.roles)
-chat: Chat;
+@ManyToOne(() => Chat, chat => chat.roles, { onDelete: 'CASCADE' })
+	chat: Chat;
 }

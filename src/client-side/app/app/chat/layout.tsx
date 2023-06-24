@@ -1,5 +1,6 @@
 import "@/public/layout.css";
 import ChatRoomsUI from "@/components/ChatUI/ChatRoomsUI";
+import { ChatEventProvider } from "@/components/ChatUI/ChatEventProvider";
 
 export default function	ChatsLayout({
 	children,
@@ -9,10 +10,12 @@ export default function	ChatsLayout({
 {
 	return (
 		<section className="Display">
-			<div className="Segment">
-				<ChatRoomsUI />
-			</div>
+			<ChatEventProvider>
+				<div className="Segment">
+					<ChatRoomsUI />
+				</div>
 				{children}
+			</ChatEventProvider>
 		</section>
 	);
 }

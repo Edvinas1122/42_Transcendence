@@ -10,18 +10,18 @@ import { useRouter } from 'next/router';
 export type EventSourceContextType = Message | null;
 // export type EventSourceContextType = {newMessage: Message | null, newParticipant: User | null}
 
-
 export const EventSourceContext = createContext<EventSourceContextType>(null);
+export const ChatSourceContext = createContext<ChatEventType | null>(null);
 
 interface EventSourceProviderProps {
 	children: React.ReactNode;
 }
 
-interface ChatEventType {
+export interface ChatEventType {
 	event: string;
 	roomId: string;
 	subType: string;
-	data?: string;
+	data: any;
 }
 
 interface EventSourceData {
@@ -34,8 +34,7 @@ interface EventSourceData {
 export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  {
 	const { fetchWithToken, loading, token } = useContext<AuthorizedFetchContextType>(AuthorizedFetchContext);
 	const [eventSource, setEventSource] = useState<EventSource | null>(null);
-	const [newMessage, setNewMessage] = useState<Message | null>(null);
-	const [newParticipant, setNewParticipant] = useState<User | null>(null);
+	const [chatEvent, setChatEvent] = useState<ChatEventType | null>(null);
 
 	useEffect(() => {
 		if (loading || !token) {
@@ -48,29 +47,7 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 
 			switch (parsedData.type) {
 				case 'chat':
-					switch (parsedData.data.event) {
-						case 'room':
-							switch (parsedData.data.subType) {
-								case 'new-available':
-									DisplayPopUp("New Chat Available", parsedData.data.data as string);
-									break;
-								case 'added':
-									DisplayPopUp("New Chat", "You have been added to a new chat");
-								default:
-									break;
-							}
-						case 'message':
-							switch (parsedData.data.subType) {
-								case 'new':
-									let newMessage: Message = parsedData.data.data as unknown as Message;
-									newMessage.chatID = parseInt(parsedData.data.roomId);
-									newMessage.me =  (newMessage.user._id == token.id) ? true : false;
-									setNewMessage(newMessage);
-									break;
-							}
-						default:
-							break;
-					}
+					setChatEvent(parsedData.data);
 				case 'user':
 					switch (parsedData.data.event) {}
 					break;
@@ -88,9 +65,9 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 	
 
 	return (
-		<EventSourceContext.Provider value={newMessage}>
-		<DisplayComponent/>
+		<ChatSourceContext.Provider value={chatEvent}>
+			<DisplayComponent/>
 			{children}
-		</EventSourceContext.Provider>
+		</ChatSourceContext.Provider>
 	);
 };

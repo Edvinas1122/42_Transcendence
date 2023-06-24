@@ -29,11 +29,9 @@ export class RolesController {
 		@Param('role', new ParseEnumPipe(RoleType)) role: RoleType
 	): Promise<UserInfo[]>
 	{
-		console.log('getChatRelatives: Any');
 		const chat = new Chat();
 		chat.id = chatId;
 		if (role === RoleType.Any) {
-			console.log('getChatRelatives: Any');
 			return await this.roleService.getChatRelatives(chat);
 		}
 		return await this.roleService.getChatRoleRelatives(chat, role);
@@ -46,6 +44,7 @@ export class RolesController {
 		@Body(new ValidationPipe({ transform: true })) body: JoinChatDto
 	): Promise<boolean>
 	{
+		console.log('joinChat triggered');
 		const chatDto = await this.chatService.joinChat(UserId, chatId, body.chatPassword);
 		return chatDto;
 	}

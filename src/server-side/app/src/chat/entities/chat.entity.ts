@@ -30,7 +30,7 @@ export class Chat {
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
 	createdAt: Date;
 
-	@OneToMany(() => Role, role => role.chat)
+	@OneToMany(() => Role, role => role.chat, { onDelete: 'CASCADE' })
 	roles: Role[];
 
 	@Column({ nullable: true })
@@ -39,6 +39,6 @@ export class Chat {
 	@Column({ default: false })
 	deleted: boolean;
 
-	@OneToMany(() => Message, message => message.chat)
+	@OneToMany(() => Message, message => message.chat, { onDelete: 'CASCADE' })
 	messages: Message[];
 }

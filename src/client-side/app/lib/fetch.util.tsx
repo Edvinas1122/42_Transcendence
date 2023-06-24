@@ -1,9 +1,22 @@
+"use server";
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation'
 import { getToken } from './token.util';
 import { GetDevToken } from './token.dev.util';
 
-async function fetchWithToken<T>(uri: string, revalidate_interval: number | null = null, params?: {}, method: "GET" | "POST" = "GET"): Promise<T> {
+export const serverFetch = async (uri: string, method: "GET" | "POST" | "DELETE" = "GET", params?: {}, body?: any) => {
+	"use server";
+
+	return await fetchWithToken(uri, null, params, method, body);
+}
+
+async function fetchWithToken<T>(
+    uri: string,
+    revalidate_interval: number | null = null,
+    params?: {},
+    method: "GET" | "POST" | "DELETE" = "GET",
+    body?: any,
+    ): Promise<T> {
 
     const fullUrl = "http://nest-app:3000" + uri;
     let cookie;
@@ -22,7 +35,7 @@ async function fetchWithToken<T>(uri: string, revalidate_interval: number | null
         ...params
     };
 
-    let options: RequestInit = { headers: headers, method: method };
+    let options: RequestInit = { headers: headers, method: method, body: body};
 
     if (revalidate_interval === null) {
         options = { ...options, cache: 'no-store' };

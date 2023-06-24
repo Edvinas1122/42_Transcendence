@@ -1,6 +1,7 @@
-import Link from 'next/link'
+"use client";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faComments, faUsers, faGamepad } from '@fortawesome/free-solid-svg-icons'
+import { useRouter, usePathname } from 'next/navigation';
 import "@/public/layout.css"
 
 interface SidebarElementProps {
@@ -33,11 +34,15 @@ const SidebarContent: SidebarElementProps[] = [
 ];
 
 const SidebarElement = (props: SidebarElementProps) => {
+	const router = useRouter();
+	const pathname = usePathname();
+
+	const handleLinkClick = pathname !== '/' ? () => router.replace(props.link) : () => router.push(props.link);
+
+
 	return (
-		<div className="Entity">
-		<Link href={props.link}>
-			<span><FontAwesomeIcon icon={props.icon} size="1x" /> {props.name}</span>
-		</Link>
+		<div className="Entity" style={{ cursor: 'pointer' }} onClick={handleLinkClick}>
+			<span><FontAwesomeIcon icon={props.icon} size="4x" /> {props.name}</span>
 		</div>
 	);
 }

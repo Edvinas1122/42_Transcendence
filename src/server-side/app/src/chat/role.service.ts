@@ -21,10 +21,12 @@ export class RoleService {
 	
 	async getChatRelatives(chat: Chat): Promise<UserInfo[]> {
 		const relatives = await this.roleRepository.find({
-			where: { id: chat.id },
+			where: {
+				chat: { id: chat.id },
+			},
 			relations: ['user'],
 		});
-		
+		console.log('Relatives', relatives);
 		return relatives.map(relative => new UserInfo(relative.user, relative.type));
 	}
 
@@ -76,16 +78,17 @@ export class RoleService {
 	}
 
 	async removeChatRelative(chat: Chat, userId: number, expectedRole?: RoleType): Promise<boolean> {
-		const conditions = {
-		  chat: chat,
-		  user: { id: userId } as User,
+		let conditions = {
+			chat: { id: chat.id },
+			user: { id: userId },
 		};
 		
 		if (expectedRole) {
-		  conditions['role'] = expectedRole;
+			// conditions['type'] = expectedRole;
 		}
-	  
+		
 		const result = await this.roleRepository.delete(conditions);
+		console.log('Remove relative', chat, userId, expectedRole, result);
 		
 		if (result.affected === 0) {
 		  throw new HttpException('The user does not have the expected role', HttpStatus.BAD_REQUEST);
