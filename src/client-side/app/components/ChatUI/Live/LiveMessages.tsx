@@ -6,6 +6,7 @@ import { Message } from "@/lib/DTO/AppData";
 import DisplayPopUp from "@/components/EventsInfoUI/EventsInfo";
 import { serverFetch } from "@/lib/fetch.util";
 
+
 const MessageBox: Function = ({ item, style }: { item: Message, style?: string }) => {
 
 	const messageClass = item.me ? 'Message user' : 'Message';
@@ -23,17 +24,16 @@ const MessageBox: Function = ({ item, style }: { item: Message, style?: string }
 	);
 }
 
-const LiveMessages: Function = ({ initialMessages, chatID }: { initialMessages: Message[], chatID: number }) => {
+// set async to re-render on every new message
+const LiveMessages: Function = ({ initialMessages, chatID }: { initialMessages: Message[] | string, chatID: number }) => {
 	
 	const newMessage: Message | null = useContext(MessageSourceContext);
 
-    const handleNewMessage = useCallback((setItems: Function) => {
-		console.log("LiveMessages Received ", chatID)
-        if (newMessage && newMessage.chatID == chatID) {
-            setItems((prevMessages: Message[]) => [...prevMessages, newMessage]);
-        }
-    }, [newMessage, chatID]);
-
+	const handleNewMessage = useCallback((setItems: Function) => {
+		if (newMessage && newMessage.chatID == chatID) {
+			setItems((prevMessages: Message[]) => [...prevMessages, newMessage]);
+		}
+	}, [newMessage, chatID]);
 
 	return (
 		<UIClientListBox

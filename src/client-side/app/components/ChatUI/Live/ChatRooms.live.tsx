@@ -5,19 +5,21 @@ import { ChatRoomSourceContext } from "@/components/ChatUI/ChatEventProvider";
 import Link from "next/link";
 import { Chat } from "@/lib/DTO/AppData";
 import "../Chat.css";
+import "@/public/layout.css";
 import { serverFetch } from "@/lib/fetch.util";
 import { usePathname, useRouter } from 'next/navigation';
 
 const ChatRoomBox: Function = ({ item, style }: { item: Chat, style?: string }) => {
+	const pathname = usePathname();
 	const router = useRouter();
-	const openChatLink: Function = () => router.replace(`/chat/${item._id}`);
+	const openChatLink = () => router.replace(`/chat/${item._id}`);
 
 	return (
-		<div className={style} onClick={openChatLink} style={{ cursor: 'pointer' }}>
-				<p>
-					<strong>{item.name}</strong>
-					<span>{item.personal}</span>
-				</p>
+		<div onClick={openChatLink} style={{ cursor: 'pointer' }}>
+			<p>
+				<strong>{item.name}</strong>
+				<span>{item.personal}</span>
+			</p>
 		</div>
 	);
 }
@@ -68,10 +70,15 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 		serverFetch(`/chat/roles/${item._id}/join`, "POST");
 	}
 
+	const isRouteActiveStyle = (item: Chat): string => {
+		return item._id.toString() == pathname.split('/')[2] ? "Active" : "";
+	}
+
 	const ChatRoomInterface = new EntityInterfaceBuilder()
 		.addRemoveButton("remove chat", deleteChat)
 		.addInteractButton("join chat", joinChat, (item: Chat) => !item.mine)
 		.addInteractButton("quit chat", () => console.log("quit chat"), (item: Chat) => item.mine ? true : false)
+		.addConditionalStyle(isRouteActiveStyle)
 		.build();
 
 	return (

@@ -7,7 +7,7 @@ import { User } from "@/lib/DTO/AppData";
 
 const ParticipantBox: Function = ({ item }: { item: User }) => {
 	return (
-		<div className="Entity">
+		<div>
 			<p>
 				<strong>{item.name}</strong>
 				<span>{item.name}</span>
@@ -17,14 +17,13 @@ const ParticipantBox: Function = ({ item }: { item: User }) => {
 	);
 }
 
-const LiveParticipants: Function = ({ initialParticipants, chatID }: { initialParticipants: User[], chatID: number }) => {
+const LiveParticipants: Function = ({ initialParticipants, chatID }: { initialParticipants: User[] | string, chatID: number }) => {
 	
 
 	return (
 		<UIClientListBox
 			Items={initialParticipants}
 			BoxComponent={ParticipantBox}
-			// ListStyle="EntityList"
 		/>
 	);
 }

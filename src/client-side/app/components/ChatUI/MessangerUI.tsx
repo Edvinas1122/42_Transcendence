@@ -3,6 +3,7 @@ import UIListBox from "../GeneralUI/GenericList";
 import GenericForm from "../GeneralUI/GenericForm";
 import LiveMessages from "./Live/LiveMessages";
 import fetchWithToken from "@/lib/fetch.util";
+import { notFound } from 'next/navigation'
 import "@/public/layout.css";
 import "./Chat.css";
 import UIClientListBox from "../GeneralUI/GenericClientList";
@@ -21,32 +22,28 @@ const SendMessageBox: Function = ({id}: {id: string}) => {
 	);
 }
 
-const MessangerUI: Function = async ({ params }: { params: { id: string } }) => {
-
-	const ChatMessages: Message[] = await fetchWithToken<Message[]>(`/chat/messages/${params.id}`);
-	const ChatParticipants: User[] = await fetchWithToken<User[]>(`/chat/roles/${params.id}/Any`);
+const MessangerUI: Function = ({ params }: { params: { id: string } }) => {
 
 	return (
-		<section className="Display">
+		<>
 			<div className="Segment">
 				<div className="Component MessageComponent">
 					<h1>
 						Messages Display
 					</h1>
-					{/* <UIListBox Items={ChatMessages} BoxComponent={MessageBox} ListStyle={"MessageList"} /> */}
-					<LiveMessages initialMessages={ChatMessages} chatID={params.id} />
+					<LiveMessages initialMessages={`/chat/messages/${params.id}`} chatID={params.id} />
 					<SendMessageBox id={params.id} />
 				</div>
 			</div>
-			<div className="Segment">
+			<div className="Segment Participants">
 				<div className="Component">
 					<h1>
 						Particaipants Display
 					</h1>
-					<UIClientListBox initialParticipants={ChatParticipants} chatID={params.id} />
+					<UIClientListBox initialParticipants={`/chat/roles/${params.id}/Any`} chatID={params.id} />
 				</div>
 			</div>
-	  	</section>
+	  	</>
 	);
 }
 

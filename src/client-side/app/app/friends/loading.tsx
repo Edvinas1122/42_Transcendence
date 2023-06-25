@@ -1,12 +1,6 @@
-import "@/public/loading.css" 
-
-const LoadingSkeleton = () => (
-	<div className="loading">
-		<div className="spinner"></div>
-	</div>
-)
+import SpinnerLoader from "@/components/GeneralUI/Loader"
 
 export default function Loading() {
 	// You can add any UI inside Loading, including a Skeleton.
-	return <LoadingSkeleton />
+	return <SpinnerLoader />
 }

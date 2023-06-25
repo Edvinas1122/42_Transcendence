@@ -85,3 +85,8 @@
     width: 80px; /* Sets a fixed width for the button */
     text-align: right; /* Aligns the text to the right */
 }
+
+.Participants {
+    width: 32%;
+    min-width: 310px;
+}

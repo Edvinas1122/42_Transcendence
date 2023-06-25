@@ -18,6 +18,11 @@ export type ParticipantContextType = {
 	data?: any;
 } | null;
 
+export type MessageContextType = {
+	messages: Message[],
+	getMessagesForChat: (chatID: number) => [],
+} 
+
 export const MessageSourceContext = React.createContext<Message | null>(null);
 export const ChatRoomSourceContext = React.createContext<ChatSourceContextType>(null);
 export const ParticipantSourceContext = React.createContext<ParticipantContextType>(null);

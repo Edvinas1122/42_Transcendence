@@ -1,6 +1,6 @@
 "use server";
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation'
+import { redirect, notFound } from 'next/navigation';
 import { getToken } from './token.util';
 import { GetDevToken } from './token.dev.util';
 
@@ -50,6 +50,7 @@ async function fetchWithToken<T>(
         }
         console.log(response);
         throw new Error('Failed to fetch data')
+
     }
     return response.json();
 }

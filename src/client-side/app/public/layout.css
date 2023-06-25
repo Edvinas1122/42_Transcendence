@@ -12,11 +12,16 @@
 
 	position: fixed;
 	width: 100px;
-	padding: 20px;
 }
 
 .Sidebar .Entity{
 	height:20vh;
+	padding: 17px;
+}
+
+.Sidebar svg {
+	width: 100%;
+	font-size: 5.5em;
 }
 
 .MainDisplay {
@@ -26,7 +31,7 @@
 }
 
 .Display {
-	display: flex;	
+	display: flex;
 	flex-direction: row;
 	width: 100%;
 	height: 100vh;
@@ -34,8 +39,9 @@
 
 .Segment
 {
+	display: flex;
+	flex-direction: row;
 	flex-grow: 1;
-	/* display: flex; */
 	background-color: #fff;
 	border: 1px solid #e6e6e6;
 	border-radius: 3px;
@@ -44,7 +50,7 @@
 }
 
 .Component {
-	
+	width: 100% !important;
 }
 
 .List {
@@ -69,14 +75,17 @@
 }
 
 .Entity {
-	height:70px;
-	border-bottom:1px solid #e7ebee;	
+	height: 70px;
 	position:relative;
 
 }
 
+.Active {
+	background: #3b3b3b41 !important;
+}
+
 .Entity:hover{
-	background:#f1f4f6;
+	background:#9595957f;
 	cursor:pointer;
 }
 

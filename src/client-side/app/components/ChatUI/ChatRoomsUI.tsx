@@ -3,8 +3,6 @@ import fetchWithToken from "@/lib/fetch.util";
 import { Chat } from "@/lib/DTO/AppData";
 import UIListBox from "@/components/GeneralUI/GenericList";
 import GenericForm from "@/components/GeneralUI/GenericForm";
-import Link from "next/link";
-import { useRouter } from 'next/navigation';
 import "./Chat.css";
 import ChatRoomsLive from "./Live/ChatRooms.live";
 
@@ -24,15 +22,12 @@ const CreateChatBox: Function = () => {
     );
 }
 
-const ChatRoomsUI: Function = async () => {
-
-	const ChatsAvailable: Chat[] = await fetchWithToken<Chat[]>("/chat/available");
+const ChatRoomsUI: Function = () => {
 
 	return (
 		<div className="Component">
 			<h1>Available Chat Rooms</h1>
-			{/* <UIListBox Items={ChatsAvailable} BoxComponent={ChatRoomBox} ListStyle="AvailableChats" /> */}
-			<ChatRoomsLive serverChats={ChatsAvailable} />
+			<ChatRoomsLive serverChats={`/chat/available`} />
 			<CreateChatBox />
 		</div>
 	);
