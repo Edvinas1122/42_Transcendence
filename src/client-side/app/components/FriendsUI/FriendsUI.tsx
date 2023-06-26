@@ -34,32 +34,6 @@ const	FriendsDummy: User[] = [
 	},
 ]
 
-// const InvitesDummy: User[] = [
-// 	{
-// 		_id: "5",
-// 		name: "John",
-// 		avatar: "",
-// 		// Online: true,
-// 	},
-// 	{
-// 		_id: "6",
-// 		name: "Jane",
-// 		avatar: "",
-// 		// Online: false,
-// 	},
-// 	{
-// 		_id: "7",
-// 		name: "Jack",
-// 		avatar: "",
-// 		// Online: true,
-// 	},
-// 	{
-// 		_id: "8",
-// 		name: "Jill",
-// 		avatar: "",
-// 		// Online: false,
-// 	},
-// ]
 
 export const LinkUserBox: Function = ({ item }: { item: User }) => {
 	return (
@@ -67,7 +41,7 @@ export const LinkUserBox: Function = ({ item }: { item: User }) => {
 		<UserBox item={item} />
 	  </Link>
 	);
-  }
+}
 
 export const UserBox: Function = ({ item }: { item: User }) => {
 	return (

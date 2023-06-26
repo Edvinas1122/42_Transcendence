@@ -6,6 +6,8 @@ import { Inject } from '@nestjs/common';
 import { TmpTokenStore } from './tmpTokenStore.service';
 import { UsersService, User } from '../users/users.service';
 import { randWords } from './utils/rand.words';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import { UserId } from '../utils/user-id.decorator';
 
 
 @Controller('auth')
@@ -22,7 +24,7 @@ export class AuthController
 	@Get('/DevToken/') // development only
 	async getToken(): Promise<any>
 	{
-		if (process.env.DEV !== 'true') {
+		if (process.env.DEV !== 'true') { // if not in dev mode, throw an error
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
 		}
 		const randomName = randWords(2);
@@ -45,13 +47,13 @@ export class AuthController
 	@Get('/DevUser/')
 	async getDevUser(@Res() res: Response): Promise<any>
 	{
-		if (process.env.DEV !== 'true') {
+		if (process.env.DEV !== 'true') { // if not in dev mode, throw an error
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
 		}
 		const randomName = randWords(2);
 		const randomId = Math.floor(Math.random() * 1000000);
 
-		const newUser = {
+		const newUser = { 
 			id: randomId,
 			name: randomName, // assuming username corresponds to the 'name' in User entity
 			avatar: "", // default avatar if any or you can leave this field to be updated later
@@ -84,5 +86,12 @@ export class AuthController
 
 		res.cookie('access_token', accessToken, { maxAge: 9000000000, httpOnly: false, secure: false });
 		return res.redirect(process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL);
+	}
+
+	@Get('validate')
+	@UseGuards(JwtAuthGuard)
+	async validate(@UserId() currentUserId: number): Promise<any>
+	{
+		return {validated: true};
 	}
 }

@@ -13,7 +13,7 @@ interface SidebarElementProps {
 const SidebarContent: SidebarElementProps[] = [
 {
 	name: 'Personal Profile',
-	link: '/',
+	link: '/user',
 	icon: faUser,
 },
 {
@@ -33,11 +33,12 @@ const SidebarContent: SidebarElementProps[] = [
 }
 ];
 
-const SidebarElement = (props: SidebarElementProps) => {
+export const SidebarElement = (props: SidebarElementProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const handleLinkClick = pathname !== '/' ? () => router.replace(props.link) : () => router.push(props.link);
+	const firstLink = SidebarContent[0].link; // first link of sidebar
+	const handleLinkClick = pathname !== firstLink ? () => router.replace(props.link) : () => router.push(props.link);
 	const ActiveStyle = "/" + pathname.split('/')[1] === props.link ? 'Active' : '';
 
 	return (

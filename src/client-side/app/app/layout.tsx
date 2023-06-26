@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import { Providers } from '@/components/Providers'
 import Sidebar from '../components/GeneralUI/Sidebar'
 import EventPopUp from '@/components/EventsInfoUI/EventsInfo'
+import validateUser from '@/components/Auth/auth.utils'
 
 
 const inter = Inter({ 
@@ -15,19 +16,21 @@ export const metadata = {
 	description: 'Learning project for 42 students',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode })
+export default async function RootLayout(props: {
+	children: React.ReactNode,
+	auth: React.ReactNode,
+	sidebar: React.ReactNode,
+})
 {
+	const loggedIn = await validateUser('/auth/validate');
+	console.log(loggedIn);
 	return (
 		<html lang="en">
 			<body className={inter.className}>
-				<Providers>
-					<div className="MainWrapper">
-						<Sidebar />
-						<div className="MainDisplay">
-							{children}
-						</div>
-					</div>
-				</Providers>
+			<div className="MainWrapper">
+				{loggedIn ? props.sidebar : null}
+				{loggedIn ? props.children : props.auth}
+			</div>
 			</body>
 		</html>
 	)

@@ -1,8 +1,6 @@
 'use client'
 
 import React, {useContext} from 'react'
-import { LoginContext } from '@/components/ContextProviders/authContext'
-
 
 export default function GlobalError({
 		error,
@@ -12,18 +10,12 @@ export default function GlobalError({
 		reset: () => void
 }) {
 
-	const {login} = useContext(LoginContext);
-
-	const loginButton = () => {
-		login();
-	}
 
 	if (error.message === 'Unauthorized') {
 		return (
 			<html>
 			<body>
 				<h2>Not logged in!</h2>
-				<button onClick={loginButton}>Login</button>
 			</body>
 			</html>
 		)

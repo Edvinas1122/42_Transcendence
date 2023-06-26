@@ -1,22 +1,24 @@
 "use server";
-import { cookies } from 'next/headers';
-import { redirect, notFound } from 'next/navigation';
 import { getToken } from './token.util';
-import { GetDevToken } from './token.dev.util';
 
-export const serverFetch = async (uri: string, method: "GET" | "POST" | "DELETE" = "GET", params?: {}, body?: any) => {
-	"use server";
+export const serverFetch = async <T = any>(
+    uri: string, 
+    method: "GET" | "POST" | "DELETE" = "GET", 
+    params?: any, 
+    body?: any
+): Promise<T> => {
+    "use server";
 
-	return await fetchWithToken(uri, null, params, method, body);
+    return await fetchWithToken<T>(uri, null, params, method, body);
 }
 
-async function fetchWithToken<T>(
+async function fetchWithToken<T = any>(
     uri: string,
     revalidate_interval: number | null = null,
     params?: {},
     method: "GET" | "POST" | "DELETE" = "GET",
     body?: any,
-    ): Promise<T> {
+): Promise<T> {
 
     const fullUrl = "http://nest-app:3000" + uri;
     let cookie;
@@ -27,8 +29,7 @@ async function fetchWithToken<T>(
     }
 
     if (!cookie) {
-        redirect('/auth');
-        // throw new Error('Unauthorized');
+        throw new Error('Unauthorized');
     }
     const headers = {
         'Authorization': `Bearer ${cookie}`,

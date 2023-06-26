@@ -1,10 +1,9 @@
 "use client";
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { AuthorizedFetchContext, AuthorizedFetchContextType } from './authContext';
+import { AuthContext, AuthContextType } from './authContext';
 import DisplayPopUp, {DisplayComponent} from '../EventsInfoUI/EventsInfo';
 import { Message, User } from '@/lib/DTO/AppData';
-import { useRouter } from 'next/router';
 
 // export type EventSourceContextType = EventSource | null;
 export type EventSourceContextType = Message | null;
@@ -32,23 +31,31 @@ interface EventSourceData {
 }
 
 export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  {
-	const { fetchWithToken, loading, token } = useContext<AuthorizedFetchContextType>(AuthorizedFetchContext);
+
+	const { token } = useContext<AuthContextType>(AuthContext);
 	const [eventSource, setEventSource] = useState<EventSource | null>(null);
 	const [chatEvent, setChatEvent] = useState<ChatEventType | null>(null);
 
+
 	useEffect(() => {
-		if (loading || !token) {
+
+		console.log('EventSourceProvider: ', token);
+		if (!token) {
 			return () => {};
 		}
-		let es = new EventSource(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/events/sse/?token=${token.accessToken}`);
+		// const url = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/events/sse/?token=${token}`;
+		const url = `http://localhost:3000/events/sse/?token=${token}`;
+		const es = new EventSource(url);
 
 		es.onmessage = (event) => {
 			const parsedData: EventSourceData = JSON.parse(event.data);
 
 			switch (parsedData.type) {
 				case 'chat':
+					console.log('global enevt: ', parsedData.data);
 					setChatEvent(parsedData.data);
 				case 'user':
+					console.log('global event: ', parsedData.data);
 					switch (parsedData.data.event) {}
 					break;
 			}
@@ -60,7 +67,7 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 		// Close EventSource connection when component unmounts
 		es.close();
 	}
-	}, [token, loading]); // re-run effect when token changes
+	}, [token]); // re-run effect when token changes
 
 	
 

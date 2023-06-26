@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { AuthorizedFetchContext } from '@/components/ContextProviders/authContext';
+import { serverFetch } from '@/lib/fetch.util';
 
 interface GenericButtonProps {
 	text: string;
@@ -34,16 +34,21 @@ const defaultIconStyle: React.CSSProperties = {
 }
 
 const GenericButton: React.FC<GenericButtonProps> = ({ text, disabled, className, style=defaultStyle, type, icon, iconPosition, iconStyle=defaultIconStyle, iconClassName, endpoint, body }) => {
-	const { fetchWithToken } = useContext(AuthorizedFetchContext);
+	// const { fetchWithToken } = useContext(AuthorizedFetchContext);
 
 	const handleClick = async () => {
 		if (endpoint) {
-			const response = await fetchWithToken(endpoint, {
-				method: 'POST',
-				body: JSON.stringify(body),
-				headers: { 'Content-Type': 'application/json' },
-			});
-
+			// const response = await fetchWithToken(endpoint, {
+			// 	method: 'POST',
+			// 	body: JSON.stringify(body),
+			// 	headers: { 'Content-Type': 'application/json' },
+			// });
+			const response = await serverFetch(
+				endpoint,
+				"POST",
+				{ 'Content-Type': 'application/json' },
+				JSON.stringify(body)
+			);
 			// handle the response here...
 		}
 	};

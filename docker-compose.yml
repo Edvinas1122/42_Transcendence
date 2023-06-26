@@ -34,6 +34,8 @@ services:
       - ./src/client-side/app/components:/app/components
       # - file_storage:/app/public/avatar
       - ./src/client-side/app/public:/app/public
+    depends_on:
+      - nest-app
 
   nest-app:
     build: 

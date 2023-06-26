@@ -16,6 +16,7 @@ import SpinnerLoader from "@/components/GeneralUI/Loader";
 		- entityInterface: interface for interactive entity boxes
 		- interactItemEntityCallbackEffects: array of buttons to interact with the entity
 		- removeItemEntityCallbackEffects: array of buttons to remove the entity
+		- conditionalStyle: function to apply to conditional style to the entity box based on the item
 
 	Currently Context has to be hadled by the parent component
 		so to avoid encapsulation problems
@@ -60,7 +61,7 @@ const UIClientListBox: Function = ({
 
 	useEffect(() => {
 		if (typeof initialItems === "string") {
-			serverFetch(initialItems).then((data) => setItems(data));
+			serverFetch<any[]>(initialItems).then((data) => setItems(data));
 		} else if (Array.isArray(initialItems)) {
 			setItems(initialItems);
 		}

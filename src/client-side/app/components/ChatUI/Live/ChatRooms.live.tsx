@@ -52,7 +52,7 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 					break;
 			}
 		}
-	}, [chatEvent]);
+	}, [chatEvent, router]); // added router and pathname to dependencies check if it works
 
 	const canDeleteChat = (item: Chat): boolean => {
 		console.log("can delete chat", item);

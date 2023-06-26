@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useContext, useEffect } from 'react';
 import { ChatSourceContext, ChatEventType } from '@/components/ContextProviders/eventContext';
-import { AuthorizedFetchContext, AuthorizedFetchContextType } from '@/components/ContextProviders/authContext';
+import { AuthContext, AuthContextType } from '@/components/ContextProviders/authContext';
 import { Chat, Message } from '@/lib/DTO/AppData';
 import { usePathname } from 'next/navigation';
 import DisplayPopUp from '../EventsInfoUI/EventsInfo';
@@ -29,7 +29,7 @@ export const ParticipantSourceContext = React.createContext<ParticipantContextTy
 
 export const ChatEventProvider = ({ children }: { children: React.ReactNode }) => {
 	
-	const { fetchWithToken, loading, token } = useContext<AuthorizedFetchContextType>(AuthorizedFetchContext);
+	const { token, id } = useContext<AuthContextType>(AuthContext);
 
 	const chatEvent: ChatEventType | null = useContext<ChatEventType | null>(ChatSourceContext);
 
@@ -39,7 +39,7 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 	const pathname = usePathname();
 
 	useEffect(() => {
-		if (chatEvent) {
+		if (chatEvent && id) {
 			switch (chatEvent.event) {
 				case 'room':
 					setChatRoomEvent({
@@ -60,7 +60,7 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 				case 'message':
 					let newMessage: Message = chatEvent.data as unknown as Message;
 					newMessage.chatID = parseInt(chatEvent.roomId);
-					newMessage.me = (newMessage.user._id == token?.id.toString()) ? true : false;
+					newMessage.me = (newMessage.user._id == id.toString()) ? true : false;
 					setNewMessage(newMessage);
 					if (pathname.split('/')[2] != chatEvent.roomId.toString())
 						DisplayPopUp("Message from " + newMessage.user.name, "ChatRoom " + newMessage.chatID + " " + newMessage.content);
@@ -69,7 +69,7 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 					break;
 			}
 		}
-	}, [chatEvent, token]);
+	}, [chatEvent, id]); // pathname added recently - test if it works
 
 	return (
 		<MessageSourceContext.Provider value={newMessage}>
