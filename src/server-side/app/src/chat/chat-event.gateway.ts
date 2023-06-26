@@ -30,7 +30,7 @@ export class ChatEventGateway {
 		return await this.eventService.sendStoredEvent(userId, data as SseMessage);
 	}
 
-	async updateParticipantsOfRoomEvent(chat: Chat, eventType: RoomEventType, store: boolean = false, info?: string): Promise<boolean> {
+	async updateParticipantsOfRoomEvent(chat: Chat, eventType: RoomEventType, store: boolean = false, info?: any): Promise<boolean> {
 		const data: ChatRoomEvent = new ChatRoomEvent(chat.id, eventType, info);
 		const users = await this.roleService.getChatRelatives(chat);
 		await this.distributeEventToUsers(users, data as SseMessage, store);

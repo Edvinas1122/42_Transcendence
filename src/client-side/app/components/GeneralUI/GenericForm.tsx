@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useContext, ChangeEvent } from 'react';
-import { AuthorizedFetchContext } from '../ContextProviders/authContext';
+// import { AuthorizedFetchContext } from '../ContextProviders/authContext';
 import "@/public/layout.css";
+import { serverFetch } from '@/lib/fetch.util';
 
 interface GenericField {
     name: string;
@@ -16,7 +17,7 @@ interface GenericField {
 
 interface GenericFormProps {
     endpoint: string;
-    method: string;
+    method: "GET" | "POST" | "DELETE";
     fields: GenericField[];
     className?: string; // Optional
 	resetAfterSubmit?: boolean; // Optional
@@ -24,7 +25,7 @@ interface GenericFormProps {
 
 const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = false }: GenericFormProps) => {
 	
-	const { fetchWithToken } = useContext(AuthorizedFetchContext);
+	// const { fetchWithToken } = useContext(AuthorizedFetchContext);
 
 	const initialFormState = fields.reduce((acc, { name, value }) => ({ ...acc, [name]: value }), {});
 	const [formState, setFormState] = useState<{ [key: string]: string | number | boolean | undefined }>(
@@ -42,13 +43,18 @@ const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = f
 		event.preventDefault();
 		try {
 			const requestData = JSON.stringify(formState);
-			// console.log('Form state:', requestData);
-			const response = await fetchWithToken(endpoint, {
+			// const response = await fetchWithToken(endpoint, {
+			// 	method,
+			// 	body: JSON.stringify(formState),
+			// 	headers: { 'Content-Type': 'application/json' },
+			// });
+			console.log("Sending request to:", endpoint);
+			const response = await serverFetch(
+				endpoint,
 				method,
-				body: JSON.stringify(formState),
-				headers: { 'Content-Type': 'application/json' },
-			});
-			const data = await response.json();
+				{ 'Content-Type': 'application/json' },
+				JSON.stringify(formState)
+			);
 			if (resetAfterSubmit) resetForm();
 		} catch (error) {
 			console.error('Error:', error);

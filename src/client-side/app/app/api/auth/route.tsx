@@ -15,5 +15,6 @@ export async function GET() {
 	if (token.accessToken !== undefined) {
 		cookies().set('access_token', token.accessToken);
 	}
-	return NextResponse.json({ token })
+	redirect('/user');
+	// return NextResponse.json({ token })
 }

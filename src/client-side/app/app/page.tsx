@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 	title: 'Profile',
 	description: 'User Profile'
 }
+import { redirect } from 'next/navigation'
 
 const Page: Function = async () => {
 
@@ -19,6 +20,7 @@ const Page: Function = async () => {
 	return (
 		<UserProfileUI UserInfo={user} isUser={true}/>
 	);
+	//redirect('/user');
 }
 
 export default Page;

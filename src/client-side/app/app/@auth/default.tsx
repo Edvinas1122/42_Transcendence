@@ -1,4 +1,5 @@
-'use client';
+"use client";
+import "@/public/layout.css"
 
 import { useRouter } from 'next/navigation';
 
@@ -19,11 +20,14 @@ const AuthPage = () => {
 	const devLink: string = "/api/auth/";
 
 	return (
-		<div>
-			<h1>Sign In with Intra</h1>
+		<div className="Display">
+			<div className ="Component">
+			<h1>Log In</h1>
+			<h2>Sign In with Intra</h2>
 			<ButtonWithLink link={intraLink} />
-			<h1>Developer Temp User Login</h1>
+			<h2>Developer Temp User Login</h2>
 			<ButtonWithLink  link={devLink} />
+			</div>
 		</div>
 	);
   }

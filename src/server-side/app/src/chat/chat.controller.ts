@@ -34,10 +34,11 @@ export class ChatController {
 		return null;
 	}
 
-	@UseGuards(PrivilegedGuard)
+	// @UseGuards(PrivilegedGuard)
 	@Delete(':chatId')
 	async deleteChat(@UserId() userId: number, @Param('chatId', new ParseIntPipe()) chatId: number): Promise<boolean>
 	{
+		console.log('delete chat');
 		const resultChat = await this.chatService.deleteChat(chatId);
 		if (!resultChat)
 			throw new NotFoundException('Chat not found');

@@ -1,13 +1,14 @@
 import { cookies } from 'next/headers';
 
-export	const getTokensId = (token: string): number => {
+export const getTokensId = (token: string): number => {
 	const base64Url = token.split('.')[1];
 	const base64 = base64Url.replace('-', '+').replace('_', '/');
-	const decodedToken = JSON.parse(window.atob(base64));
+	const decodedToken = JSON.parse(Buffer.from(base64, 'base64').toString());
 	return decodedToken['id'];
 }
 
 const getToken = (): string | null => {
+
 	const cookieStore = cookies();
 	if (cookieStore === undefined) return null;
 	const token = cookieStore.get('access_token');

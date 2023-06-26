@@ -1,5 +1,11 @@
 api fetch endpoints
 
+auth/
+	DevToken/
+	DevUser/
+	redirect/
+	validate/
+
 users/
 	<!-- me/ - UserProfile - personal profile of token bearer -->
 	profile/:id - UserProfile - id owners personal profile <--- only this

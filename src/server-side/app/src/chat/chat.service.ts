@@ -9,6 +9,8 @@ import { RoleService, RoleType } from './role.service';
 import { MessageService } from './message.service';
 import { UsersService } from '../users/users.service';
 import { ChatEventGateway, RoomEventType } from './chat-event.gateway';
+import { UserId } from '../utils/user-id.decorator';
+// import { UserDto } from '../users/dtos/user.dto';
 
 @Injectable()
 export class ChatService {
@@ -32,40 +34,6 @@ export class ChatService {
 		return this.chatRepository.findOne({where: {id: chatId}});
 	}
 
-	// async getUserChats(userId: number): Promise<ChatDto[]> {
-	// 	const userRoles = await this.roleService.getAvailableUserRoles(userId);
-	// 	const chats = userRoles.map(role => role.chat);
-	
-	// 	// mapping each chat to a Promise of ChatDto
-	// 	const chatDtoPromises = chats.map(async (chat) => {
-	// 		const owner = await this.usersService.getUserInfo(chat.ownerID);
-	// 		let participants;
-	// 		if (!chat.password || chat.password === '') {
-	// 			participants = await this.roleService.getChatRelatives(chat);
-	// 			// const messages = await this.messageService.getChatMessages(chat);
-	// 		}
-	// 		else {
-	// 			participants = [];
-	// 			// const messages = [];
-	// 		}
-	// 		if (!chat.personal) {
-	// 			const groupChatDto = new GroupChatDto(chat, owner, participants);
-	// 			// populate the GroupChatDto instance with data from the chat entity
-	// 			groupChatDto.privileged = await this.roleService.isPrivileged(userId, chat.id);
-	// 			return groupChatDto;
-	// 		} else {
-	// 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
-	// 			// populate the PersonalChatDto instance with data from the chat entity
-	// 			return personalChatDto;
-	// 		}
-	// 	});
-	
-	// 	// waiting for all Promises of ChatDto to resolve
-	// 	const chatDtos = await Promise.all(chatDtoPromises);
-	
-	// 	return chatDtos;
-	// }
-
 	async createGroupChat(createChatDto: CreateChatDto): Promise<Chat> {
 		const chat = new Chat();
 		chat.name = createChatDto.name;
@@ -83,7 +51,8 @@ export class ChatService {
 		await this.roleService.addRelativeToChat(RoleType.Owner, savedChat, owner);
 		
 		// send event to all users that are online unless the chat is private then send to participants only
-		await this.updateEvent(savedChat, RoomEventType.NewAvailable, "Group chat " + savedChat.name + " that is " + (savedChat.private ? "private" : "public") + " has been created");
+		await this.updateEvent(savedChat, RoomEventType.NewAvailable, await this.makeChatDto(chat, chat.ownerID));
+		//  "Group chat " + savedChat.name + " that is " + (savedChat.private ? "private" : "public") + " has been created");
 	
 		return savedChat;
 	}
@@ -94,17 +63,8 @@ export class ChatService {
 			return false;
 		}
 
-		// Remove all related roles to this chat before deleting the chat
-		const chatRelatives = await this.roleService.getChatRelatives(chatToDelete);
-		for (const relative of chatRelatives) {
-			// await this.chatEventGateway.sendEventToChat(chatToDelete, EventType.CHAT_ROOM_DELETED);
-			await this.roleService.removeChatRelative(chatToDelete, relative._id);
-		}
-
 		await this.chatRepository.delete(chatId);
-
 		await this.updateEvent(chatToDelete, RoomEventType.Deleted);
-		
 		return true;
 	}
 
@@ -159,39 +119,45 @@ export class ChatService {
 
 	async joinChat(userId: number, chatId: number, password?: string): Promise<boolean>
 	{
-		console.log("joinChat");
 		const chat = await this.chatRepository.findOne({where: {id: chatId}});
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
-		try {
+		if (chat.private) {
 			const role = await this.roleService.getRole(chatId, userId);
-			if (chat?.private && role.type !== RoleType.Invited) {
+			if (role.type !== RoleType.Invited) {
 				throw new BadRequestException('User not an invitee');
 			}
 			await this.roleService.editRole(role, RoleType.Participant);
-		} catch	(e) {
+		} else {
 			const user = await this.usersService.findUser(userId);
 			await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);
 		}
+
+
+		// await this.updateEvent(chat, RoomEventType.Join, new UserDto(await this.usersService.findUser(userId)));
 		return true;
 	}
 
 	private async returnChatDto(chat: Chat[], userId: number): Promise<ChatDto[]> {
 		return Promise.all(chat.map(async (chat) => {
-			const participants = await this.roleService.getChatRelatives(chat);
-			/// learn if participant of a chat
-			const isParticipant = await this.roleService.isParticipant(userId, chat.id);
-			if (!chat.personal) {
-				const owner = await this.usersService.getUserInfo(chat.ownerID);
-				const isOwner = chat.ownerID === userId;
-				const groupChatDto = new GroupChatDto(chat, owner, isOwner, isParticipant, participants);
-				return groupChatDto;
-			} else {
-				const personalChatDto = new PersonalChatDto(chat, participants[0]);
-				return personalChatDto;
-			}
+			return await this.makeChatDto(chat, userId);
 		}));
+	}
+
+	private async makeChatDto(chat: Chat, userId: number): Promise<ChatDto> {
+		const participants = await this.roleService.getChatRelatives(chat);
+		/// learn if participant of a chat
+		const isParticipant = await this.roleService.isParticipant(userId, chat.id);
+		if (!chat.personal) {
+			const owner = await this.usersService.getUserInfo(chat.ownerID);
+			const isOwner = chat.ownerID === userId;
+			const groupChatDto = new GroupChatDto(chat, owner, isOwner, isParticipant, participants);
+			return groupChatDto;
+		} else {
+			const personalChatDto = new PersonalChatDto(chat, participants[0]);
+			return personalChatDto;
+		}
 	}
 
 	// private async returnChatDto(chat: Chat[], userId: number): Promise<ChatDto[]> {
@@ -214,12 +180,13 @@ export class ChatService {
 	// }
 
 
-	private async updateEvent(chat: Chat, eventType: RoomEventType, moreInfo?: string): Promise<void> {
+	private async updateEvent(chat: Chat, eventType: RoomEventType, chatObject?: any): Promise<void> {
 		if (!chat.private) {
-			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, moreInfo);
+			// await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, chatObject ? chatObject : moreInfo);
+			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, chatObject);
 		}
 		else {
-			await this.chatEventGateway.updateParticipantsOfRoomEvent(chat, eventType, false, moreInfo);
+			await this.chatEventGateway.updateParticipantsOfRoomEvent(chat, eventType, false, chatObject);
 		}
 	}
 }
