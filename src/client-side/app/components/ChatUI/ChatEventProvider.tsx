@@ -56,6 +56,11 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 						subtype: chatEvent.subType,
 						data: chatEvent.data,
 					});
+					setChatRoomEvent({
+						roomID: chatEvent.roomId,
+						subtype: 'join',
+						data: chatEvent.data,
+					});
 					break;
 				case 'message':
 					let newMessage: Message = chatEvent.data as unknown as Message;

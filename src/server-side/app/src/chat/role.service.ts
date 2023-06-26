@@ -72,23 +72,33 @@ export class RoleService {
 	}
 
 	async removeChatRelative(chat: Chat, userId: number, expectedRole?: RoleType): Promise<boolean> {
-		let conditions = {
+		const conditions: any = {
 			chat: { id: chat.id },
 			user: { id: userId },
 		};
 		
 		if (expectedRole) {
-			// conditions['type'] = expectedRole;
+			conditions['type'] = expectedRole;
+		}
+	
+		console.log("here we are");
+	
+		// Try to find the role first
+		const role = await this.roleRepository.findOne({where: conditions});
+		
+		// If no role found or role type doesn't match expectedRole, throw an exception
+		if (!role || (expectedRole && role.type !== expectedRole)) {
+			throw new HttpException('The user does not have the expected role', HttpStatus.BAD_REQUEST);
 		}
 		
-		const result = await this.roleRepository.delete(conditions);
+		// Delete the role
+		await this.roleRepository.remove(role);
 		
-		if (result.affected === 0) {
-		  throw new HttpException('The user does not have the expected role', HttpStatus.BAD_REQUEST);
-		}
-		
+		// report the event
+
+
 		return true;
-	  }
+	}
 
 	async removeChatRelatives(chat: Chat, userIds: number[]): Promise<boolean> {
 		await this.roleRepository.delete({
@@ -130,7 +140,6 @@ export class RoleService {
 		const relative = await this.roleRepository.findOne({
 			where: { user: { id: userId }, type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant, RoleType.Invited]), chat: { id: chatId } },
 		});
-		console.log(userId, " Requester of chat ", chatId ," is ", relative);
 		return relative !== null ? true : false;
 	}
 

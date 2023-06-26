@@ -11,6 +11,7 @@ export type EventSourceContextType = Message | null;
 
 export const EventSourceContext = createContext<EventSourceContextType>(null);
 export const ChatSourceContext = createContext<ChatEventType | null>(null);
+export const OnlineUsersContext = createContext<number[] | null>(null);
 
 interface EventSourceProviderProps {
 	children: React.ReactNode;

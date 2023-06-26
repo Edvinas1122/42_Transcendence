@@ -38,6 +38,7 @@ interface Chat {
 	personal: boolean;
 	mine?: boolean;
 	type: 'personal' | 'group';
+	amParticipant?: boolean;
 }
 
 interface PersonalChat extends Chat {
@@ -49,7 +50,6 @@ interface GroupChat extends Chat {
 	owner: User;
 	participants: User[];
 	privileged: boolean;
-	amParticipant: boolean;
 	type: 'group';
 }
 

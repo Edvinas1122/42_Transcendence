@@ -10,7 +10,6 @@ import { MessageService } from './message.service';
 import { UsersService } from '../users/users.service';
 import { ChatEventGateway, RoomEventType } from './chat-event.gateway';
 import { UserId } from '../utils/user-id.decorator';
-// import { UserDto } from '../users/dtos/user.dto';
 
 @Injectable()
 export class ChatService {
@@ -137,6 +136,7 @@ export class ChatService {
 			}
 			await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);
 		}
+		await this.updateEvent(chat, RoomEventType.Join, await this.makeChatDto(chat, userId));
 		return true;
 	}
 
@@ -161,7 +161,6 @@ export class ChatService {
 					amParticipant: isParticipant,
 					participants: participants,
 				});
-			console.log(groupChatDto);
 			return groupChatDto;
 		} else {
 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
@@ -191,7 +190,6 @@ export class ChatService {
 
 	private async updateEvent(chat: Chat, eventType: RoomEventType, chatObject?: any): Promise<void> {
 		if (!chat.private) {
-			// await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, chatObject ? chatObject : moreInfo);
 			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, chatObject);
 		}
 		else {

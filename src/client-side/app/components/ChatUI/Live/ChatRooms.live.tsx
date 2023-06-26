@@ -3,11 +3,12 @@ import UIClientListBox, { EntityInterfaceBuilder, UIClientListBoxClassBuilder, C
 import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { ChatRoomSourceContext } from "@/components/ChatUI/ChatEventProvider";
 import Link from "next/link";
-import { Chat, isGroupChat } from "@/lib/DTO/AppData";
+import { Chat, GroupChat, isGroupChat } from "@/lib/DTO/AppData";
 import "../Chat.css";
 import "@/public/layout.css";
 import { serverFetch } from "@/lib/fetch.util";
 import { usePathname, useRouter } from 'next/navigation';
+import { AuthContext } from "@/components/ContextProviders/authContext";
 
 const ChatRoomBox: Function = ({ item, style }: { item: Chat, style?: string }) => {
 	const pathname = usePathname();
@@ -24,17 +25,25 @@ const ChatRoomBox: Function = ({ item, style }: { item: Chat, style?: string }) 
 	);
 }
 
+const amParticipant = (chat: GroupChat, tokenBearerID: number) => {
+	if (isGroupChat(chat)) return true;
+	if (chat.owner._id == tokenBearerID.toString()) return true;
+	return chat.participants.some((participant) => participant._id == tokenBearerID.toString());
+}
+
 const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 
 	const chatEvent = useContext(ChatRoomSourceContext);
+	const id = useContext(AuthContext);
 	const pathname = usePathname();
 	const router = useRouter();
 
 	const handleNewEvent = useCallback((setItems: Function) => {
 		if (chatEvent) {
-			console.log("new chat is mine", chatEvent);
+			// chatEvent.data.meParticipant = amParticipant(chatEvent.data, id);
 			switch (chatEvent.subtype) {
 				case "new-available":
+					console.log("new chat", chatEvent.data);
 					setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
 					break;
 				case "deleted":
@@ -45,6 +54,13 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 					}
 					break;
 				case "join":
+					console.log("join chat", chatEvent.data);
+					setItems((prevChats: Chat[]) => {
+						return prevChats.map((chat: Chat) => 
+							chat._id.toString() === chatEvent.roomID
+							? chatEvent.data : chat
+						);
+					});
 					break;
 				case "quit":
 					break;
@@ -63,6 +79,11 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 		console.log("join chat", response);
 	}
 
+	const quitChat = async (item: Chat): Promise<void> => {
+		const response = await serverFetch(`/chat/roles/${item._id}/leave`, "POST");
+		console.log("leave chat", response);
+	}
+
 	const isRouteActiveStyle = (item: Chat): string => {
 		return item._id.toString() == pathname.split('/')[2] ? "Active" : "";
 	}
@@ -71,14 +92,9 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 		.addRemoveButton("remove chat", deleteChat, (item: Chat) => item.mine ? true : false)
 		.addRemoveButton("dev remove chat", deleteChat) // delete this line
 		.addInteractButton("join chat", joinChat, (item: Chat): boolean => {
-			console.log("join chat", item);
-			console.log("participant", item.amParticipant);
-			console.log("mine", item.mine);
-			console.log("is group chat", isGroupChat(item));
-			console.log("output", isGroupChat(item) && !item.amParticipant ? true : false);
 			return isGroupChat(item) && !item.amParticipant && !item.mine ? true : false;
 		})
-		.addInteractButton("quit chat", () => console.log("quit chat"), (item: Chat) => item.mine ? false : true)
+		.addInteractButton("leave chat", quitChat, (item: Chat) => item.mine ? false : true)
 		.addConditionalStyle(isRouteActiveStyle)
 		.build();
 
@@ -97,7 +113,6 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 			dependency: (item: Chat): boolean => !item.personal
 		})
 		.build();
-
 
 	return (
 		<UIClientListBox
