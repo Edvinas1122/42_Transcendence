@@ -3,6 +3,9 @@ import { UserProfile, MatchHistory } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
 import GenericForm from '../GeneralUI/GenericForm';
 import GenericAchievement from './DummyAchievements';
+import GenericButton from '../GeneralUI/GenericButton';
+import { faUserPlus, faUserXmark, faUserSlash } from '@fortawesome/free-solid-svg-icons'
+import UserInteract from './UserInteract';
 
 const MatchHistoryDummy: MatchHistory[] = [
 	{
@@ -43,11 +46,11 @@ const MatchHistoryBox = ({ item, style }: { item: MatchHistory, style?: string }
 // THIS IS OBVIOUSLY A SHITSHOW OF A FUNCTION, I WILL FIGURE OUT A BETTER WAY LMAO 
 const UserStats = ({ user }: { user: UserProfile }) => {
 	return (
-		<div className="Component">
+		<div>
 			<div className="Component">
 				<h1>Rank #2</h1>
 			</div>
-			<div className="Component">
+			<section>
 				<div className="Segment">
 					<h2>Wins</h2>
 					<p>7</p>
@@ -56,7 +59,7 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 					<h2>Losses</h2>
 					<p>8</p>
 				</div>
-			</div>
+			</section>
 			<div className="Component">
 				<h1>Achievements</h1>
 				<GenericAchievement id='0' />
@@ -67,56 +70,67 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 	);
 }
 
+// const FriendInteractions = ({user}: {user: UserProfile}) => {
+// 	return (
+// 		<div className="Component">
+// 			<GenericButton
+// 				text="Remove Friend"
+// 				type="button"
+// 				icon={faUserXmark}
+// 				endpoint={`users/manage/remove-friend/${user._id}`}
+// 			/>
+// 			<GenericButton
+// 				text="Block User"
+// 				type="button"
+// 				icon={faUserSlash}
+// 				endpoint={`users/manage/block-user/${user._id}`}
+// 			/>
+// 		</div>
+// 	);
+// }
 
-// ADD FUNCTIONALITY TO THESE
-const FriendInteractions = ({user}: {user: UserProfile}) => {
-	return (
-		<div className="Component">
-			<strong>Remove Friend</strong>
-			<strong>Block User</strong>
-		</div>
-	);
-}
+// const NonFriendInteractions = ({user}: {user: UserProfile}) => {
+// 	return (
+// 		<div className="Component">
+// 		<GenericButton
+// 				text="Add Friend"
+// 				type="button"
+// 				icon={faUserXmark}
+// 				endpoint={`users/manage/send-friend-request/${user._id}`}
+// 			/>
+// 			<GenericButton
+// 				text="Block User"
+// 				type="button"
+// 				icon={faUserSlash}
+// 				endpoint={`users/manage/block-user/${user._id}`}
+// 			/>
+// 		</div>
+// 	);
+// }
 
-const NonFriendInteractions = ({user}: {user: UserProfile}) => {
-	return (
-		<div className="Component">
-		<strong>Add Friend</strong>
-		<strong>Block User</strong>
-		</div>
-	);
-}
-
-const UserEdit = () => {
-	return (
-		<div className="Component">
-			<GenericForm
-			endpoint="/drive/upload"
-			method="POST"
-			fields={[
-				{ name: 'Change Avatar', value: '', type: 'file'}
-			]}
-			/>
-		</div>
-	);
-}
+// const UserEdit = () => {
+// 	return (
+// 		<div className="Component">
+// 			<GenericForm
+// 			endpoint="/drive/upload"
+// 			method="POST"
+// 			fields={[
+// 				{ name: 'Change Avatar', value: '', type: 'file'}
+// 			]}
+// 			/>
+// 		</div>
+// 	);
+// }
 
 const UserProfileUI: Function = ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
-	var userInteraction;
+	
 	const userStatus = isUser ? "user" : UserInfo.friend ? "friend" : "nonFriend";
-	if (userStatus === "user") {
-		userInteraction = <UserEdit />
-	} else if (userStatus === "friend") {
-		userInteraction = <FriendInteractions user={UserInfo} />
-	} else {
-		userInteraction = <NonFriendInteractions user={UserInfo} />
-	};
 
 	return (
 		<section className="Display">
 			<div className="Segment">
 				<UserInfoBox user={UserInfo} />
-				{userInteraction}
+				<UserInteract userStatus={userStatus} userID={UserInfo._id}/>
 			</div>
 			<div className="Segment">
                 <UserStats user={UserInfo} />
