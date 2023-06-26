@@ -7,8 +7,8 @@ export default function  ChatsLayout({
 })
 {
 	return (
-		<div className="Segment">
-			{children}
-		</div>
+		<>
+		{children}
+		</>
 	);
 }

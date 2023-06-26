@@ -29,9 +29,7 @@ export class MessageService {
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
-		console.log(chat);
 		const messages = await this.messagesRepository.find({where: { chatID: chat.id }});
-		console.log(messages);
 		// Map each Message to a MessageDto
 		const messageOwner = await this.usersService.findUser(userId);
 		const messageDtos = messages.map(message => new MessageDto(message, userId, messageOwner));
@@ -47,7 +45,6 @@ export class MessageService {
 		}
 		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
 		const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
-		console.log('sendMessageToChat2', returnedMessage);
 		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
 		return returnedMessage;
 	}

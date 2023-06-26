@@ -2,17 +2,19 @@
     height: 80vh !important;
 }
 
+
 .MessageComponent {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    min-width: 400px;
     /* justify-content: space-between; */
 }
-
 
 .MessageComponent .List {
     flex-grow: 1;
     overflow: auto;
+    max-width: 800px;
 }
 
 .MessageComponent .Form {
@@ -24,28 +26,34 @@
 	flex-direction: column;
 }
 
-/* .MessageSpace {
-	flex-grow: 4;
-} */
-
-.Message {
-    max-width: 60%;
-    margin: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    background-color: #e6e6e6;
-    color: #333;
-    align-self: flex-start;
-
+.MessageSpace {
+	/* flex-grow: 4; */
 }
 
+.Message {
+    align-self: flex-start;
+    min-width: 200px;
+    max-width: 38%;
+}
 /* Different styles for messages from the user vs others */
 .Message.user {
     align-self: flex-end;
-    max-width: 60%;
+}
+
+.Message.user p{
     background-color: #007bff;
     color: #fff;
 }
+
+.Message p {
+    word-wrap: break-word;
+    background-color: #e6e6e6;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    padding: 20px;
+}
+
 
 .MessageForm {
     display: flex;
@@ -87,6 +95,6 @@
 }
 
 .Participants {
-    width: 32%;
-    min-width: 310px;
+    /* width: 32%; */
+    min-width: 350px;
 }

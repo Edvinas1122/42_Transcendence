@@ -25,7 +25,7 @@ export class ChatService {
 		private readonly chatEventGateway: ChatEventGateway,
 	) {}
 
-	async getAllUserChats(userId: number): Promise<ChatDto[]> {
+	async getAllUserChats(userId: number): Promise<ChatDto[]> { // not implemented properly
 		const chats = await this.chatRepository.find();
 		return this.returnChatDto(chats, userId);
 	}
@@ -131,11 +131,12 @@ export class ChatService {
 			await this.roleService.editRole(role, RoleType.Participant);
 		} else {
 			const user = await this.usersService.findUser(userId);
+			const role = await this.roleService.getRole(chatId, userId);
+			if (role) {
+				throw new BadRequestException('User already a participant');
+			}
 			await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);
 		}
-
-
-		// await this.updateEvent(chat, RoomEventType.Join, new UserDto(await this.usersService.findUser(userId)));
 		return true;
 	}
 
@@ -152,7 +153,15 @@ export class ChatService {
 		if (!chat.personal) {
 			const owner = await this.usersService.getUserInfo(chat.ownerID);
 			const isOwner = chat.ownerID === userId;
-			const groupChatDto = new GroupChatDto(chat, owner, isOwner, isParticipant, participants);
+			const groupChatDto = new GroupChatDto({
+					chat: chat,
+					owner: owner,
+					privileged: isOwner,
+					mine: isOwner,
+					amParticipant: isParticipant,
+					participants: participants,
+				});
+			console.log(groupChatDto);
 			return groupChatDto;
 		} else {
 			const personalChatDto = new PersonalChatDto(chat, participants[0]);

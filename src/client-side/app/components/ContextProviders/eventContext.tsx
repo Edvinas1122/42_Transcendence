@@ -39,7 +39,6 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 
 	useEffect(() => {
 
-		console.log('EventSourceProvider: ', token);
 		if (!token) {
 			return () => {};
 		}
@@ -52,10 +51,8 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 
 			switch (parsedData.type) {
 				case 'chat':
-					console.log('global enevt: ', parsedData.data);
 					setChatEvent(parsedData.data);
 				case 'user':
-					console.log('global event: ', parsedData.data);
 					switch (parsedData.data.event) {}
 					break;
 			}

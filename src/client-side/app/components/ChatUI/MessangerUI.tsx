@@ -1,5 +1,6 @@
-import { Message, User } from "@/lib/DTO/AppData";
+
 import UIListBox from "../GeneralUI/GenericList";
+import LiveParticipants from "./Live/LiveParticipants";
 import GenericForm from "../GeneralUI/GenericForm";
 import LiveMessages from "./Live/LiveMessages";
 import fetchWithToken from "@/lib/fetch.util";
@@ -40,7 +41,8 @@ const MessangerUI: Function = ({ params }: { params: { id: string } }) => {
 					<h1>
 						Particaipants Display
 					</h1>
-					<UIClientListBox initialParticipants={`/chat/roles/${params.id}/Any`} chatID={params.id} />
+
+					<LiveParticipants initialParticipants={`/chat/roles/${params.id}/Any`} chatID={params.id} />
 				</div>
 			</div>
 	  	</>

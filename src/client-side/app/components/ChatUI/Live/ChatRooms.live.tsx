@@ -1,9 +1,9 @@
 "use client";
-import UIClientListBox, { EntityInterfaceBuilder } from "@/components/GeneralUI/GenericClientList";
+import UIClientListBox, { EntityInterfaceBuilder, UIClientListBoxClassBuilder, CategoryDisisplay } from "@/components/GeneralUI/GenericClientList";
 import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { ChatRoomSourceContext } from "@/components/ChatUI/ChatEventProvider";
 import Link from "next/link";
-import { Chat } from "@/lib/DTO/AppData";
+import { Chat, isGroupChat } from "@/lib/DTO/AppData";
 import "../Chat.css";
 import "@/public/layout.css";
 import { serverFetch } from "@/lib/fetch.util";
@@ -52,22 +52,15 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 					break;
 			}
 		}
-	}, [chatEvent, router]); // added router and pathname to dependencies check if it works
-
-	const canDeleteChat = (item: Chat): boolean => {
-		console.log("can delete chat", item);
-		if (item.personal)
-			return true;
-		else
-			return item.mine? true : false;
-	}
+	}, [chatEvent, router]);
 
 	const deleteChat = (item: Chat): void => {
 		serverFetch(`/chat/${item._id}`, "DELETE");
 	}
 
-	const joinChat = (item: Chat): void => {
-		serverFetch(`/chat/roles/${item._id}/join`, "POST");
+	const joinChat = async (item: Chat): Promise<void> => {
+		const response = await serverFetch(`/chat/roles/${item._id}/join`, "POST");
+		console.log("join chat", response);
 	}
 
 	const isRouteActiveStyle = (item: Chat): string => {
@@ -75,19 +68,40 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 	}
 
 	const ChatRoomInterface = new EntityInterfaceBuilder()
-		.addRemoveButton("remove chat", deleteChat)
-		.addInteractButton("join chat", joinChat, (item: Chat) => !item.mine)
-		.addInteractButton("quit chat", () => console.log("quit chat"), (item: Chat) => item.mine ? true : false)
+		.addRemoveButton("remove chat", deleteChat, (item: Chat) => item.mine ? true : false)
+		.addRemoveButton("dev remove chat", deleteChat) // delete this line
+		.addInteractButton("join chat", joinChat, (item: Chat): boolean => {
+			console.log("join chat", item);
+			console.log("participant", item.amParticipant);
+			console.log("mine", item.mine);
+			console.log("is group chat", isGroupChat(item));
+			console.log("output", isGroupChat(item) && !item.amParticipant ? true : false);
+			return isGroupChat(item) && !item.amParticipant && !item.mine ? true : false;
+		})
+		.addInteractButton("quit chat", () => console.log("quit chat"), (item: Chat) => item.mine ? false : true)
 		.addConditionalStyle(isRouteActiveStyle)
 		.build();
 
+	const ChatRoomList = new UIClientListBoxClassBuilder()
+		.setInitialItems(serverChats)
+		.setBoxComponent(ChatRoomBox)
+		.setListStyle("AvailableChats")
+		.setEntityInterface(ChatRoomInterface)
+		.setEditItemsCallback(handleNewEvent)
+		.addCategory({
+			name: "Private Chats",
+			dependency: (item: Chat): boolean => item.personal
+		})
+		.addCategory({
+			name: "Group Chats",
+			dependency: (item: Chat): boolean => !item.personal
+		})
+		.build();
+
+
 	return (
 		<UIClientListBox
-			initialItems={serverChats}
-			BoxComponent={ChatRoomBox}
-			ListStyle="AvailableChats"
-			entityInterface={ChatRoomInterface}
-			editItemsCallback={handleNewEvent}
+			{...ChatRoomList}
 		/>
 	);
 }

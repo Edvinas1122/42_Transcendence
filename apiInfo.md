@@ -7,8 +7,7 @@ auth/
 	validate/
 
 users/
-	<!-- me/ - UserProfile - personal profile of token bearer -->
-	profile/:id - UserProfile - id owners personal profile <--- only this
+	profile/:id - UserProfile - id owners personal profile
 	all/ - get all profiles (except blocked)
 	:id/all <-- 
 	

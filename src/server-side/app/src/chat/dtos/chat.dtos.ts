@@ -73,6 +73,7 @@ export class ChatDto {
 	name: string;
 	messages: MessageDto[];
 	personal: boolean;
+	type?: "group" | "personal";
 }
 
 export class PersonalChatDto extends ChatDto {
@@ -83,16 +84,32 @@ export class PersonalChatDto extends ChatDto {
 	participant: UserInfo;
 }
 
+interface ChatGroup {
+	chat: Chat;
+	owner: UserInfo;
+	privileged: boolean;
+	mine?: boolean;
+	amParticipant?: boolean;
+	participants?: UserInfo[];
+	messages?: MessageDto[];
+	type?: "group";
+}
+
 export class GroupChatDto extends ChatDto {
-	constructor(chat: Chat, owner: UserInfo, privileged: boolean, mine?: boolean, participants?: UserInfo[], messages?: MessageDto[]) {
-		super(chat, false, messages);
-		this.owner = owner || null; // Assuming you can pass the owner during construction
-		this.participants = participants || []; // Assuming you can pass the participants during construction
-		this.privileged = privileged || false; // Assuming you can pass the privileged status during construction
+	constructor(props: ChatGroup) {
+		super(props.chat, false, props.messages);
+		this.owner = props.owner || null; // Assuming you can pass the owner during construction
+		this.participants = props.participants || []; // Assuming you can pass the participants during construction
+		this.privileged = props.privileged || false; // Assuming you can pass the privileged status during construction
+		this.amParticipant = props.amParticipant || false; // Assuming you can pass the amParticipant status 
+		this.type = "group";
+		this.mine = props.mine || false;
 	}
 	owner: UserInfo;
 	participants: UserInfo[];
 	privileged: boolean;
 	passwordProtected: boolean;
 	mine?: boolean;
+	amParticipant?: boolean;
+	type?: "group";
 }

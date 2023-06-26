@@ -41,7 +41,7 @@ const SidebarElementLink = (props: SidebarElementProps) => {
 }
 
 const Sidebar = ({ params }: { params: { id: string } }) => {
-	console.log("log here params", params);
+
 	return (
 		<div className="Sidebar">
 			{SidebarContent.map((element, index) => (

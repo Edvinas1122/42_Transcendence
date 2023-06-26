@@ -15,7 +15,9 @@ export default function	ChatsLayout({
 				<div className="Segment ChatRooms">
 					<ChatRoomsUI />
 				</div>
-				{children}
+				<div className="Segment">
+					{children}
+				</div>
 			</ChatEventProvider>
 		</section>
 	);

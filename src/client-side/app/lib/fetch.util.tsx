@@ -46,10 +46,9 @@ async function fetchWithToken<T = any>(
 
     const response = await fetch(fullUrl, options);
     if (!response.ok) {
-        if (response.status === 401) {
+        if (response.status === 401) { // consider returning without throwing
             throw new Error('Unauthorized');
         }
-        console.log(response);
         throw new Error('Failed to fetch data')
 
     }
