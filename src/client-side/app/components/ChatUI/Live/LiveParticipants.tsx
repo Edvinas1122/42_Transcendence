@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useContext } from "react";
-import UIClientListBox from "@/components/GeneralUI/GenericClientList";
+import UIClientListBox, {UIClientListBoxClassBuilder} from "@/components/GeneralUI/GenericClientList";
 import { EventSourceContext } from "@/components/ContextProviders/eventContext";
 import { User } from "@/lib/DTO/AppData";
 
@@ -11,19 +11,28 @@ const ParticipantBox: Function = ({ item }: { item: User }) => {
 			<p>
 				<strong>{item.name}</strong>
 				<span>{item.name}</span>
+				<span>{item.Role}</span>
 			</p>
 			<div className="status"></div>
 		</div>
 	);
 }
 
+
+
 const LiveParticipants: Function = ({ initialParticipants, chatID }: { initialParticipants: User[] | string, chatID: number }) => {
 	
 
+	const ParticipantsList = new UIClientListBoxClassBuilder()
+		.setInitialItems(initialParticipants)
+		.setBoxComponent(ParticipantBox)
+		.build();
+
 	return (
 		<UIClientListBox
-			Items={initialParticipants}
-			BoxComponent={ParticipantBox}
+			{...ParticipantsList}
 		/>
 	);
 }
+
+export default LiveParticipants;

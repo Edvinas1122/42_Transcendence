@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState, Suspense } from "react";
 import "@/public/layout.css";
-import { Message } from "@/lib/DTO/AppData";
 import { serverFetch } from "@/lib/fetch.util";
 import { notFound } from "next/navigation";
 import SpinnerLoader from "@/components/GeneralUI/Loader";
@@ -25,7 +24,6 @@ import SpinnerLoader from "@/components/GeneralUI/Loader";
 		LiveMessages.tsx
 */
 
-
 export interface EntityButton {
 	name: string,
 	onClick: Function,
@@ -38,6 +36,11 @@ export interface EntityBoxInterface {
 	conditionalStyle?: Function,
 }
 
+export interface CategoryDisisplay {
+	name: string,
+	dependency: (item: any) => boolean,
+}
+
 interface UIClientListBoxProps {
     initialItems: any[] | string,
     BoxComponent: Function,
@@ -45,6 +48,7 @@ interface UIClientListBoxProps {
     BoxStyle?: string,
     editItemsCallback?: Function
 	entityInterface?: EntityBoxInterface,
+	categories?: CategoryDisisplay[]
 }
 
 const UIClientListBox: Function = ({ 
@@ -54,6 +58,7 @@ const UIClientListBox: Function = ({
     BoxStyle,
     editItemsCallback,
 	entityInterface,
+	categories,
 }: UIClientListBoxProps ) => {
 
     const endOfListRef = useRef<HTMLDivElement | null>(null);
@@ -61,7 +66,7 @@ const UIClientListBox: Function = ({
 
 	useEffect(() => {
 		if (typeof initialItems === "string") {
-			serverFetch<any[]>(initialItems).then((data) => setItems(data));
+			serverFetch<any[]>(initialItems).then((data) => setItems(data)); // not found error bug
 		} else if (Array.isArray(initialItems)) {
 			setItems(initialItems);
 		}
@@ -79,26 +84,105 @@ const UIClientListBox: Function = ({
 		setItems((prevItems: any[]) => prevItems.filter(item => item._id !== itemToRemove._id));
 	};
 
+	const renderGroup = (groupItems: any[], groupName: string) => {
+		return (
+		  <div key={groupName}>
+			{/* <h2>{groupName}</h2> */}
+			{groupItems.map((item: any) => (
+			  <EntityBox
+				key={item._id}
+				item={item}
+				style={BoxStyle}
+				BoxComponent={BoxComponent}
+				entityInterface={entityInterface}
+				removeItemFromList={removeItemFromList}
+				conditionalStyle={entityInterface?.conditionalStyle}
+			  />
+			))}
+		  </div>
+		);
+	  };
+
+	let restItems = [...Items];
+	const categorizedItems = categories?.map((category) => {
+		const categoryItems = restItems.filter((item) => category.dependency(item));
+		restItems = restItems.filter((item) => !categoryItems.includes(item)); // Now, this will not cause re-render
+		return { name: category.name, items: categoryItems };
+	});
+
     return (
 		<div className={"List " + ListStyle}>
 			<Suspense fallback={<SpinnerLoader />}>
-			{Items && Items.map((item: any) => {
-				return (
-					<EntityBox
-						key={item._id}
-						item={item}
-						style={BoxStyle}
-						BoxComponent={BoxComponent}
-						entityInterface={entityInterface}
-						removeItemFromList={removeItemFromList}
-						conditionalStyle={entityInterface?.conditionalStyle}
-					/>
-				);
-			})}
+			{categorizedItems && categorizedItems.map((category, index) => 
+				renderGroup(category.items, category.name)
+			)}
+			{restItems.length > 0 && renderGroup(restItems, 'Rest')}
 			<div ref={endOfListRef} />
 			</Suspense>
 		</div>
     );
+}
+
+export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
+	public initialItems: any[] | string = [];
+	public BoxComponent: Function = () => null;
+	public ListStyle: string = "";
+	public BoxStyle: string = "";
+	public editItemsCallback?: Function;
+	public entityInterface?: EntityBoxInterface;
+	public categories?: CategoryDisisplay[];
+
+	public setInitialItems(initialItems: any[] | string) {
+		this.initialItems = initialItems;
+		return this;
+	}
+
+	public setBoxComponent(BoxComponent: Function) {
+		this.BoxComponent = BoxComponent;
+		return this;
+	}
+
+	public setListStyle(ListStyle: string) {
+		this.ListStyle = ListStyle;
+		return this;
+	}
+
+	public setBoxStyle(BoxStyle: string) {
+		this.BoxStyle = BoxStyle;
+		return this;
+	}
+
+	public setEditItemsCallback(editItemsCallback: Function) {
+		this.editItemsCallback = editItemsCallback;
+		return this;
+	}
+
+	public setEntityInterface(entityInterface: EntityBoxInterface) {
+		this.entityInterface = entityInterface;
+		return this;
+	}
+
+	public setCategories(categories: CategoryDisisplay[]) {
+		this.categories = categories;
+		return this;
+	}
+
+	public addCategory(category: CategoryDisisplay) {
+		this.categories = this.categories ? [...this.categories, category] : [category];
+		return this;
+	}
+
+	public build() {
+		return Object.freeze({
+			initialItems: this.initialItems,
+			BoxComponent: this.BoxComponent,
+			ListStyle: this.ListStyle,
+			BoxStyle: this.BoxStyle,
+			editItemsCallback: this.editItemsCallback,
+			entityInterface: this.entityInterface,
+			categories: this.categories,
+		});
+	}
 }
 
 interface EntityBoxProps {
@@ -127,8 +211,8 @@ const EntityBox: Function = ({
 		<div className={"Entity " + style}>
 			<BoxComponent
 				item={item}
-				// style={style}
 			/>
+			<div className="Interface">
 			{entityInterface?.interactItemEntityCallbackEffects?.map((button, index) => {
 				if (!button.dependency || button.dependency(item)) {
 					return <button key={index} onClick={() => button.onClick(item)}>{button.name}</button>
@@ -138,19 +222,20 @@ const EntityBox: Function = ({
 			{entityInterface?.removeItemEntityCallbackEffects?.map((button, index) => {
 				if (!button.dependency || button.dependency(item)) {
 					return <button 
-								key={index}
-								onClick={async () => {
-									if (isAsync(button.onClick)) {
-										await button.onClick(item);
-									} else {
-										button.onClick(item);
-									}
-									removeItemFromList(item);
-								}}
-							>{button.name}</button>
+					key={index}
+					onClick={async () => {
+						if (isAsync(button.onClick)) {
+							await button.onClick(item);
+						} else {
+							button.onClick(item);
+						}
+						removeItemFromList(item);
+					}}
+					>{button.name}</button>
 				}
 				return null;
 			})}
+			</div>
 		</div>
 	);
 }

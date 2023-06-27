@@ -72,8 +72,8 @@ export class ProfileManagementService {
 
 	async getLastPendingFriendRequest( receiverId: number): Promise<UserInfo> {
 		const relationship = await this.relationshipsRepository.findOne({
-		where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
-		relations: ["user1"]
+			where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
+			relations: ["user1"]
 		});
 
 		const user = relationship.user1;

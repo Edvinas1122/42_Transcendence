@@ -15,7 +15,8 @@
 }
 
 .Sidebar .Entity{
-	height:20vh;
+	height:15vh;
+	min-height: 160px;
 	padding: 17px;
 }
 
@@ -48,8 +49,8 @@
 	border: 1px solid #e6e6e6;
 	border-radius: 3px;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-	width: 100%;
 	height: 100vh;
+	width: 100%;
 }
 
 .Component {
@@ -77,8 +78,15 @@
 	display: contents;
 }
 
+.Form input {
+	width: 100%;
+	padding: 10px;
+	border: none;
+	border-radius: 3px;
+}
+
 .Entity {
-	height: 70px;
+	height: auto;
 	position:relative;
 
 }
@@ -92,29 +100,40 @@
 	cursor:pointer;
 }
 
-.Entity img{
-	width:40px;
-	border-radius:50%;
-	margin:15px;
-	float:left;
+/* .Entity span, strong {
+	margin: 0;
+	padding: 10px;
+} */
+
+
+.Interface {
+	/* display: flex; */
+	/* flex-direction: column; */
+	flex-grow: 1;
+	width: 100%;
 }
 
-.Entity p{
-	padding:15px 0 0 0;			
-	float:left;
-	width:220px;
+.Interface button {
+	margin: 10px;
+	background-color: #007bff;
+	align-self: flex-end;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    flex-shrink: 0;
+    text-align: right;
 }
+
 .Entity p strong{
 	font-weight:600;
 	font-size:15px;
 	color:#597a96;  
-
 }
-.Entity p span{
+
+/* .Entity p span{
 	font-size:13px;
 	font-weight:400;
 	color:#aab8c2;
-}
-
-.Entity .Achievement{
 }

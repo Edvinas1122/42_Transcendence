@@ -11,6 +11,7 @@ export type EventSourceContextType = Message | null;
 
 export const EventSourceContext = createContext<EventSourceContextType>(null);
 export const ChatSourceContext = createContext<ChatEventType | null>(null);
+export const OnlineUsersContext = createContext<number[] | null>(null);
 
 interface EventSourceProviderProps {
 	children: React.ReactNode;
@@ -39,7 +40,6 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 
 	useEffect(() => {
 
-		console.log('EventSourceProvider: ', token);
 		if (!token) {
 			return () => {};
 		}
@@ -52,10 +52,8 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 
 			switch (parsedData.type) {
 				case 'chat':
-					console.log('global enevt: ', parsedData.data);
 					setChatEvent(parsedData.data);
 				case 'user':
-					console.log('global event: ', parsedData.data);
 					switch (parsedData.data.event) {}
 					break;
 			}

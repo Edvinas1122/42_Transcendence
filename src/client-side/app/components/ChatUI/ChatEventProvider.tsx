@@ -56,6 +56,11 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 						subtype: chatEvent.subType,
 						data: chatEvent.data,
 					});
+					setChatRoomEvent({
+						roomID: chatEvent.roomId,
+						subtype: 'join',
+						data: chatEvent.data,
+					});
 					break;
 				case 'message':
 					let newMessage: Message = chatEvent.data as unknown as Message;
@@ -69,7 +74,7 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 					break;
 			}
 		}
-	}, [chatEvent, id]); // pathname added recently - test if it works
+	}, [chatEvent, id]);
 
 	return (
 		<MessageSourceContext.Provider value={newMessage}>

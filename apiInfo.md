@@ -7,8 +7,7 @@ auth/
 	validate/
 
 users/
-	<!-- me/ - UserProfile - personal profile of token bearer -->
-	profile/:id - UserProfile - id owners personal profile <--- only this
+	profile/:id - UserProfile - id owners personal profile
 	all/ - get all profiles (except blocked)
 	:id/all <-- 
 	
@@ -31,6 +30,7 @@ chat/
 
 	roles/
 		:chatId/join (POST) - JoinChatDto - Accept pending request and join
+		:chatId/quit (POST) - JoinChatDto - Accept pending request and join
 		:chatId/(:role)(or Any) - Get chat relatives
 		:chatId/invite/:userId (POST) - Invite to chat
 		:chatId/invite/accept (POST) - Accept an invite to a chat

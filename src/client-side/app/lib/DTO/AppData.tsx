@@ -42,16 +42,24 @@ interface Chat {
 	messages: Message[];
 	personal: boolean;
 	mine?: boolean;
+	type: 'personal' | 'group';
+	amParticipant?: boolean;
 }
 
 interface PersonalChat extends Chat {
 	participant: User;
+	type: 'personal'; 
 }
 
 interface GroupChat extends Chat {
 	owner: User;
 	participants: User[];
 	privileged: boolean;
+	type: 'group';
+}
+
+function isGroupChat(chat: Chat): chat is GroupChat { // discriminator
+    return chat.type === 'group';
 }
 
 interface Message {
@@ -60,6 +68,7 @@ interface Message {
 	user: User;
 	me?: boolean;
 	chatID?: number; // experimanetal
+	timeSent?: Date;
 }
 
 enum RoleType {
@@ -76,3 +85,4 @@ interface AppData {
 
 export default AppData;
 export type { User, UserProfile, MatchHistory, Chat, Achievement, PersonalChat, GroupChat, Message, RoleType };
+export { isGroupChat };

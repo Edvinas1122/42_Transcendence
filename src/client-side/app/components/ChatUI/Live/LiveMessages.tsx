@@ -5,22 +5,28 @@ import { MessageSourceContext } from "@/components/ChatUI/ChatEventProvider";
 import { Message } from "@/lib/DTO/AppData";
 import DisplayPopUp from "@/components/EventsInfoUI/EventsInfo";
 import { serverFetch } from "@/lib/fetch.util";
+import "@/components/ChatUI/Chat.css";
 
 
-const MessageBox: Function = ({ item, style }: { item: Message, style?: string }) => {
+const MessageBox: Function = ({ item }: { item: Message }) => {
 
 	const messageClass = item.me ? 'Message user' : 'Message';
 	const messageSpace = "MessageSpace";
 
 	return (
-		<div className="MessageArea">
+		<>
 			<div className={messageSpace}></div>
 			<div className={messageClass}>
-				{/* <p>{item.user.name}</p> */}
-				<p>{item.content}</p>
+				<article>
+					<header>
+						<address>{item.user.name}</address>
+						{/* <time>{item.timeSent}</time> */}
+					</header>
+					<p>{item.content}</p>
+				</article>
 			</div>
 			<div className={messageSpace}></div>
-		</div>
+		</>
 	);
 }
 
@@ -41,6 +47,7 @@ const LiveMessages: Function = ({ initialMessages, chatID }: { initialMessages: 
 			editItemsCallback={handleNewMessage}
 			BoxComponent={MessageBox}
 			ListStyle="MessageList"
+			BoxStyle="MessageArea"
 		/>
 	);
 }

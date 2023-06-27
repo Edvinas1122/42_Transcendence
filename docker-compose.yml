@@ -19,6 +19,11 @@ services:
       - db
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   next-app:
     build: 

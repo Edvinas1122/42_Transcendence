@@ -26,12 +26,10 @@ export class RoleService {
 			},
 			relations: ['user'],
 		});
-		console.log('Relatives', relatives);
 		return relatives.map(relative => new UserInfo(relative.user, relative.type));
 	}
 
 	async getChatRoleRelatives(chat: Chat, role: RoleType = RoleType.Blocked): Promise<UserInfo[]> {
-		console.log('Relatives', role);
 		const relatives = await this.roleRepository.find({
 			where: { 
 				chat: { id: chat.id },
@@ -39,8 +37,6 @@ export class RoleService {
 			},
 			relations: ['user'],
 		});
-		console.log('Relatives', relatives);
-		
 		return relatives.map(relative => new UserInfo(relative.user, relative.type));
 	}
 
@@ -69,33 +65,40 @@ export class RoleService {
 			newRole.chat = chat;
 
 			await this.roleRepository.save(newRole);
-			console.log('New role', newRole);
 			return true;
 		} catch (error) {
-			console.error(error);
-		return false;
+			return false;
 		}
 	}
 
 	async removeChatRelative(chat: Chat, userId: number, expectedRole?: RoleType): Promise<boolean> {
-		let conditions = {
+		const conditions: any = {
 			chat: { id: chat.id },
 			user: { id: userId },
 		};
 		
 		if (expectedRole) {
-			// conditions['type'] = expectedRole;
+			conditions['type'] = expectedRole;
+		}
+	
+		console.log("here we are");
+	
+		// Try to find the role first
+		const role = await this.roleRepository.findOne({where: conditions});
+		
+		// If no role found or role type doesn't match expectedRole, throw an exception
+		if (!role || (expectedRole && role.type !== expectedRole)) {
+			throw new HttpException('The user does not have the expected role', HttpStatus.BAD_REQUEST);
 		}
 		
-		const result = await this.roleRepository.delete(conditions);
-		console.log('Remove relative', chat, userId, expectedRole, result);
+		// Delete the role
+		await this.roleRepository.remove(role);
 		
-		if (result.affected === 0) {
-		  throw new HttpException('The user does not have the expected role', HttpStatus.BAD_REQUEST);
-		}
-		
+		// report the event
+
+
 		return true;
-	  }
+	}
 
 	async removeChatRelatives(chat: Chat, userIds: number[]): Promise<boolean> {
 		await this.roleRepository.delete({
@@ -112,22 +115,12 @@ export class RoleService {
 		return !!relative;
 	}
 
-	async getRole(chatId: number, userId: number): Promise<Role> {
+	async getRole(chatId: number, userId: number): Promise<Role | null> {
 		const role = await this.roleRepository.findOne({
 			where: { chat: { id: chatId }, user: { id: userId }}
 		});
-		if (!role) {
-			throw new NotFoundException('Role not found');
-		}
 		return role;
 	}
-
-	// async userHasRole(userId: number, role: RoleType): Promise<boolean> {
-	// 	const relative = await this.roleRepository.findOne({
-	// 		where: { user: { id: userId }, type: role },
-	// 	});
-	// 	return !!relative;
-	// }
 
 	async isPrivileged(userId: number, chatId: number): Promise<boolean> {
 		const relative = await this.roleRepository.findOne({
@@ -145,9 +138,9 @@ export class RoleService {
 
 	async isParticipant(userId: number, chatId: number): Promise<boolean> {
 		const relative = await this.roleRepository.findOne({
-			where: { user: { id: userId }, type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant]), chat: { id: chatId } },
+			where: { user: { id: userId }, type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant, RoleType.Invited]), chat: { id: chatId } },
 		});
-		return !!relative;
+		return relative !== null ? true : false;
 	}
 
 	async editRole(role: Role, roleType: RoleType): Promise<boolean> {

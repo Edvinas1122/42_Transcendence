@@ -26,7 +26,7 @@ const ChatRoomsUI: Function = () => {
 
 	return (
 		<div className="Component">
-			<h1>Available Chat Rooms</h1>
+			<h1>Chat Rooms</h1>
 			<ChatRoomsLive serverChats={`/chat/available`} />
 			<CreateChatBox />
 		</div>

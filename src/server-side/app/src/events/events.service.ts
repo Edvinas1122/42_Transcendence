@@ -16,6 +16,8 @@ export class EventService {
 	private eventSubjects = new Map<string, Subject<any>>();
 
 	connectUser(userId: string) {
+		console.log('disconnectUser', userId);
+		console.log("total connected users: ", this.eventSubjects.size);
 		this.eventSubjects.set(userId, new Subject<any>());
 	}
 

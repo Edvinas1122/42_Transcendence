@@ -55,11 +55,9 @@ export class RolesController {
 		@Param('chatId', new ParseIntPipe()) chatId,
 	): Promise<boolean>
 	{
-		// is an owner?
 		const chat = await this.chatService.getChat(chatId);
 		let status: boolean;
-		// if so, delete the chat
-		if (chat?.owner.id === UserId) {
+		if (chat?.owner?.id == UserId) {
 			status = await this.chatService.deleteChat(chat.id);
 		} else {
 			status = await this.roleService.removeChatRelative(chatId, UserId);
