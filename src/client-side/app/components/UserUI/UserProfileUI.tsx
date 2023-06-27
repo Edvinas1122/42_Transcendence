@@ -1,10 +1,7 @@
 import React from 'react';
 import { UserProfile, MatchHistory } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
-import GenericForm from '../GeneralUI/GenericForm';
 import GenericAchievement from './Placeholders/DummyAchievements';
-import GenericButton from '../GeneralUI/GenericButton';
-import { faUserPlus, faUserXmark, faUserSlash } from '@fortawesome/free-solid-svg-icons'
 import UserInteract from './UserInteract';
 
 const MatchHistoryDummy: MatchHistory[] = [
@@ -46,16 +43,16 @@ const MatchHistoryBox = ({ item, style }: { item: MatchHistory, style?: string }
 // THIS IS OBVIOUSLY A SHITSHOW OF A FUNCTION, I WILL FIGURE OUT A BETTER WAY LMAO 
 const UserStats = ({ user }: { user: UserProfile }) => {
 	return (
-		<div>
+		<div className="Segment">
 			<div className="Component">
 				<h1>Rank #2</h1>
 			</div>
 			<section>
-				<div className="Segment">
+				<div className="Component">
 					<h2>Wins</h2>
 					<p>7</p>
 				</div>
-				<div className="Segment">
+				<div className="Component">
 					<h2>Losses</h2>
 					<p>8</p>
 				</div>
@@ -69,58 +66,6 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 		</div>
 	);
 }
-
-// const FriendInteractions = ({user}: {user: UserProfile}) => {
-// 	return (
-// 		<div className="Component">
-// 			<GenericButton
-// 				text="Remove Friend"
-// 				type="button"
-// 				icon={faUserXmark}
-// 				endpoint={`users/manage/remove-friend/${user._id}`}
-// 			/>
-// 			<GenericButton
-// 				text="Block User"
-// 				type="button"
-// 				icon={faUserSlash}
-// 				endpoint={`users/manage/block-user/${user._id}`}
-// 			/>
-// 		</div>
-// 	);
-// }
-
-// const NonFriendInteractions = ({user}: {user: UserProfile}) => {
-// 	return (
-// 		<div className="Component">
-// 		<GenericButton
-// 				text="Add Friend"
-// 				type="button"
-// 				icon={faUserXmark}
-// 				endpoint={`users/manage/send-friend-request/${user._id}`}
-// 			/>
-// 			<GenericButton
-// 				text="Block User"
-// 				type="button"
-// 				icon={faUserSlash}
-// 				endpoint={`users/manage/block-user/${user._id}`}
-// 			/>
-// 		</div>
-// 	);
-// }
-
-// const UserEdit = () => {
-// 	return (
-// 		<div className="Component">
-// 			<GenericForm
-// 			endpoint="/drive/upload"
-// 			method="POST"
-// 			fields={[
-// 				{ name: 'Change Avatar', value: '', type: 'file'}
-// 			]}
-// 			/>
-// 		</div>
-// 	);
-// }
 
 const UserProfileUI: Function = ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
 	
