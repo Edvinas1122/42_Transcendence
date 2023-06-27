@@ -4,15 +4,16 @@ import "@/public/layout.css";
 import { serverFetch } from "@/lib/fetch.util";
 import { notFound } from "next/navigation";
 import SpinnerLoader from "@/components/GeneralUI/Loader";
+import { ButtonProps, FormProps, ToggleUnitProps, EntityInterfaceBuilder, Button, Form, ToggleUnit } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
 
 /*
-    Generic client Entity list component
-    
-    Designed for dynamic lists modification:
-        - editItemsCallback: callback function to set items
-    
+	Generic client Entity list component
+	
+	Designed for dynamic lists modification:
+		- editItemsCallback: callback function to set items
+	
 	And for interactive entity boxes:
-		- entityInterface: interface for interactive entity boxes
+		- interfaceBuilder: interface for interactive entity boxes
 		- interactItemEntityCallbackEffects: array of buttons to interact with the entity
 		- removeItemEntityCallbackEffects: array of buttons to remove the entity
 		- conditionalStyle: function to apply to conditional style to the entity box based on the item
@@ -30,11 +31,18 @@ export interface EntityButton {
 	dependency?: (item: any) => boolean,
 }
 
-export interface EntityBoxInterface {
-	interactItemEntityCallbackEffects?: EntityButton[],
-	removeItemEntityCallbackEffects?: EntityButton[],
-	conditionalStyle?: Function,
+export interface EntityForm {
+	name: string,
+	onClick: Function,
+	fields: any[],
+	dependency?: (item: any) => boolean,
 }
+
+// export interface EntityBoxInterface {
+// 	interactItemEntityCallbackEffects?: EntityButton[],
+// 	removeItemEntityCallbackEffects?: EntityButton[],
+// 	conditionalStyle?: Function,
+// }
 
 export interface CategoryDisisplay {
 	name: string,
@@ -42,27 +50,27 @@ export interface CategoryDisisplay {
 }
 
 interface UIClientListBoxProps {
-    initialItems: any[] | string,
-    BoxComponent: Function,
-    ListStyle?: string,
-    BoxStyle?: string,
-    editItemsCallback?: Function
-	entityInterface?: EntityBoxInterface,
+	initialItems: any[] | string,
+	BoxComponent: Function,
+	ListStyle?: string,
+	BoxStyle?: string,
+	editItemsCallback?: Function
+	interfaceBuilder?: any,
 	categories?: CategoryDisisplay[]
 }
 
 const UIClientListBox: Function = ({ 
-    initialItems,
-    BoxComponent,
-    ListStyle,
-    BoxStyle,
-    editItemsCallback,
-	entityInterface,
+	initialItems,
+	BoxComponent,
+	ListStyle,
+	BoxStyle,
+	editItemsCallback,
+	interfaceBuilder,
 	categories,
 }: UIClientListBoxProps ) => {
 
-    const endOfListRef = useRef<HTMLDivElement | null>(null);
-    const [Items, setItems] = useState<any[]>([]);
+	const endOfListRef = useRef<HTMLDivElement | null>(null);
+	const [Items, setItems] = useState<any[]>([]);
 
 	useEffect(() => {
 		if (typeof initialItems === "string") {
@@ -72,13 +80,13 @@ const UIClientListBox: Function = ({
 		}
 	}, [initialItems]);
 
-    useEffect(() => {
-        editItemsCallback && editItemsCallback(setItems);
-    }, [editItemsCallback]);
-    
-    useEffect(() => {
-        endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [Items]);
+	useEffect(() => {
+		editItemsCallback && editItemsCallback(setItems);
+	}, [editItemsCallback]);
+	
+	useEffect(() => {
+		endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [Items]);
 
 	const removeItemFromList = (itemToRemove: any) => {
 		setItems((prevItems: any[]) => prevItems.filter(item => item._id !== itemToRemove._id));
@@ -86,22 +94,21 @@ const UIClientListBox: Function = ({
 
 	const renderGroup = (groupItems: any[], groupName: string) => {
 		return (
-		  <div key={groupName}>
+		<div key={groupName}>
 			{/* <h2>{groupName}</h2> */}
 			{groupItems.map((item: any) => (
-			  <EntityBox
+			<EntityBox
 				key={item._id}
 				item={item}
 				style={BoxStyle}
 				BoxComponent={BoxComponent}
-				entityInterface={entityInterface}
 				removeItemFromList={removeItemFromList}
-				conditionalStyle={entityInterface?.conditionalStyle}
-			  />
+				interfaceBuilder={interfaceBuilder}
+			/>
 			))}
-		  </div>
+		</div>
 		);
-	  };
+	};
 
 	let restItems = [...Items];
 	const categorizedItems = categories?.map((category) => {
@@ -110,7 +117,7 @@ const UIClientListBox: Function = ({
 		return { name: category.name, items: categoryItems };
 	});
 
-    return (
+	return (
 		<div className={"List " + ListStyle}>
 			<Suspense fallback={<SpinnerLoader />}>
 			{categorizedItems && categorizedItems.map((category, index) => 
@@ -120,7 +127,7 @@ const UIClientListBox: Function = ({
 			<div ref={endOfListRef} />
 			</Suspense>
 		</div>
-    );
+	);
 }
 
 export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
@@ -129,7 +136,7 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 	public ListStyle: string = "";
 	public BoxStyle: string = "";
 	public editItemsCallback?: Function;
-	public entityInterface?: EntityBoxInterface;
+	public interfaceBuilder?: any
 	public categories?: CategoryDisisplay[];
 
 	public setInitialItems(initialItems: any[] | string) {
@@ -157,8 +164,8 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 		return this;
 	}
 
-	public setEntityInterface(entityInterface: EntityBoxInterface) {
-		this.entityInterface = entityInterface;
+	public setEntityInterface(interfaceBuilder: any) {
+		this.interfaceBuilder = interfaceBuilder;
 		return this;
 	}
 
@@ -179,29 +186,41 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 			ListStyle: this.ListStyle,
 			BoxStyle: this.BoxStyle,
 			editItemsCallback: this.editItemsCallback,
-			entityInterface: this.entityInterface,
+			interfaceBuilder: this.interfaceBuilder,
 			categories: this.categories,
 		});
 	}
 }
 
 interface EntityBoxProps {
-    item: any,
-    BoxComponent: Function,
-    style?: string,
-	entityInterface?: EntityBoxInterface,
+	item: any,
+	BoxComponent: Function,
+	style?: string,
 	removeItemFromList: Function,
 	conditionalStyle?: Function,
+	interfaceBuilder?: any,
 }
 
 const EntityBox: Function = ({
 	item,
 	BoxComponent,
 	style,
-	entityInterface,
 	removeItemFromList,
 	conditionalStyle,
+	interfaceBuilder,
 }: EntityBoxProps) => {
+	const [buttons, setButtons] = useState<ButtonProps[]>(interfaceBuilder?.buttons || []);
+	const [forms, setForms] = useState<FormProps[]>(interfaceBuilder?.forms || []);
+	const [toggleUnits, setToggleUnits] = useState<ToggleUnitProps[]>(interfaceBuilder?.toggleUnits || []);
+
+	useEffect(() => {
+		if (interfaceBuilder) {
+			console.log("buttons", interfaceBuilder.buttons);
+			setButtons(interfaceBuilder.buttons);
+			setForms(interfaceBuilder.forms);
+			setToggleUnits(interfaceBuilder.toggleUnits);
+		}
+	}, [interfaceBuilder]);
 
 	if (conditionalStyle) {
 		style = conditionalStyle(item);
@@ -213,28 +232,11 @@ const EntityBox: Function = ({
 				item={item}
 			/>
 			<div className="Interface">
-			{entityInterface?.interactItemEntityCallbackEffects?.map((button, index) => {
-				if (!button.dependency || button.dependency(item)) {
-					return <button key={index} onClick={() => button.onClick(item)}>{button.name}</button>
-				}
-				return null;
-			})}
-			{entityInterface?.removeItemEntityCallbackEffects?.map((button, index) => {
-				if (!button.dependency || button.dependency(item)) {
-					return <button 
-					key={index}
-					onClick={async () => {
-						if (isAsync(button.onClick)) {
-							await button.onClick(item);
-						} else {
-							button.onClick(item);
-						}
-						removeItemFromList(item);
-					}}
-					>{button.name}</button>
-				}
-				return null;
-			})}
+				{buttons && buttons.map((button, index) => (
+					<Button key={index} {...button} onClick={() => button.onClick(item)} />
+				))}
+				{forms && forms.map((form, index) => <Form key={index} {...form} />)}
+				{toggleUnits && toggleUnits.map((toggleUnit, index) => <ToggleUnit key={index} {...toggleUnit} />)}
 			</div>
 		</div>
 	);
@@ -244,52 +246,53 @@ function isAsync(fn: Function) {
     return Object.prototype.toString.call(fn) === '[object AsyncFunction]';
 }
 
-/*
-	A hellper class to build the entity interface
+// /*
+// 	A hellper class to build the entity interface
 
-	Offers methods to add buttons to the entity interface
-		and a build method to return a frozen copy of the object
-		so to avoid encapsulation problems
+// 	Offers methods to add buttons to the entity interface
+// 		and a build method to return a frozen copy of the object
+// 		so to avoid encapsulation problems
 
-*/
-export class EntityInterfaceBuilder implements EntityBoxInterface {
-    public removeItemEntityCallbackEffects: EntityButton[] = [];
-    public interactItemEntityCallbackEffects: EntityButton[] = [];
-	public conditionalStyle?: Function;
+// */
+// export class EntityInterfaceBuilder implements EntityBoxInterface {
+//     public removeItemEntityCallbackEffects: EntityButton[] = [];
+//     public interactItemEntityCallbackEffects: EntityButton[] = [];
+// 	public interfaceUnit: any[] = [];
+// 	public conditionalStyle?: Function;
 
-    addRemoveButton(name: string, onClick: Function, dependency?: (item: any) => boolean) {
-        const button: EntityButton = {
-            name,
-            onClick,
-            dependency
-        }
-        this.removeItemEntityCallbackEffects.push(button);
-        return this;
-    }
+//     addRemoveButton(name: string, onClick: Function, dependency?: (item: any) => boolean) {
+//         const button: EntityButton = {
+//             name,
+//             onClick,
+//             dependency
+//         }
+//         this.removeItemEntityCallbackEffects.push(button);
+//         return this;
+//     }
 
-    addInteractButton(name: string, onClick: Function, dependency?: (item: any) => boolean) {
-        const button: EntityButton = {
-            name,
-            onClick,
-            dependency
-        }
-        this.interactItemEntityCallbackEffects.push(button);
-        return this;
-    }
+//     addInteractButton(name: string, onClick: Function, dependency?: (item: any) => boolean) {
+//         const button: EntityButton = {
+//             name,
+//             onClick,
+//             dependency
+//         }
+//         this.interactItemEntityCallbackEffects.push(button);
+//         return this;
+//     }
 
-	addConditionalStyle(conditionalStyle: Function) {
-		this.conditionalStyle = conditionalStyle;
-		return this;
-	}
+// 	addConditionalStyle(conditionalStyle: Function) {
+// 		this.conditionalStyle = conditionalStyle;
+// 		return this;
+// 	}
 
-    build(): EntityBoxInterface {
-        // return a "frozen" copy of the object
-        return Object.freeze({
-            removeItemEntityCallbackEffects: [...this.removeItemEntityCallbackEffects],
-            interactItemEntityCallbackEffects: [...this.interactItemEntityCallbackEffects],
-			conditionalStyle: this.conditionalStyle,
-        });
-    }
-}
+//     build(): EntityBoxInterface {
+//         // return a "frozen" copy of the object
+//         return Object.freeze({
+//             removeItemEntityCallbackEffects: [...this.removeItemEntityCallbackEffects],
+//             interactItemEntityCallbackEffects: [...this.interactItemEntityCallbackEffects],
+// 			conditionalStyle: this.conditionalStyle,
+//         });
+//     }
+// }
 
 export default UIClientListBox;

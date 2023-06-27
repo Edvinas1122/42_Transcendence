@@ -30,7 +30,7 @@ chat/
 
 	roles/
 		:chatId/join (POST) - JoinChatDto - Accept pending request and join
-		:chatId/quit (POST) - JoinChatDto - Accept pending request and join
+		:chatId/leave (POST) -  Accept pending request and join
 		:chatId/(:role)(or Any) - Get chat relatives
 		:chatId/invite/:userId (POST) - Invite to chat
 		:chatId/invite/accept (POST) - Accept an invite to a chat

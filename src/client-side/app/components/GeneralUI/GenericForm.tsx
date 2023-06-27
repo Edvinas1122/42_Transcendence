@@ -24,8 +24,6 @@ interface GenericFormProps {
 }
 
 const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = false }: GenericFormProps) => {
-	
-	// const { fetchWithToken } = useContext(AuthorizedFetchContext);
 
 	const initialFormState = fields.reduce((acc, { name, value }) => ({ ...acc, [name]: value }), {});
 	const [formState, setFormState] = useState<{ [key: string]: string | number | boolean | undefined }>(
@@ -43,11 +41,6 @@ const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = f
 		event.preventDefault();
 		try {
 			const requestData = JSON.stringify(formState);
-			// const response = await fetchWithToken(endpoint, {
-			// 	method,
-			// 	body: JSON.stringify(formState),
-			// 	headers: { 'Content-Type': 'application/json' },
-			// });
 			console.log("Sending request to:", endpoint);
 			const response = await serverFetch(
 				endpoint,

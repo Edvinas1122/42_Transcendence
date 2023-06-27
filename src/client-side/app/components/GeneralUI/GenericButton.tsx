@@ -4,16 +4,14 @@ import { serverFetch } from '@/lib/fetch.util';
 
 interface GenericButtonProps {
 	text: string;
+	endpoint?: string;
+	body?: object;
 	disabled?: boolean;
 	className?: string;
-	style?: React.CSSProperties;
 	type?: "button" | "submit" | "reset";
 	icon?: any;
 	iconPosition?: "left" | "right";
-	iconStyle?: React.CSSProperties;
 	iconClassName?: string;
-	endpoint?: string;
-	body?: object;
 }
 
 const defaultStyle: React.CSSProperties = {
@@ -29,35 +27,33 @@ const defaultStyle: React.CSSProperties = {
 	cursor: 'pointer', /* Add a mouse pointer on hover */
 }
 
-const defaultIconStyle: React.CSSProperties = {
-	marginRight: '10px',
-}
-
-const GenericButton: React.FC<GenericButtonProps> = ({ text, disabled, className, style=defaultStyle, type, icon, iconPosition, iconStyle=defaultIconStyle, iconClassName, endpoint, body }) => {
-	// const { fetchWithToken } = useContext(AuthorizedFetchContext);
-
+const GenericButton: React.FC<GenericButtonProps> = ({
+	text,
+	disabled,
+	className,
+	type,
+	icon,
+	iconPosition,
+	iconClassName,
+	endpoint,
+	body,
+}) => {
 	const handleClick = async () => {
 		if (endpoint) {
-			// const response = await fetchWithToken(endpoint, {
-			// 	method: 'POST',
-			// 	body: JSON.stringify(body),
-			// 	headers: { 'Content-Type': 'application/json' },
-			// });
 			const response = await serverFetch(
 				endpoint,
 				"POST",
 				{ 'Content-Type': 'application/json' },
 				JSON.stringify(body)
 			);
-			// handle the response here...
 		}
 	};
 
 	return (
-		<button className={`GenericButton ${className}`} style={style} onClick={handleClick} disabled={disabled} type={type}>
-			{icon && iconPosition === 'left' && <FontAwesomeIcon icon={icon} className={iconClassName} style={iconStyle} />}
+		<button className={`GenericButton ${className}`} onClick={handleClick} disabled={disabled} type={type}>
+			{icon && iconPosition === 'left' && <FontAwesomeIcon icon={icon} className={iconClassName} />}
 			{text}
-			{icon && iconPosition === 'right' && <FontAwesomeIcon icon={icon} className={iconClassName} style={iconStyle} />}
+			{icon && iconPosition === 'right' && <FontAwesomeIcon icon={icon} className={iconClassName} />}
 		</button>
 	);
 };
