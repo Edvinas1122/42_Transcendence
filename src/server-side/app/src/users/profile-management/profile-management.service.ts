@@ -250,7 +250,6 @@ export class ProfileManagementService {
 	// 	return usersInfo;
 	//   }
 
-
 	private async setUsersOnlineStatus(users: UserInfo[]): Promise<UserInfo[]> {
 		const onlineUsers: number[] = await this.eventsGateway.getAllOnlineUsers();
 		users.forEach(user => {
@@ -291,5 +290,17 @@ export class ProfileManagementService {
 			}
 		});
 		return result;
+	}
+
+	async getRelationshipStatus(userId: number): Promise<RelationshipStatus> {
+	  
+		const relationship = await this.relationshipsRepository
+		  .createQueryBuilder('relationship')
+		  .leftJoinAndSelect('relationship.user1', 'user1')
+		  .leftJoinAndSelect('relationship.user2', 'user2')
+		  .where('(user1.id = :userId OR user2.id = :userId)', { userId })
+		  .getOne();
+	  
+		return relationship?.status || RelationshipStatus.PENDING;
 	}
 }

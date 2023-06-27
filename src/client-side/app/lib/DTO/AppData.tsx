@@ -28,7 +28,7 @@ interface User {
 	Online?: boolean; // non Current user context
 	Ingame?: boolean; 
 	Role?: RoleType; // chat context
-	friend?: boolean;
+	friend?: string;
 }
 
 interface UserProfile extends User {

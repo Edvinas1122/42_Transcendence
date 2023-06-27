@@ -2,14 +2,14 @@ import { Metadata } from 'next';
 import fetchWithToken from '@/lib/fetch.util';
 import UserProfileInfo from '@/components/UserUI/UserProfileDisplay';
 import { User } from '@/lib/DTO/AppData';
-import CurrentUserId from '@/lib/token.dev.util';
+// import CurrentUserId from '@/lib/token.dev.util';
 import UserProfileUI from '@/components/UserUI/UserProfileUI';
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
 	title: 'Profile',
 	description: 'User Profile'
 }
-import { redirect } from 'next/navigation'
 
 const Page: Function = async () => {
 

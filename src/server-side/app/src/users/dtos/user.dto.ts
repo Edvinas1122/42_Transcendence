@@ -1,5 +1,6 @@
 import { RoleType } from '../../chat/entities/role.entity';
 import { User } from '../entities/user.entity';
+import { Relationship, RelationshipStatus } from '../profile-management/entities/relationship.entity';
 
 export class UpdateUserDto {
 	name: string;
@@ -21,18 +22,20 @@ export class UserInfo {
     Online?: boolean;
     Ingame?: boolean;
     Role?: RoleType;
+	
 }
 
 export class UserProfileInfo extends UserInfo {
-	constructor(user: User) {
+	constructor(user: User, friend?: string) {
 		super(user);
 		this.MachHistory = [];
 		this.Achievements = [];
+		this.friend = friend;
 		// you can also assign user properties here if needed
 	}
 	MachHistory?: MachHistory[];
 	Achievements?: Achievement[];
-	friend?: boolean; // for non-current user context
+	friend?: string;
 }
 
 export class Achievement {

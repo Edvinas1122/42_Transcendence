@@ -3,41 +3,52 @@ import GenericForm from '../GeneralUI/GenericForm';
 import GenericButton from '../GeneralUI/GenericButton';
 import { faUserPlus, faUserXmark, faUserSlash } from '@fortawesome/free-solid-svg-icons'
 
-const FriendInteractions = ({user}: {user: string}) => {
-	return (
-		<div className="Component">
-			<GenericButton
+const GenericFriendButton = ({userID, userStatus}: {userID: string, userStatus: string}) => {
+	switch (userStatus) {
+		case 'received':
+			return(
+				<>
+					<GenericButton
+					text="Accept"
+					type="button"
+					endpoint={`/users/manage/approve-friend-request/${userID}`} />
+					<GenericButton
+					text="Reject"
+					type="button"
+					endpoint={`/users/manage/reject-friend-request/${userID}`} />
+				</>);
+		case 'sent': 
+			return (
+				<GenericButton
+				text="Request Sent"
+				disabled={true}
+				/>);
+		case 'approved': 
+			return (
+				<GenericButton
 				text="Remove Friend"
-				type="button"
 				icon={faUserXmark}
-				endpoint={`users/manage/remove-friend/${user}`}
-			/>
-			<GenericButton
-				text="Block User"
-				type="button"
-				icon={faUserSlash}
-				endpoint={`users/manage/block-user/${user}`}
-			/>
-		</div>
-	);
+				endpoint={`/users/manage/remove-friend/${userID}`}
+				/>);
+		default: 
+			return (
+				<GenericButton
+				text="Add Friend"
+				icon={faUserPlus}
+				endpoint={`/users/manage/send-friend-request/${userID}`}
+			/>);
+	}
 }
 
-//add friend request sent
-const NonFriendInteractions = ({user}: {user: string}) => {
-	// conditional user if invited 
-    return (
+const FriendInteractions = ({userID, userStatus}: {userID: string, userStatus: string}) => {
+	return (
 		<div className="Component">
-		<GenericButton
-				text="Add Friend"
-				type="button"
-				icon={faUserPlus}
-				endpoint={`users/manage/send-friend-request/${user}`}
-			/>
+			<GenericFriendButton userID={userID} userStatus={userStatus}/>
 			<GenericButton
 				text="Block User"
 				type="button"
 				icon={faUserSlash}
-				endpoint={`users/manage/block-user/${user}`}
+				endpoint={`/users/manage/block-user/${userID}`}
 			/>
 		</div>
 	);
@@ -60,10 +71,8 @@ const UserEdit = () => {
 const UserInteract = ({userStatus, userID}: {userStatus: string, userID: string}) => {
 	if (userStatus === "user") {
 		return <UserEdit />
-	} else if (userStatus === "friend") {
-		return <FriendInteractions user={userID} />
 	} else {
-		return <NonFriendInteractions user={userID} />
+		return <FriendInteractions userID={userID} userStatus={userStatus}/>
 	};
 }
 

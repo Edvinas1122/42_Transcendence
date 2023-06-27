@@ -2,7 +2,7 @@ import React from 'react';
 import { UserProfile, MatchHistory } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
 import GenericForm from '../GeneralUI/GenericForm';
-import GenericAchievement from './DummyAchievements';
+import GenericAchievement from './Placeholders/DummyAchievements';
 import GenericButton from '../GeneralUI/GenericButton';
 import { faUserPlus, faUserXmark, faUserSlash } from '@fortawesome/free-solid-svg-icons'
 import UserInteract from './UserInteract';
@@ -62,9 +62,9 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 			</section>
 			<div className="Component">
 				<h1>Achievements</h1>
-				<GenericAchievement id='0' />
-				<GenericAchievement id='1' />
-				<GenericAchievement id='2' />
+				<GenericAchievement id={0} />
+				<GenericAchievement id={1} />
+				<GenericAchievement id={2} />
 			</div>
 		</div>
 	);
@@ -124,7 +124,10 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 
 const UserProfileUI: Function = ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
 	
-	const userStatus = isUser ? "user" : UserInfo.friend ? "friend" : "nonFriend";
+	const userStatus = isUser ? "user" : UserInfo.friend? UserInfo.friend : "none";
+	console.log(UserInfo)
+
+	console.log(userStatus);
 
 	return (
 		<section className="Display">

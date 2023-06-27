@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserProfileInfo, UserInfo } from './dtos/user.dto';
 import { MachHistory } from './dtos/game-stats.dto';
-import { RelationshipStatus } from './profile-management/entities/relationship.entity';
+import { Relationship, RelationshipStatus } from './profile-management/entities/relationship.entity';
 
 @Injectable()
 export class UsersService {
@@ -40,12 +40,15 @@ export class UsersService {
 		return this.userRepository.findOne({ where: { id } });
 	}
 
+	
 	async getUserProfile(id: number): Promise<UserProfileInfo> {
 		const resultUser = await this.userRepository.findOne({ where: { id } });
 		if (!resultUser) {
 			throw new NotFoundException('User not found');
 		}
-		const user: UserProfileInfo = new UserProfileInfo(resultUser);
+		const relationship = await this.getRelationshipStatus(id);
+		console.log("REATIONSHIP", relationship);
+		const user: UserProfileInfo = new UserProfileInfo(resultUser, relationship);
 		// user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
 		return user;
 	}
@@ -113,7 +116,51 @@ export class UsersService {
 		});
 		return result;
 	}
+	
+	private async getRelationshipStatus(userId: number): Promise<string> {
+		const user = await this.userRepository
+		  .createQueryBuilder('user')
+		  .leftJoinAndSelect('user.relationshipsInitiated', 'relationshipInitiated')
+		  .leftJoinAndSelect('user.relationshipsReceived', 'relationshipReceived')
+		  .leftJoin('relationshipInitiated.user2', 'user2')
+		  .leftJoin('relationshipReceived.user1', 'user1')
+		  .where('user.id = :userId', { userId })
+		  .getOne();
+	  
+		console.log('User:', user);
+	  
+		if (!user) {
+		  return 'none';
+		}
+	  
+		const initiatedRelationship = user.relationshipsInitiated?.find(relationship => relationship.user1ID === userId);
+		const receivedRelationship = user.relationshipsReceived?.find(relationship => relationship.user2ID === userId);
+	  
+		console.log('Initiated Relationship:', initiatedRelationship);
+		console.log('Received Relationship:', receivedRelationship);
+	  
+		if (initiatedRelationship && initiatedRelationship.status === RelationshipStatus.PENDING) {
+		  return 'received';
+		}
+	  
+		if (receivedRelationship && receivedRelationship.status === RelationshipStatus.PENDING) {
+		  return 'sent';
+		}
+	  
+		if (initiatedRelationship && initiatedRelationship.status === RelationshipStatus.BLOCKED) {
+		  return 'blocked';
+		}
+	  
+		if (initiatedRelationship && initiatedRelationship.status === RelationshipStatus.APPROVED) {
+		  return 'approved';
+		}
 
+		if (receivedRelationship && receivedRelationship.status ===  RelationshipStatus.APPROVED) {
+			return 'approved';
+		}
+	  
+		return 'none';
+	  }
 }
 
 export { User };
