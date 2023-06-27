@@ -25,11 +25,11 @@ const ChatRoomBox: Function = ({ item, style }: { item: Chat, style?: string }) 
 	);
 }
 
-const amParticipant = (chat: GroupChat, tokenBearerID: number) => {
-	if (isGroupChat(chat)) return true;
-	if (chat.owner._id == tokenBearerID.toString()) return true;
-	return chat.participants.some((participant) => participant._id == tokenBearerID.toString());
-}
+// const amParticipant = (chat: GroupChat, tokenBearerID: number) => {
+// 	if (isGroupChat(chat)) return true;
+// 	if (chat.owner._id == tokenBearerID.toString()) return true;
+// 	return chat.participants.some((participant) => participant._id == tokenBearerID.toString());
+// }
 
 const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 
