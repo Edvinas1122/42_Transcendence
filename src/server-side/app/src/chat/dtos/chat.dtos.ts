@@ -89,12 +89,12 @@ export class PersonalChatDto extends ChatDto {
 interface ChatGroup {
 	chat: Chat;
 	owner: UserInfo;
-	privileged: boolean;
+	privileged?: boolean;
 	mine?: boolean;
 	participants?: UserInfo[];
 	messages?: MessageDto[];
 	type?: "group";
-	amParticipant: boolean;
+	amParticipant?: boolean;
 }
 
 export class GroupChatDto extends ChatDto {

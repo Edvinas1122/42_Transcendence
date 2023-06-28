@@ -11,24 +11,29 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AuthContext } from "@/components/ContextProviders/authContext";
 import { EntityInterfaceBuilder } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
 
-const ChatRoomBox: Function = ({ item }: { item: Chat }) => {
+const ChatRoomBox: Function = ({ item, childnode }: { item: Chat, childnode: Function }) => {
 	const pathname = usePathname();
 	const router = useRouter();
 	const openChatLink = () => router.replace(`/chat/${item._id}`);
+	const [linkGate, setLinkGate] = useState<boolean>(false);
 
 	return (
-		<div onClick={openChatLink} style={{ cursor: 'pointer' }}>
+		<div onClick={openChatLink} className={"Link"} style={{ cursor: 'pointer' }}>
 			<p>
 				<strong>{item.name}</strong>
 				<span>{item.personal}</span>
 			</p>
+			{childnode}
 		</div>
 	);
 }
 
-const amParticipant = (chat: GroupChat, tokenBearerID: number) => {
-	if (isGroupChat(chat) && chat.owner._id == tokenBearerID.toString()) return true;
-	return chat.participants.some((participant) => participant._id == tokenBearerID.toString());
+const meParticipant = (chat: Chat, id: string): boolean => {
+	if (isGroupChat(chat)) {
+		console.log("me participant", chat.participants, id);
+		return chat.participants.some((participant: string) => participant._id == id);
+	}
+	return true;
 }
 
 const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
@@ -40,10 +45,10 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 
 	const handleNewEvent = useCallback((setItems: Function) => {
 		if (chatEvent) {
-			// chatEvent.data.meParticipant = amParticipant(chatEvent.data, id);
 			switch (chatEvent.subtype) {
 				case "new-available":
-					console.log("new chat", chatEvent.data);
+					chatEvent.data.amParticipant = meParticipant(chatEvent.data, id.id);
+					console.log("new chat chat rooms live ", chatEvent.data);
 					setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
 					break;
 				case "deleted":
@@ -74,37 +79,17 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 					break;
 			}
 		}
-	}, [chatEvent, router]);
+	}, [chatEvent]);
 
-	// const deleteChat = (item: Chat) => (event: React.MouseEvent<HTMLButtonElement>) => {
-	// 	event.preventDefault(); 
-	// 	serverFetch(`/chat/${item._id}`, "DELETE")
-	// 		.then(() => {
-	// 			console.log('Chat deleted.');
-	// 		})
-	// 		.catch((err) => {
-	// 			console.error(err);
-	// 	});
-	//   };
-
-	// const joinChat = async (item: Chat): Promise<void> => {
-	// 	const response = await serverFetch(`/chat/roles/${item._id}/join`, "POST");
-	// 	console.log("join chat", response);
-	// }
-
-	const quitChat = async (item: Chat): Promise<void> => {
-		const response = await serverFetch(`/chat/roles/${item._id}/leave`, "POST");
-		console.log("leave chat", response);
-	}
 
 	const isRouteActiveStyle = (item: Chat): string => {
 		return item._id.toString() == pathname.split('/')[2] ? "Active" : "";
 	}
 
-	const interfaceBuilder = EntityInterfaceBuilder()
-		.addToggleDependency(
+	const ChatInterface = EntityInterfaceBuilder<Chat>()
+		.addToggleButton(
 			{
-				dependency: (item: any) => item.amParticipant,
+				dependency: (item: Chat) => item.amParticipant,
 				unitOne: {
 					name: "Leave",
 					endpointTemplate: "/chat/roles/${item._id}/leave",
@@ -112,14 +97,13 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 				unitTwo: {
 					name: "Join",
 					endpointTemplate: "/chat/roles/${item._id}/join",
+					fiedls: [
+						{
+							name: "password",
+							type: "password",
+						}
+					]
 				},
-			}
-		)
-		.addButton(
-			{
-				name: "Delete",
-				endpointTemplate: "/chat/${item._id}",
-				type: "delete"
 			}
 		)
 	
@@ -127,8 +111,9 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 		.setInitialItems(serverChats)
 		.setBoxComponent(ChatRoomBox)
 		.setListStyle("AvailableChats")
-		.setEntityInterface(interfaceBuilder)
+		.setEntityInterface(ChatInterface)
 		.setEditItemsCallback(handleNewEvent)
+		.setConditionalStyle(isRouteActiveStyle)
 		.addCategory({
 			name: "Private Chats",
 			dependency: (item: Chat): boolean => item.personal

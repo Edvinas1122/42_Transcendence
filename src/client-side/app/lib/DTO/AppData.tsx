@@ -54,6 +54,8 @@ interface GroupChat extends Chat {
 }
 
 function isGroupChat(chat: Chat): chat is GroupChat { // discriminator
+	if (!chat?.type)
+		return false;	
     return chat.type === 'group';
 }
 

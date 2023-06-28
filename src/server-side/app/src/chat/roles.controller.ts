@@ -57,7 +57,8 @@ export class RolesController {
 	{
 		const chat = await this.chatService.getChat(chatId);
 		let status: boolean;
-		if (chat?.owner?.id == UserId) {
+		console.log('leaveChat triggered', chat);
+		if (chat?.ownerID == UserId) {
 			status = await this.chatService.deleteChat(chat.id);
 		} else {
 			status = await this.roleService.removeChatRelative(chatId, UserId);

@@ -1,33 +1,8 @@
 import React, { useState, useEffect, MouseEvent } from 'react';
 import { serverFetch } from '@/lib/fetch.util';
 import { SpinnerLoaderSmall } from '../Loader';
-
-interface FormField {
-	name: string;
-	type: string;
-	value: string;
-	onChange: (event: MouseEvent<HTMLInputElement>) => void;
-}
-
-interface ButtonConfig {
-    name: string,
-	endpointTemplate: string,
-	type: "simple" | "grayout" | "delete" | "toggle",
-	displayDependency?: (item: any) => boolean,
-	fields?: FormField[],
-}
-
-interface ToggleUnit {
-	name: string,
-	endpointTemplate: string,
-	fiedls?: FormField[],
-}
-
-interface ToggleDependency {
-	dependency: (item: any) => boolean,
-	unitOne: ToggleUnit,
-	unitTwo: ToggleUnit,
-}
+import { ButtonConfig, ToggleUnit, ToggleButtonConf, EntityInterfaceBuilder, BehaviouralMap  } from './InterfaceComposer.lib';
+import "@/public/layout.css";
 
 const Button = ({
 	name,
@@ -54,6 +29,7 @@ const InterfaceUnit = ({
 	endpointTemplate,
 	httpmethod,
 	item,
+	fields,
 	callBackBehaviour,
 	renderDependency
 }: {
@@ -61,6 +37,7 @@ const InterfaceUnit = ({
 	endpointTemplate: string,
 	httpmethod?: "POST" | "DELETE";
 	item: any,
+	fields?: FormField[],
 	callBackBehaviour?: (item: any) => void,
 	renderDependency?: (item: any) => boolean,
 }) => {
@@ -69,7 +46,16 @@ const InterfaceUnit = ({
 	const [loading, setLoading] = useState(false);
 	const [visible, setVisible] = useState(true);
 	const [error, setError] = useState(false);
+	const [fieldValues, setFieldValues] = useState(
+		fields?.reduce((acc, field) => ({...acc, [field.name]: field.value}), {}) || {}
+	);
 	const method = httpmethod || "POST";
+
+    const onSubmitFunction = (event: React.FormEvent) => {
+		event.preventDefault();
+        onClickFunction();
+	};
+
 	useEffect(() => {
 		if (renderDependency && !renderDependency(item))
 			setVisible(false);
@@ -80,6 +66,7 @@ const InterfaceUnit = ({
 		(async () => {
 			setLoading(true);
 			try {
+				console.log("here is field values", fieldValues);
 				const response = await serverFetch<Response>(endpoint, method);
 				// assume success
 				callBackBehaviour && callBackBehaviour(item);
@@ -93,12 +80,28 @@ const InterfaceUnit = ({
 		})();
 	};
 
+	const onInputChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+		setFieldValues(prevState => ({...prevState, [name]: event.target.value}));
+	};
+
 	return (
-			<Button
-				name={name}
-				onClick={onClickFunction}
-				state={!visible ? "notVisible" : error? "error": loading ? "loading" : "idle"}
+		<>
+		<Button
+			name={name}
+			onClick={onClickFunction}
+			state={!visible ? "notVisible" : error? "error": loading ? "loading" : "idle"}
+		/>
+		<form onSubmit={onSubmitFunction}>
+		{fields && fields.map((field, index) => (
+			<input 
+				key={index} 
+				type={field.type || 'text'} 
+				value={fieldValues[field.name] || ''} 
+				onChange={onInputChange(field.name)} 
 			/>
+			))}
+		</form>
+		</>
 	)
 }
 
@@ -140,6 +143,7 @@ export const ToggleInterfaceUnit = ({
 				name={visibleUnit.name}
 				endpointTemplate={visibleUnit.endpointTemplate}
 				item={item}
+				fields={visibleUnit.fiedls}
 				httpmethod={"POST"}
 				callBackBehaviour={toggleUnit}
 			/>
@@ -147,18 +151,18 @@ export const ToggleInterfaceUnit = ({
 	);
 };
 
-
-export const EntityInterfaceBuilder = () => {
+export const EntityInterfaceBuilder: EntityInterfaceBuilder<T> = () => {
 	let buttonConfigs: ButtonConfig[] = [];
 	let toggleConfigs: ToggleDependency[] = [];
 
-	const getButtons = (item: any, callBackBehaviourMap: BehaviouralMap): JSX.Element[] => {
+	const getButtons = (item: T, callBackBehaviourMap: BehaviouralMap): JSX.Element[] => {
 		const regularButtons = buttonConfigs.map((button, index) => 
 			<InterfaceUnit
 				key={index}
 				name={button.name}
 				endpointTemplate={button.endpointTemplate}
 				item={item}
+				fields={button.fields}
 				httpmethod={callBackBehaviourMap[button.type].method}
 				callBackBehaviour={callBackBehaviourMap[button.type].sucessBehaviour}
 				renderDependency={button.displayDependency}
@@ -183,20 +187,13 @@ export const EntityInterfaceBuilder = () => {
 		return builder;
 	}
 
-	const addToggleDependency = (props: ToggleDependency) => {
+	const addToggleButton = (props: ToggleButtonConf) => {
 		toggleConfigs = [...toggleConfigs, props];
 		return builder;
 	};
 
-	const builder = { addButton, addToggleDependency, getButtons };
+	const builder = { addButton, addToggleButton, getButtons };
 	return builder;
-}
-
-interface BehaviouralMap {
-	[key: string]: {
-		sucessBehaviour?: Function,
-		method?: "POST" | "DELETE"
-	}
 }
 
 export const EntityInterface = ({ 
@@ -206,7 +203,7 @@ export const EntityInterface = ({
 	}: {
 		item: any,
 		interfaceBuilder: any,
-		removeItemFromList: Function
+		removeItemFromList: (item: any) => void
 }) => {
 	const [buttons, setButtons] = useState<JSX.Element[]>([]);
 
@@ -231,7 +228,9 @@ export const EntityInterface = ({
 
 	return (
 		<>
-			{buttons}
+			<div className="Interface">
+				{buttons}
+			</div>
 		</>
 	)
 }

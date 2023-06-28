@@ -15,9 +15,10 @@
 }
 
 .Sidebar .Entity{
-	height:15vh;
-	min-height: 160px;
-	padding: 17px;
+}
+
+.Sidebar .Link {
+	padding: 1em;
 }
 
 .Sidebar svg {
@@ -95,7 +96,10 @@
 	background: #3b3b3b41 !important;
 }
 
-.Entity:hover{
+.Link {
+}
+
+.Entity .Link:hover{
 	background:#9595957f;
 	cursor:pointer;
 }
