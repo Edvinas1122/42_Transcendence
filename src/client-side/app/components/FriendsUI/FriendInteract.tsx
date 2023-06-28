@@ -19,12 +19,10 @@ const FriendRequestBoxBase: Function = ({item}: {item: User}) => {
 			</p>
 			<GenericButton
 			text="Accept"
-            style={acceptButtonStyle}
 			type="button"
 			endpoint={`/users/manage/approve-friend-request/${item._id}`} />
 			<GenericButton
 			text="Reject"
-            style={acceptButtonStyle}
 			type="button"
 			endpoint={`/users/manage/reject-friend-request/${item._id}`} />
 		</div>
@@ -47,7 +45,6 @@ export const BlockedUserBox: Function = ({item}: {item: User}) => {
 			</p>
 			<GenericButton
 			text="Unblock"
-            style={acceptButtonStyle}
 			type="button"
 			endpoint={`/users/manage/unblock-user/${item._id}`} />
 		</div>
