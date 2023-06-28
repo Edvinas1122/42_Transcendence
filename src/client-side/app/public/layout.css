@@ -126,6 +126,19 @@
     text-align: right;
 }
 
+.Interface button.waiting {
+	margin: 10px;
+	background-color: #659dd8;
+	align-self: flex-end;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    flex-shrink: 0;
+    text-align: right;
+}
+
 .Entity p strong{
 	font-weight:600;
 	font-size:15px;

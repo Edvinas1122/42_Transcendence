@@ -29,6 +29,7 @@ RUN npm install class-validator class-transformer
 
 # file upload
 RUN npm install npm i -D @types/multer
+RUN npm install cookie-parser
 
 COPY app/ ./
 

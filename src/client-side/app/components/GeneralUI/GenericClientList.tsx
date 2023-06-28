@@ -4,7 +4,8 @@ import "@/public/layout.css";
 import { serverFetch } from "@/lib/fetch.util";
 import { notFound } from "next/navigation";
 import SpinnerLoader from "@/components/GeneralUI/Loader";
-import { ButtonProps, FormProps, ToggleUnitProps, EntityInterfaceBuilder, Button, Form, ToggleUnit } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
+import { EntityInterface } from "./InterfaceGenerics/InterfaceComposer";
+
 
 /*
 	Generic client Entity list component
@@ -209,18 +210,6 @@ const EntityBox: Function = ({
 	conditionalStyle,
 	interfaceBuilder,
 }: EntityBoxProps) => {
-	const [buttons, setButtons] = useState<ButtonProps[]>(interfaceBuilder?.buttons || []);
-	const [forms, setForms] = useState<FormProps[]>(interfaceBuilder?.forms || []);
-	const [toggleUnits, setToggleUnits] = useState<ToggleUnitProps[]>(interfaceBuilder?.toggleUnits || []);
-
-	useEffect(() => {
-		if (interfaceBuilder) {
-			console.log("buttons", interfaceBuilder.buttons);
-			setButtons(interfaceBuilder.buttons);
-			setForms(interfaceBuilder.forms);
-			setToggleUnits(interfaceBuilder.toggleUnits);
-		}
-	}, [interfaceBuilder]);
 
 	if (conditionalStyle) {
 		style = conditionalStyle(item);
@@ -231,13 +220,15 @@ const EntityBox: Function = ({
 			<BoxComponent
 				item={item}
 			/>
+		{interfaceBuilder && (
 			<div className="Interface">
-				{buttons && buttons.map((button, index) => (
-					<Button key={index} {...button} onClick={() => button.onClick(item)} />
-				))}
-				{forms && forms.map((form, index) => <Form key={index} {...form} />)}
-				{toggleUnits && toggleUnits.map((toggleUnit, index) => <ToggleUnit key={index} {...toggleUnit} />)}
+				<EntityInterface
+					item={item}
+					interfaceBuilder={interfaceBuilder}
+					removeItemFromList={removeItemFromList}
+				/>
 			</div>
+		)}
 		</div>
 	);
 }

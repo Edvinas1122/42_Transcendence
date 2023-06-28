@@ -11,7 +11,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AuthContext } from "@/components/ContextProviders/authContext";
 import { EntityInterfaceBuilder } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
 
-const ChatRoomBox: Function = ({ item, style }: { item: Chat, style?: string }) => {
+const ChatRoomBox: Function = ({ item }: { item: Chat }) => {
 	const pathname = usePathname();
 	const router = useRouter();
 	const openChatLink = () => router.replace(`/chat/${item._id}`);
@@ -53,20 +53,20 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 						console.log("Kick user from chat");
 					}
 					break;
-				case "join":
-					console.log("join chat chat rooms live ", chatEvent.data);
-					// setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
+				// case "join":
+				// 	console.log("join chat chat rooms live ", chatEvent.data);
+				// 	setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
 
-					setItems((prevChats: Chat[]) => {
-						return prevChats.map((chat: Chat) => {
-							const data = chat._id.toString() === chatEvent.roomID
-							? chatEvent.data : chat
-							data.amParticipant = true;
-							console.log("join chat chat rooms live ", data);
-							return data;
-						});
-					});
-					break;
+				// 	setItems((prevChats: Chat[]) => {
+				// 		return prevChats.map((chat: Chat) => {
+				// 			const data = chat._id.toString() === chatEvent.roomID
+				// 			? chatEvent.data : chat
+				// 			data.amParticipant = true;
+				// 			console.log("join chat chat rooms live ", data);
+				// 			return data;
+				// 		});
+				// 	});
+					// break;
 				case "quit":
 					console.log("quit chat chat rooms live ", chatEvent.data);
 					break;
@@ -76,16 +76,21 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 		}
 	}, [chatEvent, router]);
 
-	const deleteChat = (item: Chat) => async (event: MouseEvent<HTMLButtonElement, MouseEvent>): Promise<boolean> => {
-		event.preventDefault(); // Prevent the default button click behavior.
-		await serverFetch(`/chat/${item._id}`, "DELETE");
-		return true; // Or however you wish to determine success.
-	}
+	// const deleteChat = (item: Chat) => (event: React.MouseEvent<HTMLButtonElement>) => {
+	// 	event.preventDefault(); 
+	// 	serverFetch(`/chat/${item._id}`, "DELETE")
+	// 		.then(() => {
+	// 			console.log('Chat deleted.');
+	// 		})
+	// 		.catch((err) => {
+	// 			console.error(err);
+	// 	});
+	//   };
 
-	const joinChat = async (item: Chat): Promise<void> => {
-		const response = await serverFetch(`/chat/roles/${item._id}/join`, "POST");
-		console.log("join chat", response);
-	}
+	// const joinChat = async (item: Chat): Promise<void> => {
+	// 	const response = await serverFetch(`/chat/roles/${item._id}/join`, "POST");
+	// 	console.log("join chat", response);
+	// }
 
 	const quitChat = async (item: Chat): Promise<void> => {
 		const response = await serverFetch(`/chat/roles/${item._id}/leave`, "POST");
@@ -96,27 +101,33 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 		return item._id.toString() == pathname.split('/')[2] ? "Active" : "";
 	}
 
-	// const interfaceBuilder = new EntityInterfaceBuilder<Chat>()
-		// .addRemoveButton("remove chat", deleteChat, (item: Chat) => item.mine ? true : false)
-		// .addRemoveButton("dev remove chat", deleteChat) // delete this line
-		// .addInteractButton("join chat", joinChat, (item: Chat): boolean => {
-		// 	return isGroupChat(item) && !item.amParticipant && !item.mine ? true : false;
-		// })
-		// .addInteractButton("leave chat", quitChat, (item: Chat) => item.mine ? false : true)
-		// .addConditionalStyle(isRouteActiveStyle)
-
 	const interfaceBuilder = EntityInterfaceBuilder()
-		.addInteractButton({
-			name: "deleteChat",
-			onClick: deleteChat,
-		})
-		.build();
-
+		.addToggleDependency(
+			{
+				dependency: (item: any) => item.amParticipant,
+				unitOne: {
+					name: "Leave",
+					endpointTemplate: "/chat/roles/${item._id}/leave",
+				},
+				unitTwo: {
+					name: "Join",
+					endpointTemplate: "/chat/roles/${item._id}/join",
+				},
+			}
+		)
+		.addButton(
+			{
+				name: "Delete",
+				endpointTemplate: "/chat/${item._id}",
+				type: "delete"
+			}
+		)
+	
 	const ChatRoomList = new UIClientListBoxClassBuilder()
 		.setInitialItems(serverChats)
 		.setBoxComponent(ChatRoomBox)
 		.setListStyle("AvailableChats")
-		.setEntityInterface(interfaceBuilder)	
+		.setEntityInterface(interfaceBuilder)
 		.setEditItemsCallback(handleNewEvent)
 		.addCategory({
 			name: "Private Chats",

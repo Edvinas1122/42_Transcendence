@@ -94,7 +94,7 @@ interface ChatGroup {
 	participants?: UserInfo[];
 	messages?: MessageDto[];
 	type?: "group";
-	amParticipant?: boolean;
+	amParticipant: boolean;
 }
 
 export class GroupChatDto extends ChatDto {
@@ -105,6 +105,7 @@ export class GroupChatDto extends ChatDto {
 		this.privileged = props.privileged || false; // Assuming you can pass the privileged status during construction
 		this.type = "group";
 		this.mine = props.mine || false;
+		this.amParticipant = props.amParticipant || false;
 	}
 	owner: UserInfo;
 	participants: UserInfo[];
