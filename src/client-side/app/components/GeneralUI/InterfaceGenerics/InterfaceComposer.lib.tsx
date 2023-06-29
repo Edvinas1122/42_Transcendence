@@ -26,13 +26,13 @@ interface ToggleButtonConf<T extends HasId> {
 }
 
 interface HasId {
-	_id: string;
+	_id: number;
 }
 
 
-type EntityInterfaceBuilder<T extends HasId> = () => {
-	addButton: (props: ButtonConfig<T>) => any,
-	addToggleDependency: (props: ToggleButtonConf<T>) => any,
+type EntityInterfaceBuilder<T extends HasId> = {
+	addButton: (props: ButtonConfig<T>) => EntityInterfaceBuilder<T>,
+	addToggleButton: (props: ToggleButtonConf<T>) => EntityInterfaceBuilder<T>,
 	getButtons: (item: T, callBackBehaviourMap: BehaviouralMap) => JSX.Element[],
 };
 
@@ -43,4 +43,12 @@ interface BehaviouralMap {
 	}
 }
 
-export type { ButtonConfig, ToggleUnit, ToggleButtonConf, EntityInterfaceBuilder, HasId, BehaviouralMap };
+export type {
+	ButtonConfig,
+	ToggleUnit,
+	ToggleButtonConf,
+	EntityInterfaceBuilder,
+	HasId,
+	BehaviouralMap,
+	FormField
+};

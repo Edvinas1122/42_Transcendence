@@ -3,7 +3,7 @@ import UIClientListBox, { UIClientListBoxClassBuilder, CategoryDisisplay } from 
 import React, { useState, useEffect, useContext, useCallback, useRef, MouseEvent } from "react";
 import { ChatRoomSourceContext } from "@/components/ChatUI/ChatEventProvider";
 import Link from "next/link";
-import { Chat, GroupChat, isGroupChat } from "@/lib/DTO/AppData";
+import { Chat, GroupChat, isGroupChat, User } from "@/lib/DTO/AppData";
 import "../Chat.css";
 import "@/public/layout.css";
 import { serverFetch } from "@/lib/fetch.util";
@@ -11,7 +11,15 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AuthContext } from "@/components/ContextProviders/authContext";
 import { EntityInterfaceBuilder } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
 
-const ChatRoomBox: Function = ({ item, childnode }: { item: Chat, childnode: Function }) => {
+interface ChatRoomBoxProps {
+	item: Chat,
+	childnode: React.ReactNode
+}
+
+const ChatRoomBox: React.FC<ChatRoomBoxProps> = ({
+	item,
+	childnode
+}) => {
 	const pathname = usePathname();
 	const router = useRouter();
 	const openChatLink = () => router.replace(`/chat/${item._id}`);
@@ -28,10 +36,10 @@ const ChatRoomBox: Function = ({ item, childnode }: { item: Chat, childnode: Fun
 	);
 }
 
-const meParticipant = (chat: Chat, id: string): boolean => {
+const meParticipant = (chat: Chat, id: number): boolean => {
 	if (isGroupChat(chat)) {
 		console.log("me participant", chat.participants, id);
-		return chat.participants.some((participant: string) => participant._id == id);
+		return chat.participants.some((participant: User) => participant._id == id);
 	}
 	return true;
 }
@@ -89,7 +97,7 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 	const ChatInterface = EntityInterfaceBuilder<Chat>()
 		.addToggleButton(
 			{
-				dependency: (item: Chat) => item.amParticipant,
+				dependency: (item: Chat) => item?.amParticipant? true : false,
 				unitOne: {
 					name: "Leave",
 					endpointTemplate: "/chat/roles/${item._id}/leave",

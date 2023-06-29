@@ -56,16 +56,11 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 						subtype: chatEvent.subType,
 						data: chatEvent.data,
 					});
-					setChatRoomEvent({
-						roomID: chatEvent.roomId,
-						subtype: 'join',
-						data: chatEvent.data,
-					});
 					break;
 				case 'message':
 					let newMessage: Message = chatEvent.data as unknown as Message;
 					newMessage.chatID = parseInt(chatEvent.roomId);
-					newMessage.me = (newMessage.user._id == id.toString()) ? true : false;
+					newMessage.me = (newMessage.user._id == id) ? true : false;
 					setNewMessage(newMessage);
 					if (pathname.split('/')[2] != chatEvent.roomId.toString())
 						DisplayPopUp("Message from " + newMessage.user.name, "ChatRoom " + newMessage.chatID + " " + newMessage.content);

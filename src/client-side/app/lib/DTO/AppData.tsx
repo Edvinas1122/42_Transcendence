@@ -1,7 +1,10 @@
 "use client";
 
-interface MachHistory {
-	_id: string;
+interface HasId {
+	_id: number;
+}
+
+interface MachHistory extends HasId {
 	opeonent: string;
 	userScore: number;
 	oponentScore: number;
@@ -9,15 +12,13 @@ interface MachHistory {
 	completed: boolean;
 }
 
-interface Achievement {
-	_id: string;
+interface Achievement extends HasId {
 	name: string;
 	description: string;
 	achievedOn: Date;
 }
 
-interface User {
-	_id: string;
+interface User extends HasId {
 	name: string;
 	avatar: string;
 	Online?: boolean; // non Current user context
@@ -31,8 +32,7 @@ interface UserProfile extends User {
 	Achievements: Achievement[];
 }
 
-interface Chat {
-	_id: number;
+interface Chat extends HasId {
 	name: string;
 	messages: Message[];
 	personal: boolean;
@@ -59,8 +59,7 @@ function isGroupChat(chat: Chat): chat is GroupChat { // discriminator
     return chat.type === 'group';
 }
 
-interface Message {
-	_id: number;
+interface Message extends HasId {
 	content: string;
 	user: User;
 	me?: boolean;

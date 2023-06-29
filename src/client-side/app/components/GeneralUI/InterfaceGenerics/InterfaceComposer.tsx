@@ -1,7 +1,15 @@
 import React, { useState, useEffect, MouseEvent } from 'react';
 import { serverFetch } from '@/lib/fetch.util';
 import { SpinnerLoaderSmall } from '../Loader';
-import { ButtonConfig, ToggleUnit, ToggleButtonConf, EntityInterfaceBuilder, BehaviouralMap  } from './InterfaceComposer.lib';
+import {
+	ButtonConfig,
+	ToggleUnit,
+	ToggleButtonConf,
+	EntityInterfaceBuilder,
+	BehaviouralMap,
+	HasId,
+	FormField
+	} from './InterfaceComposer.lib';
 import "@/public/layout.css";
 
 const Button = ({
@@ -46,8 +54,8 @@ const InterfaceUnit = ({
 	const [loading, setLoading] = useState(false);
 	const [visible, setVisible] = useState(true);
 	const [error, setError] = useState(false);
-	const [fieldValues, setFieldValues] = useState(
-		fields?.reduce((acc, field) => ({...acc, [field.name]: field.value}), {}) || {}
+	const [fieldValues, setFieldValues] = useState<Record<string, any>>(
+		fields?.reduce((acc, field) => ({ ...acc, [field.name]: field.value }), {}) || {}
 	);
 	const method = httpmethod || "POST";
 
@@ -151,9 +159,9 @@ export const ToggleInterfaceUnit = ({
 	);
 };
 
-export const EntityInterfaceBuilder: EntityInterfaceBuilder<T> = () => {
-	let buttonConfigs: ButtonConfig[] = [];
-	let toggleConfigs: ToggleDependency[] = [];
+export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilder<T> {
+	let buttonConfigs: ButtonConfig<T>[] = [];
+	let toggleConfigs: ToggleButtonConf<T>[] = [];
 
 	const getButtons = (item: T, callBackBehaviourMap: BehaviouralMap): JSX.Element[] => {
 		const regularButtons = buttonConfigs.map((button, index) => 
@@ -182,17 +190,53 @@ export const EntityInterfaceBuilder: EntityInterfaceBuilder<T> = () => {
 		return [...regularButtons, ...toggleButtons];
 	}
 
-	const addButton = (props: ButtonConfig) => {
+	const addButton = (props: ButtonConfig<T>) => {
 		buttonConfigs = [...buttonConfigs, props];
 		return builder;
 	}
 
-	const addToggleButton = (props: ToggleButtonConf) => {
+	const addToggleButton = (props: ToggleButtonConf<T>) => {
 		toggleConfigs = [...toggleConfigs, props];
 		return builder;
 	};
 
-	const builder = { addButton, addToggleButton, getButtons };
+	const builder: EntityInterfaceBuilder<T> = {
+		addButton: (props: ButtonConfig<T>) => {
+		  buttonConfigs = [...buttonConfigs, props];
+		  return builder;
+		},
+		addToggleButton: (props: ToggleButtonConf<T>) => {
+			toggleConfigs = [...toggleConfigs, props];
+			return builder;
+		},
+		getButtons: (item: T, callBackBehaviourMap: BehaviouralMap) => {
+			const regularButtons = buttonConfigs.map((button, index) => 
+			  <InterfaceUnit
+				key={index}
+				name={button.name}
+				endpointTemplate={button.endpointTemplate}
+				item={item}
+				fields={button.fields}
+				httpmethod={callBackBehaviourMap[button.type].method}
+				callBackBehaviour={callBackBehaviourMap[button.type].sucessBehaviour}
+				renderDependency={button.displayDependency}
+			  />
+			);
+
+		const toggleButtons = toggleConfigs.map((toggle, index) => 
+			<ToggleInterfaceUnit
+				key={index}
+				unitOne={toggle.unitOne}
+				unitTwo={toggle.unitTwo}
+				item={item}
+				dependency={toggle.dependency}
+			/>
+		  );
+	
+		  return [...regularButtons, ...toggleButtons];
+		},
+	};
+
 	return builder;
 }
 

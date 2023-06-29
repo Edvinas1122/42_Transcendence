@@ -29,6 +29,7 @@ async function fetchWithToken<T = any>(
     }
 
     if (!cookie) {
+        console.log("No cookie found");
         throw new Error('Unauthorized');
     }
     const headers = {
@@ -44,7 +45,7 @@ async function fetchWithToken<T = any>(
 		options = { ...options, next: { revalidate: revalidate_interval }  };
 	}
 
-    const response = await fetch(fullUrl, options);
+    const response: Response = await fetch(fullUrl, options);
     if (!response.ok) {
         if (response.status === 401) { // consider returning without throwing
             throw new Error('Unauthorized');

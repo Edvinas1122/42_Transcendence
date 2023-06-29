@@ -9,25 +9,25 @@ import "./Friends.css";
 
 const	FriendsDummy: User[] = [
 	{
-		_id: "1",
+		_id: 1,
 		name: "John",
 		avatar: "",
 		Online: true,
 	},
 	{
-		_id: "2",
+		_id: 2,
 		name: "Jane",
 		avatar: "",
 		Online: false,
 	},
 	{
-		_id: "3",
+		_id: 3,
 		name: "Jack",
 		avatar: "",
 		Online: true,
 	},
 	{
-		_id: "4",
+		_id: 4,
 		name: "Jill",
 		avatar: "",
 		Online: false,
