@@ -70,10 +70,7 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 const UserProfileUI: Function = ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
 	
 	const userStatus = isUser ? "user" : UserInfo.friend? UserInfo.friend : "none";
-	console.log(UserInfo)
-
-	console.log(userStatus);
-
+	
 	return (
 		<section className="Display">
 			<div className="Segment">
