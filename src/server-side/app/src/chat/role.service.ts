@@ -26,7 +26,7 @@ export class RoleService {
 			},
 			relations: ['user'],
 		});
-		return relatives.map(relative => new UserInfo(relative.user, relative.type));
+		return relatives.filter(relative => relative && relative.user).map(relative => new UserInfo(relative.user, relative.type)); // online status not implemented
 	}
 
 	async getChatRoleRelatives(chat: Chat, role: RoleType = RoleType.Blocked): Promise<UserInfo[]> {

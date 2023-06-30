@@ -171,6 +171,7 @@ export class ChatService {
 		const participants = await this.roleService.getChatRelatives(chat);
 		/// learn if participant of a chat
 		const isParticipant = await this.roleService.isParticipant(userId, chat.id);
+
 		if (!chat.personal) {
 			const owner = await this.usersService.getUserInfo(chat.ownerID);
 			const isOwner = chat.ownerID === userId;

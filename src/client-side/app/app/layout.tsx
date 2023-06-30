@@ -23,7 +23,8 @@ export default async function RootLayout(props: {
 })
 {
 	const loggedIn = await validateUser('/auth/validate');
-	console.log(loggedIn);
+
+	console.log("logged in status", loggedIn);
 	return (
 		<html lang="en">
 			<body className={inter.className}>

@@ -26,7 +26,7 @@ users/
 chat/
 	available/ - Chat[] - Personal and Group chats available to token bearer
 	create/ (POST) - CreateChatRequest - Create a chat room
-	edit/ - 
+	edit/ (POST) - CreateChatRequest - 
 	:chatId (DELETE) - Delete a chat room
 
 	roles/
