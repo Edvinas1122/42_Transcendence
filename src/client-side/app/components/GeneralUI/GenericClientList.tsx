@@ -87,7 +87,8 @@ const UIClientListBox: Function = ({
 	}, [Items]);
 
 	const removeItemFromList = (item: any): void => {
-		setItems((prevItems: any[]) => prevItems.filter(item => item._id !== item._id));
+		setItems((prevItems: any[]) => 
+			prevItems.filter(currentItem => currentItem._id !== item._id));
 	};
 
 	const renderGroup = (groupItems: any[], groupName: string) => {
@@ -96,7 +97,6 @@ const UIClientListBox: Function = ({
 			{groupItems.length > 0 && groupName != "Rest" &&
 				<h2 className="groupName">{groupName}</h2>}
 			{groupItems.map((item: any) => (
-				console.log(item),
 			<EntityBox
 				key={item._id}
 				item={item}

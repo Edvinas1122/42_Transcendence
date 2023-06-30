@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Chat } from './entities/chat.entity';
 import { Message } from './entities/message.entity';
 import { User } from '../users/entities/user.entity';
-import { CreateChatDto, ChatDto, PersonalChatDto, GroupChatDto } from './dtos/chat.dtos';
+import { CreateChatDto, ChatDto, PersonalChatDto, GroupChatDto, UpdateChatDto } from './dtos/chat.dtos';
 import { RoleService, RoleType } from './role.service';
 import { MessageService } from './message.service';
 import { UsersService } from '../users/users.service';
@@ -37,7 +37,7 @@ export class ChatService {
 		const chat = new Chat();
 		chat.name = createChatDto.name;
 		chat.private = createChatDto.isPrivate;
-		chat.password = createChatDto.password;
+		chat.password = createChatDto.password ? createChatDto.password : "";
 		chat.ownerID = createChatDto.ownerID;
 		const owner = await this.usersService.findUser(createChatDto.ownerID);
 		if (!owner) {
@@ -65,6 +65,21 @@ export class ChatService {
 		await this.chatRepository.delete(chatId);
 		return true;
 	}
+
+	async editChat(chatId: number, createChatDto: UpdateChatDto): Promise<Chat> {
+		const chat = await this.chatRepository.findOne({where: {id: chatId}});
+		if (!chat) {
+			throw new NotFoundException('Chat not found');
+		}
+		// chat.name = createChatDto.name;
+		// chat.private = createChatDto.isPrivate;
+		chat.password = createChatDto.password ? createChatDto.password : "";
+		// chat.ownerID = createChatDto.ownerID;
+		console.log(chat);
+		return await this.chatRepository.save(chat);
+	}
+
+	
 
 	async getChatMessages(chatId: number): Promise<Message[]> {
 		const chat = await this.chatRepository.findOne({where: {id: chatId}, relations: ['messages'] });
@@ -156,8 +171,18 @@ export class ChatService {
 			await this.deleteChat(chat.id);
 		} else {
 			await this.roleService.removeChatRelative(chat, userId);
-			this.updateEvent(chat, RoomEventType.Leave, await this.makeChatDto(chat, userId), true);
+			this.updateEvent(chat, RoomEventType.Leave, await this.makeChatDto(chat, userId), true); // reloads participants
 		}
+		return true;
+	}
+
+	async kickFromChat(userId: number, chatId: number, kickedId: number): Promise<boolean> {
+		const chat = await this.chatRepository.findOne({where: {id: chatId}});
+		if (!chat) {
+			throw new NotFoundException('Chat not found');
+		}
+		this.updateEvent(chat, RoomEventType.Kicked, await this.makeChatDto(chat, userId), true); // ashame to all Online users
+		const role = await this.roleService.removeChatRelative(chat, kickedId);
 		return true;
 	}
 
@@ -169,7 +194,6 @@ export class ChatService {
 
 	private async makeChatDto(chat: Chat, userId: number): Promise<ChatDto> {
 		const participants = await this.roleService.getChatRelatives(chat);
-		/// learn if participant of a chat
 		const isParticipant = await this.roleService.isParticipant(userId, chat.id);
 
 		if (!chat.personal) {
@@ -189,26 +213,6 @@ export class ChatService {
 			return personalChatDto;
 		}
 	}
-
-	// private async returnChatDto(chat: Chat[], userId: number): Promise<ChatDto[]> {
-	// 	return Promise.all(chat.map(async (chat) => {
-	// 		const participants = await this.roleService.getChatRelatives(chat);
-	// 		/// learn if participant of a chat
-	// 		const isParticipant = await this.roleService.isParticipant(userId, chat.id);
-	// 		const role = await this.roleService.getRole(chat.id, userId);
-	// 		if (!chat.personal) {
-	// 			const owner = await this.usersService.getUserInfo(chat.ownerID);
-	// 			const isOwner = chat.ownerID === userId;
-	// 			const privileged = isOwner || role.type === RoleType.Admin;
-	// 			const groupChatDto = new GroupChatDto(chat, owner, isParticipant, isOwner, participants);
-	// 			return groupChatDto;
-	// 		} else {
-	// 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
-	// 			return personalChatDto;
-	// 		}
-	// 	}));
-	// }
-
 
 	private async updateEvent(chat: Chat, eventType: RoomEventType, chatObject?: any, participantsExclusive: boolean = false, saveEvent: boolean = false): Promise<void> {
 		if (!participantsExclusive && !chat.private && !chat.personal) {

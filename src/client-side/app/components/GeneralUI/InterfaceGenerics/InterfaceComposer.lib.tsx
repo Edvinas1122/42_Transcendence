@@ -6,10 +6,17 @@ interface FormField {
 	dependency?: (item: any) => boolean;
 }
 
+/*
+	simple - just a button
+	grayout - button that grays out when clicked
+	delete - use callback to remove item from list
+	toggle - not sure yet
+	action - updates notifcation if successful, designed for put or post entity updates
+*/ 
 interface ButtonConfig<T extends HasId> {
     name: string,
 	endpointTemplate: string,
-	type: "simple" | "grayout" | "delete" | "toggle",
+	type: "simple" | "grayout" | "delete" | "toggle" | "action",
 	displayDependency?: (item: T) => boolean,
 	fields?: FormField[],
 }
@@ -46,7 +53,7 @@ type EntityInterfaceBuilder<T extends HasId> = {
 
 interface BehaviouralMap {
 	[key: string]: {
-		sucessBehaviour?: (item: any) => void,
+		sucessBehaviour?: (item: any, response?: EntityUpdateResponse) => void,
 		togggledBehaviour?: (status: boolean) => void,
 		method?: "POST" | "DELETE"
 	}
@@ -60,5 +67,11 @@ export type {
 	HasId,
 	BehaviouralMap,
 	FormField,
-	UnitRouter
+	UnitRouter,
+	EntityUpdateResponse,
 };
+
+interface EntityUpdateResponse extends Response {
+	title: string;
+	message: string;
+}

@@ -40,7 +40,7 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 
 	useEffect(() => {
 		if (chatEvent && id) {
-			console.log("chatEvent: ", chatEvent);
+			console.log(chatEvent);
 			switch (chatEvent.event) {
 				case 'room':
 					switch (chatEvent.subType) {
@@ -68,12 +68,27 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 								data: chatEvent.data,
 							});
 							DisplayPopUp("User Left", "Chat room " + chatEvent.roomId);
+							break;
+						case 'kicked':
+							setChatRoomEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							setParticipantEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							DisplayPopUp("User Kicked", "Chat room " + chatEvent.roomId);
+							break;
 						default:
 							setChatRoomEvent({
 								roomID: chatEvent.roomId,
 								subtype: chatEvent.subType,
 								data: chatEvent.data,
 							});
+							break;
 						}
 					break;
 				case 'participant':

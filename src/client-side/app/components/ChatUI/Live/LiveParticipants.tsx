@@ -41,6 +41,7 @@ const LiveParticipants: Function = ({
 	
 	const handleNewEvent = useCallback((setItems: Function) => {
 		if (participantsEvent) {
+			console.log("participantsEvent", participantsEvent);
 			if (participantsEvent.data._id == chatID) {
 				switch (participantsEvent.subtype) {
 					case "join":
@@ -49,18 +50,25 @@ const LiveParticipants: Function = ({
 					case "leave":
 						setItems(participantsEvent.data.participants);
 						break;
+					case "kicked":
+						setItems(participantsEvent.data.participants);
+						break;
+					default:
+						setItems(participantsEvent.data.participants);
+						break;
 				}
 			}
 		}
 	}, [participantsEvent]);
 
+
 	const ParticipantRoleInterface = EntityInterfaceBuilder<User>()
 		.addButton({
 			// available to admins and owners
 			name: "Kick",
-			endpointTemplate: "/chat/roles/[id]",
+			endpointTemplate: `/chat/roles/${chatID}/[id]`,
 			type: "delete",
-			// identityDependency: (item: User) => item._id,
+			displayDependency: (item: User) => item.Role === "Owner" ? false : true,
 		})
 		.addToggleButton({
 			// available to admins and owners
@@ -68,11 +76,11 @@ const LiveParticipants: Function = ({
 			type: "simple",
 			unitOne: {
 				name: "Mute",
-				endpointTemplate: "/chat/roles/[id]/mute",
+				endpointTemplate: `/chat/roles/${chatID}/mute`,
 			},
 			unitTwo: {
 				name: "Unmute",
-				endpointTemplate: "/chat/roles/[id]/unmute",
+				endpointTemplate: `/chat/roles/${chatID}/unmute`,
 			}
 		})
 		.addToggleButton({
@@ -81,11 +89,11 @@ const LiveParticipants: Function = ({
 			type: "simple",
 			unitOne: {
 				name: "Make Admin",
-				endpointTemplate: "/chat/roles/[id]/makeadmin",
+				endpointTemplate: `/chat/roles/${chatID}/promote`,
 			},
 			unitTwo: {
 				name: "Demote",
-				endpointTemplate: "/chat/roles/[id]/demote",
+				endpointTemplate: `/chat/roles/${chatID}/demote`,
 			}
 		})
 

@@ -1,15 +1,13 @@
 "use client";
 import UIClientListBox, { UIClientListBoxClassBuilder, CategoryDisisplay } from "@/components/GeneralUI/GenericClientList";
-import React, { useState, useEffect, useContext, useCallback, useRef, MouseEvent } from "react";
-import { ChatRoomSourceContext } from "@/components/ChatUI/ChatEventProvider";
-import Link from "next/link";
-import { Chat, GroupChat, isGroupChat, User } from "@/lib/DTO/AppData";
-import "../Chat.css";
-import "@/public/layout.css";
-import { serverFetch } from "@/lib/fetch.util";
-import { usePathname, useRouter } from 'next/navigation';
-import { AuthContext } from "@/components/ContextProviders/authContext";
 import { EntityInterfaceBuilder } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
+import { AuthContext } from "@/components/ContextProviders/authContext";
+import { ChatRoomSourceContext } from "@/components/ChatUI/ChatEventProvider";
+import { Chat, GroupChat, isGroupChat, User } from "@/lib/DTO/AppData";
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useContext, useCallback } from "react";
+import "@/public/layout.css";
+import "../Chat.css";
 
 interface ChatRoomBoxProps {
 	item: Chat,
@@ -40,6 +38,16 @@ const meParticipant = (chat: Chat, id: number): boolean => {
 	return true;
 }
 
+function doIleaveChat(router: any, pathname: string, chat: Chat, myId: number): boolean {
+	if (isGroupChat(chat)) {
+		if (!chat.participants.some((participant: User) => participant._id == myId)) {
+			router.push("/chat");
+			return true;
+		}
+	}
+	return false;
+}
+
 const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 
 	const chatEvent = useContext(ChatRoomSourceContext);
@@ -59,9 +67,14 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 					break;
 				case "deleted":
 					setItems((prevChats: Chat[]) => prevChats.filter((chat: Chat) => chat._id.toString() != chatEvent.roomID));
-					if (pathname.split('/')[2] == chatEvent.roomID.toString()) {
-						router.push("/chat");
-						console.log("Kick user from chat");
+					doIleaveChat(router, pathname, chatEvent.data, id.id);
+					break;
+				case "kicked":
+					console.log("kicked chat rooms live ", chatEvent.data);
+					if (doIleaveChat(router, pathname, chatEvent.data, id.id)) {
+						/// replace chat with new one
+						console.log("I am kicked!!");
+						setItems((prevChats: Chat[]) => prevChats.filter((currentChat: Chat) => currentChat._id !== chatEvent.data._id));
 					}
 					break;
 				default:
@@ -75,8 +88,8 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 		.addButton(
 			{
 				name: "Change Password",
-				endpointTemplate: "/chat/[id]/password",
-				type: "simple",
+				endpointTemplate: "/chat/[id]/edit",
+				type: "action",
 				displayDependency: (item: Chat) => isGroupChat(item) && item?.mine? true : false,
 				fields: [
 					{
@@ -122,7 +135,11 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 			dependency: (item: Chat): boolean => item.personal
 		})
 		.addCategory({
-			name: "Group Chats",
+			name: "My Group Chats",
+			dependency: (item: Chat): boolean => item.mine ? true : false
+		})
+		.addCategory({
+			name: "Available Chats",
 			dependency: (item: Chat): boolean => !item.personal
 		})
 		.setLinkDefinition({

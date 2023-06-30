@@ -25,6 +25,11 @@ export class ChatEventGateway {
 		return true;
 	}
 
+	// async updateOnlineUsersOfRoomEvent(chatId: number, eventType: RoomEventType, info?: any): Promise<boolean> {
+	// 	const data: ChatRoomEvent = new ChatRoomEvent(chatId, eventType, info);
+	// 	return await this.eventService.sendToAll(data as SseMessage);
+	// }
+
 	async updateUserOfRoomEvent(userId: string, chatId: number, eventType: RoomEventType , charName?: string): Promise<boolean> {
 		const data: ChatRoomEvent = new ChatRoomEvent(chatId, RoomEventType.Invite, charName);
 		return await this.eventService.sendStoredEvent(userId, data as SseMessage);

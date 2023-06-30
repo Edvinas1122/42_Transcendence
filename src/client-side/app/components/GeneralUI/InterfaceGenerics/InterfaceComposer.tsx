@@ -1,6 +1,7 @@
 import React, { useState, useEffect, MouseEvent } from 'react';
 import DisplayPopUp from "@/components/EventsInfoUI/EventsInfo";
 import { serverFetch } from '@/lib/fetch.util';
+import { useServerFetch } from '@/lib/fetch.client';
 import { SpinnerLoaderSmall } from '../Loader';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -57,11 +58,14 @@ const InterfaceUnit = ({
 	httpmethod?: "POST" | "DELETE";
 	item: any,
 	fields?: FormField[],
-	callBackBehaviour?: (item: any) => void,
+	callBackBehaviour?: (item: any, response?: EntityUpdateResponse) => void,
 	renderDependency?: (item: any) => boolean,
 	link?: UnitRouter,
 }) => {
-	const endpoint = endpointTemplate.replace("[id]", item._id);
+	const pathname = usePathname();
+	// const pageId = pathname.split("/").pop() || ''; // fallback to empty string if no value
+	const endpoint = endpointTemplate.replace("[id]", item._id)
+	// .replace("[@]", pageId);
 	const [loading, setLoading] = useState(false);
 	// const [visible, setVisible] = useState(true);
 	const [error, setError] = useState(false);
@@ -70,8 +74,7 @@ const InterfaceUnit = ({
 		);
 	const method = httpmethod || "POST";
 	const router = useRouter();
-	const pathname = usePathname();
-	const interfaceUnitLinksTo = link ? link.link?.replace("[id]", item._id) : ""; 
+	const interfaceUnitLinksTo = link ? link.link?.replace("[id]", item._id) : "";
 
 	const routeActivatesLink = (): boolean => {
 		
@@ -97,7 +100,7 @@ const InterfaceUnit = ({
 	// 	if (renderDependency && !renderDependency(item))
 	// 		setVisible(false);
 	// }, [item]);
-	const visible = renderDependency ? renderDependency(item) : true;
+	const visible = renderDependency ? renderDependency(item) : true; // removed state for now
 
 
 	const onClickFunction = () => {
@@ -106,10 +109,12 @@ const InterfaceUnit = ({
 			setFieldValues(fields?.reduce((acc, field) => ({ ...acc, [field.name]: '' }), {}) || {});
 			try {
 				console.log("endpoint", endpoint, "field Values", fieldValues);
-				const response = await serverFetch<Response>(endpoint, method, { 'Content-Type': 'application/json' }, JSON.stringify(fieldValues));
-				// assume success
+				const response = await serverFetch<Promise<EntityUpdateResponse>>(endpoint, method, { 'Content-Type': 'application/json' }, JSON.stringify(fieldValues));
+				if (response?.error) {
+					throw new Error(JSON.stringify(response));
+				}
 				setLoading(false);
-				callBackBehaviour && callBackBehaviour(item);
+				callBackBehaviour && callBackBehaviour(item, response);
 				linkHanlder();
 				return response;	
 			} catch (error: any) {
@@ -135,7 +140,7 @@ const InterfaceUnit = ({
 			onClick={onClickFunction}
 			state={!visible ? "notVisible" : error? "error": loading ? "loading" : "idle"}
 		/>
-		{fields && visible && (
+		{fields && visible && !loading && (
 			<form onSubmit={onSubmitFunction}>
 				{fields.map((field, index) => {
 					if (field.dependency && field.dependency(item)) {
@@ -165,7 +170,6 @@ export const ToggleInterfaceUnit = ({
 	toggleBehaviour,
 	initialToggleState
 }: {
-	key: number,
 	unitOne: ToggleUnit,
 	unitTwo: ToggleUnit,
 	item: any,
@@ -196,7 +200,7 @@ export const ToggleInterfaceUnit = ({
 	return (
 		<>
 			<InterfaceUnit
-				key={1}
+				// key={visibleUnit.name}
 				name={visibleUnit.name}
 				endpointTemplate={visibleUnit.endpointTemplate}
 				item={item}
@@ -216,7 +220,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 	const getButtons = (item: T, callBackBehaviourMap: BehaviouralMap, linkStatus?: boolean): JSX.Element[] => {
 		const regularButtons = buttonConfigs.map((button, index) => 
 			<InterfaceUnit
-				key={index}
+				key={`interface-${index}`}
 				name={button.name}
 				endpointTemplate={button.endpointTemplate}
 				item={item}
@@ -229,7 +233,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 
 		const toggleButtons = toggleConfigs.map((toggle, index) => 
 			<ToggleInterfaceUnit
-				key={index}
+				key={`toggle-${index}`}
 				unitOne={toggle.unitOne}
 				unitTwo={toggle.unitTwo}
 				item={item}
@@ -264,7 +268,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 		getButtons: (item: T, callBackBehaviourMap: BehaviouralMap, linkStatus?: boolean) => {
 			const regularButtons = buttonConfigs.map((button, index) => 
 			  <InterfaceUnit
-				key={index}
+				key={`button-${index}`}
 				name={button.name}
 				endpointTemplate={button.endpointTemplate}
 				item={item}
@@ -277,7 +281,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 
 		const toggleButtons = toggleConfigs.map((toggle, index) => 
 			<ToggleInterfaceUnit
-				key={index}
+				key={`toggle-${index}`}
 				unitOne={toggle.unitOne}
 				unitTwo={toggle.unitTwo}
 				item={item}
@@ -292,6 +296,12 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 	};
 
 	return builder;
+}
+
+interface EntityUpdateResponse extends Response {
+	title: string;
+	message: string;
+	error?: any;
 }
 
 export const EntityInterface = ({ 
@@ -324,6 +334,10 @@ export const EntityInterface = ({
 		},
 		linkToggle: {
 			togggledBehaviour: setLinkActiveStatus,
+			method: "POST",
+		},
+		action: {
+			sucessBehaviour: (item: any, response?: EntityUpdateResponse) => {response && DisplayPopUp(response.title, response.message, 1500)},
 			method: "POST",
 		},
 	};

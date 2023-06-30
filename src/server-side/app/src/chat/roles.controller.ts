@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Post, Delete, Param, Body, Patch, UseGuards, Inject, ParseIntPipe, ValidationPipe, ParseEnumPipe } from '@nestjs/common';
+import { Controller, Get, Req, Post, Delete, Param, Body, Patch, UseGuards, Inject, ParseIntPipe, ValidationPipe, ParseEnumPipe, BadRequestException } from '@nestjs/common';
 import { RoleService, RoleType, AcceptedRoleType } from './role.service';
 import { Chat } from './entities/chat.entity';
 import { User } from '../users/entities/user.entity';
@@ -7,7 +7,7 @@ import { UsersService } from '../users/users.service'
 import { UserInfo } from '../users/dtos/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto, EditRoleDto } from './dtos/chat.dtos'; // import DTOs
-import { PrivilegedGuard } from './guards/owner.guard';
+import { PrivilegedGuard } from './guards/privileged.guard';
 import { UserId } from '../utils/user-id.decorator';
 
 
@@ -91,29 +91,30 @@ export class RolesController {
 		return await this.roleService.removeChatRelative(chat, UserId);
 	}
 
-	@UseGuards(PrivilegedGuard)
+	@UseGuards(PrivilegedGuard)  // KICK USER
 	@Delete(':chatId/:userId')
 	async removeChatRelative(
+		@UserId() UserId: number,
 		@Param('chatId', new ParseIntPipe()) chatId: number,
 		@Param('userId', new ParseIntPipe()) userId: number
 	): Promise<boolean>
 	{
-		const chat = await this.chatService.getChat(chatId);
-		return await this.roleService.removeChatRelative(chat, userId);
+		return await this.chatService.kickFromChat(UserId, chatId, userId);
 	}
 
-	@UseGuards(PrivilegedGuard)
-	@Delete(':chatId/')
-	async removeChatRelatives(
-		@Param('chatId', new ParseIntPipe()) chatId: number,
-		@Body('userIds') userIds: number[]
-	): Promise<void>
-	{
-		const chat = await this.chatService.getChat(chatId);
-		await this.roleService.removeChatRelatives(chat, userIds);
-	}
+	// @UseGuards(PrivilegedGuard) // KICK MANY USERS
+	// @Delete(':chatId/')
+	// async removeChatRelatives(
+	// 	@Param('chatId', new ParseIntPipe()) chatId: number,
+	// 	@Body('userIds') userIds: number[]
+	// ): Promise<void>
+	// {
+	// 	const chat = await this.chatService.getChat(chatId);
+	// 	await this.roleService.removeChatRelatives(chat, userIds);
+	// }
 
-	@UseGuards(PrivilegedGuard)
+
+	@UseGuards(PrivilegedGuard) // 
 	@Patch('chats/:chatId/:userId')
 	async editRole(
 		@Param('chatId', new ParseIntPipe()) chatId: number,

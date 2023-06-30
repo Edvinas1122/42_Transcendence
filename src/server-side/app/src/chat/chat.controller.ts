@@ -5,8 +5,13 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto } from './dtos/chat.dtos'; // import DTOs
 import { EventService } from '../events/events.service';
-import { PrivilegedGuard } from './guards/owner.guard';
+import { OwnerGuard } from './guards/owner.guard';
 import { UserId } from '../utils/user-id.decorator';
+
+interface EntityUpdateResponse {
+	title: string;
+	message: string;
+}
 
 @UseGuards(JwtAuthGuard)
 @Controller('chat')
@@ -21,6 +26,7 @@ export class ChatController {
 		return chats;
 	}
 
+
 	@Post('create')
 	async createChat(@UserId() userId: number, @Body(new ValidationPipe({ transform: true })) createChatDto: CreateChatDto): Promise<Chat | null>
 	{
@@ -34,16 +40,23 @@ export class ChatController {
 		return null;
 	}
 
-	// @UseGuards(PrivilegedGuard)
-	// @Delete(':chatId')
-	// async deleteChat(@UserId() userId: number, @Param('chatId', new ParseIntPipe()) chatId: number): Promise<boolean>
-	// {
-	// 	console.log('delete chat');
-	// 	const resultChat = await this.chatService.deleteChat(chatId);
-	// 	if (!resultChat)
-	// 		throw new NotFoundException('Chat not found');
-	// 	return resultChat;
-	// }
-
-
+	@UseGuards(OwnerGuard)
+	@Post(':chatId/edit')
+	async editChat(
+		@UserId() userId: number,
+		@Param('chatId', new ParseIntPipe()) chatId: number,
+		@Body(new ValidationPipe({ transform: true })) updateChatDto: UpdateChatDto
+	): Promise<EntityUpdateResponse | null>
+	{
+		console.log('edit chat');
+		const resultChat = await this.chatService.editChat(chatId, updateChatDto);
+		if (resultChat) {
+			const response: EntityUpdateResponse = {
+				title: 'Password updated',
+				message: `Chat ${resultChat.name} has been updated`
+			};
+			return response;
+		}
+		return null;
+	}
 }

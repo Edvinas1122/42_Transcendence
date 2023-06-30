@@ -30,8 +30,10 @@ export class ChatIdDto {
 	chatId: number;
 }
 
-export class UpdateChatDto extends CreateChatDto {
-	id: number;
+export class UpdateChatDto {
+	@IsString()
+	@MinLength(1)
+	password?: string | undefined;
 }
 
 export class JoinChatDto {
