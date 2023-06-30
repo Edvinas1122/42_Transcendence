@@ -6,7 +6,6 @@ import { notFound, usePathname, useRouter } from "next/navigation";
 import SpinnerLoader from "@/components/GeneralUI/Loader";
 import { EntityInterface } from "./InterfaceGenerics/InterfaceComposer";
 import { HasId } from "./InterfaceGenerics/InterfaceComposer.lib";
-import ErrorBoundary from "./ErrorBoundry";
 
 /*
 	Generic client Entity list component
@@ -63,7 +62,8 @@ const UIClientListBox: Function = ({
 
 	useEffect(() => {
 		if (error) {
-			throw new Error(error);
+			notFound();
+			// throw new Error(error);
 		}
 	}, [error]);
 

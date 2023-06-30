@@ -111,7 +111,7 @@ const InterfaceUnit = ({
 				callBackBehaviour && callBackBehaviour(item);
 				linkHanlder();
 				return response;	
-			} catch (error) {
+			} catch (error: any) {
 				const errorObject = JSON.parse(error.message); 
 				DisplayPopUp(errorObject.error, errorObject.message, 1500, "danger");
 				setLoading(false);
