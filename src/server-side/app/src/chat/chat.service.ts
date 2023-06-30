@@ -211,7 +211,7 @@ export class ChatService {
 
 
 	private async updateEvent(chat: Chat, eventType: RoomEventType, chatObject?: any, participantsExclusive: boolean = false, saveEvent: boolean = false): Promise<void> {
-		if (!participantsExclusive && !chat.private && !chat.personal && chat.password === '' || null) {
+		if (!participantsExclusive && !chat.private && !chat.personal) {
 			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, chatObject);
 		}
 		else {

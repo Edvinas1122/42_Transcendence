@@ -60,6 +60,7 @@ const LiveParticipants: Function = ({
 			name: "Kick",
 			endpointTemplate: "/chat/roles/[id]",
 			type: "delete",
+			// identityDependency: (item: User) => item._id,
 		})
 		.addToggleButton({
 			// available to admins and owners

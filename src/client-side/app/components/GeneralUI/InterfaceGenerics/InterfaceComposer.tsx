@@ -63,7 +63,7 @@ const InterfaceUnit = ({
 }) => {
 	const endpoint = endpointTemplate.replace("[id]", item._id);
 	const [loading, setLoading] = useState(false);
-	const [visible, setVisible] = useState(true);
+	// const [visible, setVisible] = useState(true);
 	const [error, setError] = useState(false);
 	const [fieldValues, setFieldValues] = useState<Record<string, any>>(
 		fields?.reduce((acc, field) => ({ ...acc, [field.name]: field.value }), {}) || {}
@@ -93,10 +93,11 @@ const InterfaceUnit = ({
         onClickFunction();
 	};
 
-	useEffect(() => {
-		if (renderDependency && !renderDependency(item))
-			setVisible(false);
-	}, [item]);
+	// useEffect(() => {
+	// 	if (renderDependency && !renderDependency(item))
+	// 		setVisible(false);
+	// }, [item]);
+	const visible = renderDependency ? renderDependency(item) : true;
 
 
 	const onClickFunction = () => {
@@ -134,7 +135,7 @@ const InterfaceUnit = ({
 			onClick={onClickFunction}
 			state={!visible ? "notVisible" : error? "error": loading ? "loading" : "idle"}
 		/>
-		{fields && (
+		{fields && visible && (
 			<form onSubmit={onSubmitFunction}>
 				{fields.map((field, index) => {
 					if (field.dependency && field.dependency(item)) {

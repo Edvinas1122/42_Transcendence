@@ -129,14 +129,16 @@
 	/* display: flex; */
 	/* flex-direction: row; */
 	/* flex-grow: 1; */
-	width: 100%;
+
 }
 
 .Unit input[type="text"], input[type="password"] {
-	vertical-align: middle;
+	vertical-align: bottom;
+	width: 5em;
 }
 
 form input[type="text"], input[type="password"] {
+
 	border-radius: 5px;
 	height: 2em;
 	border: 1px solid #ccc;

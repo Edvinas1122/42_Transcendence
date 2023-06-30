@@ -49,9 +49,11 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 
 	const handleNewEvent = useCallback((setItems: Function) => {
 		if (chatEvent) {
+			console.log("chat event", chatEvent.data);
 			switch (chatEvent.subtype) {
 				case "new-available":
 					chatEvent.data.amParticipant = meParticipant(chatEvent.data, id.id);
+					chatEvent.data.mine = chatEvent.data.owner._id == id.id;
 					console.log("new chat chat rooms live ", chatEvent.data);
 					setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
 					break;
@@ -75,6 +77,14 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 				name: "Change Password",
 				endpointTemplate: "/chat/[id]/password",
 				type: "simple",
+				displayDependency: (item: Chat) => isGroupChat(item) && item?.mine? true : false,
+				fields: [
+					{
+						name: "password",
+						type: "password",
+						dependency: (item: Chat) => true,
+					}
+				]
 			}
 		)
 		.addToggleButton(

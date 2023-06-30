@@ -112,8 +112,8 @@ export class GroupChatDto extends ChatDto {
 	owner: UserInfo;
 	participants: UserInfo[];
 	privileged: boolean;
-	passwordProtected: boolean;
 	mine?: boolean;
 	amParticipant?: boolean;
 	type?: "group";
+	passwordProtected: boolean;
 }
