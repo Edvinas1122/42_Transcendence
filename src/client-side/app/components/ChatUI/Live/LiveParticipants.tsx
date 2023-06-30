@@ -56,10 +56,39 @@ const LiveParticipants: Function = ({
 
 	const ParticipantRoleInterface = EntityInterfaceBuilder<User>()
 		.addButton({
+			// available to admins and owners
 			name: "Kick",
 			endpointTemplate: "/chat/roles/[id]",
 			type: "delete",
 		})
+		.addToggleButton({
+			// available to admins and owners
+			dependency: (item: User) => item?.Muted ? false : true,
+			type: "simple",
+			unitOne: {
+				name: "Mute",
+				endpointTemplate: "/chat/roles/[id]/mute",
+			},
+			unitTwo: {
+				name: "Unmute",
+				endpointTemplate: "/chat/roles/[id]/unmute",
+			}
+		})
+		.addToggleButton({
+			// available to owner
+			dependency: (item: User) => item?.Role == "Admin" ? true : false,
+			type: "simple",
+			unitOne: {
+				name: "Make Admin",
+				endpointTemplate: "/chat/roles/[id]/makeadmin",
+			},
+			unitTwo: {
+				name: "Demote",
+				endpointTemplate: "/chat/roles/[id]/demote",
+			}
+		})
+
+
 
 	const ParticipantsList = new UIClientListBoxClassBuilder()
 		.setInitialItems(initialParticipants)

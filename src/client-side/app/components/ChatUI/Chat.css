@@ -14,7 +14,7 @@
 .MessageComponent .List {
     flex-grow: 1;
     overflow: auto;
-    max-width: 800px;
+    /* max-width: 800px; */
 }
 
 .MessageComponent .Form {
@@ -109,4 +109,12 @@
 
 .Participants .Entity p strong {
     margin-right: 10px;
+}
+
+.Participants .Interface {
+    display: flex;
+}
+
+.Participants button {
+    padding: 5px 10px !important;
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, MouseEvent } from 'react';
+import DisplayPopUp from "@/components/EventsInfoUI/EventsInfo";
 import { serverFetch } from '@/lib/fetch.util';
 import { SpinnerLoaderSmall } from '../Loader';
 import { usePathname, useRouter } from 'next/navigation';
@@ -101,17 +102,23 @@ const InterfaceUnit = ({
 	const onClickFunction = () => {
 		(async () => {
 			setLoading(true);
+			setFieldValues(fields?.reduce((acc, field) => ({ ...acc, [field.name]: '' }), {}) || {});
 			try {
-				const response = await serverFetch<Response>(endpoint, method);
+				console.log("endpoint", endpoint, "field Values", fieldValues);
+				const response = await serverFetch<Response>(endpoint, method, { 'Content-Type': 'application/json' }, JSON.stringify(fieldValues));
 				// assume success
 				setLoading(false);
 				callBackBehaviour && callBackBehaviour(item);
 				linkHanlder();
 				return response;	
 			} catch (error) {
-				console.error(error);
+				const errorObject = JSON.parse(error.message); 
+				DisplayPopUp(errorObject.error, errorObject.message, 1500, "danger");
 				setLoading(false);
 				setError(true);
+				setTimeout(() => {
+					setError(false);
+				}, 1000);
 			}
 		})();
 	};
@@ -121,23 +128,26 @@ const InterfaceUnit = ({
 	};
 
 	return (
-		<>
+		<div className="Unit">
 		<Button
 			name={name}
 			onClick={onClickFunction}
 			state={!visible ? "notVisible" : error? "error": loading ? "loading" : "idle"}
 		/>
-		<form onSubmit={onSubmitFunction}>
-		{fields && fields.map((field, index) => (
-			<input 
-				key={index} 
-				type={field.type || 'text'} 
-				value={fieldValues[field.name] || ''} 
-				onChange={onInputChange(field.name)} 
-			/>
-			))}
-		</form>
-		</>
+		{fields && (
+			<form onSubmit={onSubmitFunction}>
+					{fields.map((field, index) => (
+						<input 
+							key={index} 
+							type={field.type || 'text'} 
+							value={fieldValues[field.name] || ''} 
+							onChange={onInputChange(field.name)}
+							placeholder={field.name + "..."} // This line adds the placeholder text
+						/>
+					))}
+			</form>
+		)}
+		</div>
 	)
 }
 

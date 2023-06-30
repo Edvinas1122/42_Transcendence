@@ -24,6 +24,8 @@ interface User extends HasId {
 	Online?: boolean; // non Current user context
 	Ingame?: boolean; 
 	Role?: RoleType; // chat context
+	Muted?: boolean; // chat context
+	Banned?: boolean; // chat context
 	friend?: boolean;
 }
 

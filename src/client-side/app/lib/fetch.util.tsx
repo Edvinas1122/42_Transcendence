@@ -5,7 +5,7 @@ export const serverFetch = async <T = any>(
     uri: string, 
     method: "GET" | "POST" | "DELETE" = "GET", 
     params?: any, 
-    body?: any
+    body?: any // does it work
 ): Promise<T> => {
     "use server";
 
@@ -37,7 +37,11 @@ async function fetchWithToken<T = any>(
         ...params
     };
 
-    let options: RequestInit = { headers: headers, method: method, body: body};
+    let options: RequestInit = {
+        headers: headers,
+        method: method,
+        body: body,
+    };
 
     if (revalidate_interval === null) {
         options = { ...options, cache: 'no-store' };
@@ -45,12 +49,15 @@ async function fetchWithToken<T = any>(
 		options = { ...options, next: { revalidate: revalidate_interval }  };
 	}
 
+    console.log("fetching with token", options);
+
     const response: Response = await fetch(fullUrl, options);
     if (!response.ok) {
+        const responseBody = await response.json();
         if (response.status === 401) { // consider returning without throwing
-            throw new Error('Unauthorized');
+            throw new Error(JSON.stringify(responseBody));
         }
-        throw new Error('Failed to fetch data')
+        throw new Error(JSON.stringify(responseBody));
 
     }
     return response.json();

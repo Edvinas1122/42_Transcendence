@@ -63,6 +63,10 @@
 	/* height: 100vh; */
 }
 
+.List h2 {
+	font-size: 0.8em;
+}
+
 .Form {
 	/* display: flex;
 	justify-content: flex-end;
@@ -111,19 +115,43 @@
 
 
 .Interface {
-	/* display: flex; */
-	/* flex-direction: column; */
+	display: flex;
+	flex-direction: row;
 	flex-grow: 1;
 	width: 100%;
 }
 
-.Interface button {
-	margin: 10px;
+.Unit {
+	display: contents;
+}
+
+.Unit form {
+	/* display: flex; */
+	/* flex-direction: row; */
+	/* flex-grow: 1; */
+	width: 100%;
+}
+
+.Unit input[type="text"], input[type="password"] {
+	vertical-align: middle;
+}
+
+form input[type="text"], input[type="password"] {
+	border-radius: 5px;
+	height: 2em;
+	border: 1px solid #ccc;
+}
+
+
+
+.Interface button, button.waiting {
+	font-size: 0.8em;
+	margin: 0px 4px;
 	background-color: #007bff;
 	align-self: flex-end;
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
     flex-shrink: 0;
@@ -131,16 +159,7 @@
 }
 
 .Interface button.waiting {
-	margin: 10px;
-	background-color: #659dd8;
-	align-self: flex-end;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    flex-shrink: 0;
-    text-align: right;
+	background-color: #659dd8 !important;
 }
 
 .Entity p strong{

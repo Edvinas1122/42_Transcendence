@@ -6,7 +6,7 @@ import { notFound, usePathname, useRouter } from "next/navigation";
 import SpinnerLoader from "@/components/GeneralUI/Loader";
 import { EntityInterface } from "./InterfaceGenerics/InterfaceComposer";
 import { HasId } from "./InterfaceGenerics/InterfaceComposer.lib";
-
+import ErrorBoundary from "./ErrorBoundry";
 
 /*
 	Generic client Entity list component
@@ -59,10 +59,20 @@ const UIClientListBox: Function = ({
 
 	const endOfListRef = useRef<HTMLDivElement | null>(null);
 	const [Items, setItems] = useState<any[]>([]);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (error) {
+			throw new Error(error);
+		}
+	}, [error]);
 
 	useEffect(() => {
 		if (typeof initialItems === "string") {
-			serverFetch<any[]>(initialItems).then((data) => setItems(data)); // not found error bug
+			serverFetch<any[]>(initialItems).then((data) => setItems(data)).catch((error) => {
+				setError(error);
+				// throw new Error(error);
+			});
 		} else if (Array.isArray(initialItems)) {
 			setItems(initialItems);
 		}
@@ -113,7 +123,7 @@ const UIClientListBox: Function = ({
 			<Suspense fallback={<SpinnerLoader />}>
 			{categorizedItems && categorizedItems.map((category, index) => 
 				renderGroup(category.items, category.name)
-			)}
+				)}
 			{restItems.length > 0 && renderGroup(restItems, 'Rest')}
 			<div ref={endOfListRef} />
 			</Suspense>

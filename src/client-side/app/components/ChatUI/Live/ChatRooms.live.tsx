@@ -70,6 +70,13 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 
 
 	const ChatInterface = EntityInterfaceBuilder<Chat>()
+		.addButton(
+			{
+				name: "Change Password",
+				endpointTemplate: "/chat/[id]/password",
+				type: "simple",
+			}
+		)
 		.addToggleButton(
 			{
 				dependency: (item: Chat) => item?.amParticipant? true : false,

@@ -37,7 +37,7 @@ export class UpdateChatDto extends CreateChatDto {
 export class JoinChatDto {
 	@IsString()
 	@IsOptional()
-	chatPassword?: string;
+	password?: string;
   }
 export class SendMessageDto {
 	@IsString()

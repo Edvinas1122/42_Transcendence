@@ -44,8 +44,8 @@ export class RolesController {
 		@Body(new ValidationPipe({ transform: true })) body: JoinChatDto
 	): Promise<boolean>
 	{
-		console.log('joinChat triggered');
-		const chatDto = await this.chatService.joinChat(UserId, chatId, body.chatPassword);
+		console.log('joinChat triggered', "body", body);
+		const chatDto = await this.chatService.joinChat(UserId, chatId, body.password);
 		return chatDto;
 	}
 
