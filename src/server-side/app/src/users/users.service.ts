@@ -49,7 +49,7 @@ export class UsersService {
 		const relationship = await this.getRelationshipStatus(id);
 		console.log("REATIONSHIP", relationship);
 		const user: UserProfileInfo = new UserProfileInfo(resultUser, relationship);
-		// user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
+		user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
 		return user;
 	}
 

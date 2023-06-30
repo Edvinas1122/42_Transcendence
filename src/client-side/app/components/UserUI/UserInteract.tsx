@@ -5,6 +5,7 @@ import GenericForm from '../GeneralUI/GenericForm';
 import GenericButton from '../GeneralUI/GenericButton';
 import GenericMultiStateButton from '../GeneralUI/GenericMultiStateButton';
 import { faUserPlus, faUserXmark, faUserSlash } from '@fortawesome/free-solid-svg-icons'
+import EditAvatar from "../PreferencesUI/EditAvatar";
 
 const GenericFriendButton = ({userID, userStatus}: {userID: string, userStatus: string}) => {
 	switch (userStatus) {
@@ -83,13 +84,14 @@ const FriendInteractions = ({userID, userStatus}: {userID: string, userStatus: s
 const UserEdit = () => {
 	return (
 		<div className="Component">
-			<GenericForm
+			{/* <GenericForm
 			endpoint="/drive/upload"
 			method="POST"
 			fields={[
 				{ name: 'Change Avatar', value: '', type: 'file'}
 			]}
-			/>
+			/> */}
+			<EditAvatar />
 		</div>
 	);
 }
