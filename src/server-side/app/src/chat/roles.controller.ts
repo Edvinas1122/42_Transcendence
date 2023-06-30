@@ -55,15 +55,7 @@ export class RolesController {
 		@Param('chatId', new ParseIntPipe()) chatId,
 	): Promise<boolean>
 	{
-		const chat = await this.chatService.getChat(chatId);
-		let status: boolean;
-		console.log('leaveChat triggered', chat);
-		if (chat?.ownerID == UserId) {
-			status = await this.chatService.deleteChat(chat.id);
-		} else {
-			status = await this.roleService.removeChatRelative(chatId, UserId);
-		return status;
-		}
+		return await this.chatService.leaveChat(UserId, chatId);
 	}
 
 	@Post(':chatId/invite/:userId')

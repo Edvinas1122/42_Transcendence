@@ -3,6 +3,7 @@ interface FormField {
 	name: string;
 	type?: string;
 	value?: string;
+	dependency?: (item: any) => boolean;
 }
 
 interface ButtonConfig<T extends HasId> {
@@ -13,14 +14,21 @@ interface ButtonConfig<T extends HasId> {
 	fields?: FormField[],
 }
 
+interface UnitRouter {
+	link: string,
+	currentActiveOnly?: string,
+}
+
 interface ToggleUnit {
 	name: string,
 	endpointTemplate: string,
-	fiedls?: FormField[],
+	fields?: FormField[],
+	link?: UnitRouter,
 }
 
 interface ToggleButtonConf<T extends HasId> {
 	dependency: (item: T) => boolean,
+	type: "linkToggle" | "simple",
 	unitOne: ToggleUnit,
 	unitTwo: ToggleUnit,
 }
@@ -39,6 +47,7 @@ type EntityInterfaceBuilder<T extends HasId> = {
 interface BehaviouralMap {
 	[key: string]: {
 		sucessBehaviour?: (item: any) => void,
+		togggledBehaviour?: (status: boolean) => void,
 		method?: "POST" | "DELETE"
 	}
 }
@@ -50,5 +59,6 @@ export type {
 	EntityInterfaceBuilder,
 	HasId,
 	BehaviouralMap,
-	FormField
+	FormField,
+	UnitRouter
 };

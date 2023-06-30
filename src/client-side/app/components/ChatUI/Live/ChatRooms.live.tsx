@@ -20,19 +20,15 @@ const ChatRoomBox: React.FC<ChatRoomBoxProps> = ({
 	item,
 	childnode
 }) => {
-	const pathname = usePathname();
-	const router = useRouter();
-	const openChatLink = () => router.replace(`/chat/${item._id}`);
-	const [linkGate, setLinkGate] = useState<boolean>(false);
 
 	return (
-		<div onClick={openChatLink} className={"Link"} style={{ cursor: 'pointer' }}>
+		<>
 			<p>
 				<strong>{item.name}</strong>
 				<span>{item.personal}</span>
 			</p>
 			{childnode}
-		</div>
+		</>
 	);
 }
 
@@ -66,23 +62,6 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 						console.log("Kick user from chat");
 					}
 					break;
-				// case "join":
-				// 	console.log("join chat chat rooms live ", chatEvent.data);
-				// 	setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
-
-				// 	setItems((prevChats: Chat[]) => {
-				// 		return prevChats.map((chat: Chat) => {
-				// 			const data = chat._id.toString() === chatEvent.roomID
-				// 			? chatEvent.data : chat
-				// 			data.amParticipant = true;
-				// 			console.log("join chat chat rooms live ", data);
-				// 			return data;
-				// 		});
-				// 	});
-					// break;
-				case "quit":
-					console.log("quit chat chat rooms live ", chatEvent.data);
-					break;
 				default:
 					break;
 			}
@@ -90,25 +69,25 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 	}, [chatEvent]);
 
 
-	const isRouteActiveStyle = (item: Chat): string => {
-		return item._id.toString() == pathname.split('/')[2] ? "Active" : "";
-	}
-
 	const ChatInterface = EntityInterfaceBuilder<Chat>()
 		.addToggleButton(
 			{
 				dependency: (item: Chat) => item?.amParticipant? true : false,
+				type: "linkToggle",
 				unitOne: {
 					name: "Leave",
-					endpointTemplate: "/chat/roles/${item._id}/leave",
+					endpointTemplate: "/chat/roles/[id]/leave",
+					link: {link: "/chat", currentActiveOnly: "/chat/[@]"},
 				},
 				unitTwo: {
 					name: "Join",
-					endpointTemplate: "/chat/roles/${item._id}/join",
-					fiedls: [
+					endpointTemplate: "/chat/roles/[id]/join",
+					// link: "/chat/[id]",
+					fields: [
 						{
 							name: "password",
 							type: "password",
+							dependency: (item: Chat) => isGroupChat(item) && item?.protected? true : false,
 						}
 					]
 				},
@@ -118,10 +97,9 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 	const ChatRoomList = new UIClientListBoxClassBuilder()
 		.setInitialItems(serverChats)
 		.setBoxComponent(ChatRoomBox)
+		.setEditItemsCallback(handleNewEvent)
 		.setListStyle("AvailableChats")
 		.setEntityInterface(ChatInterface)
-		.setEditItemsCallback(handleNewEvent)
-		.setConditionalStyle(isRouteActiveStyle)
 		.addCategory({
 			name: "Private Chats",
 			dependency: (item: Chat): boolean => item.personal
@@ -129,6 +107,12 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 		.addCategory({
 			name: "Group Chats",
 			dependency: (item: Chat): boolean => !item.personal
+		})
+		.setLinkDefinition({
+			linktemplate: "/chat/[id]",
+			samePage: true,
+			// highlightOnly: true,
+			dependency: (item: Chat): boolean => item?.amParticipant? true : false
 		})
 		.build();
 

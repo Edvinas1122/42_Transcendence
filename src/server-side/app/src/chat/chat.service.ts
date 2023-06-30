@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat } from './entities/chat.entity';
@@ -51,7 +51,6 @@ export class ChatService {
 		
 		// send event to all users that are online unless the chat is private then send to participants only
 		await this.updateEvent(savedChat, RoomEventType.NewAvailable, await this.makeChatDto(chat, chat.ownerID));
-		//  "Group chat " + savedChat.name + " that is " + (savedChat.private ? "private" : "public") + " has been created");
 	
 		return savedChat;
 	}
@@ -62,8 +61,8 @@ export class ChatService {
 			return false;
 		}
 
-		await this.chatRepository.delete(chatId);
 		await this.updateEvent(chatToDelete, RoomEventType.Deleted);
+		await this.chatRepository.delete(chatId);
 		return true;
 	}
 
@@ -129,6 +128,10 @@ export class ChatService {
 			}
 			await this.roleService.editRole(role, RoleType.Participant);
 		} else {
+			console.log("Validating password", "chat.password", chat.password, "password", password);
+			if (chat.password !== "" && chat.password !== password) {
+				throw new UnauthorizedException('Wrong password');
+			}
 			const user = await this.usersService.findUser(userId);
 			const role = await this.roleService.getRole(chatId, userId);
 			if (role) {
@@ -136,7 +139,25 @@ export class ChatService {
 			}
 			await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);
 		}
-		await this.updateEvent(chat, RoomEventType.Join, await this.makeChatDto(chat, userId));
+		this.updateEvent(chat, RoomEventType.Join, await this.makeChatDto(chat, userId), true);
+		return true;
+	}
+
+	async leaveChat(userId: number, chatId: number): Promise<boolean> {
+		const chat = await this.chatRepository.findOne({where: {id: chatId}});
+		if (!chat) {
+			throw new NotFoundException('Chat not found');
+		}
+		const role = await this.roleService.getRole(chatId, userId);
+		if (!role) {
+			throw new BadRequestException('User not a participant');
+		}
+		if (chat.ownerID == userId) {
+			await this.deleteChat(chat.id);
+		} else {
+			await this.roleService.removeChatRelative(chat, userId);
+			this.updateEvent(chat, RoomEventType.Leave, await this.makeChatDto(chat, userId), true);
+		}
 		return true;
 	}
 
@@ -188,12 +209,12 @@ export class ChatService {
 	// }
 
 
-	private async updateEvent(chat: Chat, eventType: RoomEventType, chatObject?: any): Promise<void> {
-		if (!chat.private) {
+	private async updateEvent(chat: Chat, eventType: RoomEventType, chatObject?: any, participantsExclusive: boolean = false, saveEvent: boolean = false): Promise<void> {
+		if (!participantsExclusive && !chat.private && !chat.personal && chat.password === '' || null) {
 			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, chatObject);
 		}
 		else {
-			await this.chatEventGateway.updateParticipantsOfRoomEvent(chat, eventType, false, chatObject);
+			await this.chatEventGateway.updateParticipantsOfRoomEvent(chat, eventType, saveEvent, chatObject);
 		}
 	}
 }

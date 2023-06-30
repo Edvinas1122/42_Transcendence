@@ -40,15 +40,41 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 
 	useEffect(() => {
 		if (chatEvent && id) {
+			console.log("chatEvent: ", chatEvent);
 			switch (chatEvent.event) {
 				case 'room':
-					setChatRoomEvent({
-						roomID: chatEvent.roomId,
-						subtype: chatEvent.subType,
-						data: chatEvent.data,
-					});
-					if (chatEvent.subType == 'new-available')
-						DisplayPopUp("New ChatRoom Available", "ChatRoom " + chatEvent.roomId + " is now available");
+					switch (chatEvent.subType) {
+						case 'new-available':
+							setChatRoomEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							if (chatEvent.subType == 'new-available')
+								DisplayPopUp("New ChatRoom Available", "ChatRoom " + chatEvent.roomId + " is now available");
+							break;
+						case 'join':
+							setParticipantEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							DisplayPopUp("User Joined", "Chat room " + chatEvent.roomId);
+							break;
+						case 'leave':
+							setParticipantEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							DisplayPopUp("User Left", "Chat room " + chatEvent.roomId);
+						default:
+							setChatRoomEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+						}
 					break;
 				case 'participant':
 					setParticipantEvent({

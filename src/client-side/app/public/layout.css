@@ -99,7 +99,7 @@
 .Link {
 }
 
-.Entity .Link:hover{
+.Link:hover{
 	background:#9595957f;
 	cursor:pointer;
 }

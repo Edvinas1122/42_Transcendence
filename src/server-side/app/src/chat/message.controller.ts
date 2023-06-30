@@ -5,20 +5,22 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { SendMessageDto } from './dtos/chat.dtos';
 import { PermitedChatGuard } from './guards/permited.guard';
 import { UserId } from '../utils/user-id.decorator';
+import { ParticipantGuard } from './guards/participant.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('chat/messages')
 export class MessagesController {
 	constructor(private readonly messageService: MessageService) {}
-
+	
 	// @UseGuards(PermitedChatGuard)
+	@UseGuards(ParticipantGuard)
 	@Get(':chatId')
 	async getChatMessages(@UserId() userId: number, @Param('chatId', new ParseIntPipe()) chatId: number): Promise<MessageDto[]>
 	{
 		return await this.messageService.getChatMessages(chatId, userId);
 	}
 
-	// @UseGuards(PermitedChatGuard)
+	@UseGuards(ParticipantGuard)
 	@Post(':chatId')
 	async sendMessage(@UserId() userId: number, @Param('chatId', new ParseIntPipe()) chatId: number, @Body(new ValidationPipe({ transform: true })) message: SendMessageDto): Promise<MessageDto>
 	{

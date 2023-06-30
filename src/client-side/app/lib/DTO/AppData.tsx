@@ -35,9 +35,9 @@ interface UserProfile extends User {
 interface Chat extends HasId {
 	name: string;
 	messages: Message[];
-	personal: boolean;
+	personal: boolean; // a fuckup double discriminator
 	mine?: boolean;
-	type: 'personal' | 'group';
+	type: 'personal' | 'group'; // a fuckup double discriminator
 	amParticipant?: boolean;
 }
 
@@ -50,10 +50,11 @@ interface GroupChat extends Chat {
 	owner: User;
 	participants: User[];
 	privileged: boolean;
+	protected?: boolean // remove optional field
 	type: 'group';
 }
 
-function isGroupChat(chat: Chat): chat is GroupChat { // discriminator
+function isGroupChat(chat: Chat): chat is GroupChat { // discrimination
 	if (!chat?.type)
 		return false;	
     return chat.type === 'group';
@@ -68,6 +69,7 @@ interface Message extends HasId {
 }
 
 enum RoleType {
+	Owner = 'Owner',
 	Admin = 'Admin',
 	Participant = 'Participant',
 	Muted = 'Muted',
