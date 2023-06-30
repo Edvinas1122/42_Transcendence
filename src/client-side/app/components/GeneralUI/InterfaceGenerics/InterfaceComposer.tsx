@@ -136,15 +136,20 @@ const InterfaceUnit = ({
 		/>
 		{fields && (
 			<form onSubmit={onSubmitFunction}>
-					{fields.map((field, index) => (
-						<input 
-							key={index} 
-							type={field.type || 'text'} 
-							value={fieldValues[field.name] || ''} 
-							onChange={onInputChange(field.name)}
-							placeholder={field.name + "..."} // This line adds the placeholder text
-						/>
-					))}
+				{fields.map((field, index) => {
+					if (field.dependency && field.dependency(item)) {
+						return (
+							<input 
+								key={index} 
+								type={field.type || 'text'} 
+								value={fieldValues[field.name] || ''} 
+								onChange={onInputChange(field.name)} 
+								placeholder={field.name + "..."} // This line adds the placeholder text
+							/>
+						);
+					}
+					return null; // don't render anything if dependency is not met
+				})}
 			</form>
 		)}
 		</div>

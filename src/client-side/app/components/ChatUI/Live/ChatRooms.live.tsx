@@ -94,7 +94,7 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 						{
 							name: "password",
 							type: "password",
-							dependency: (item: Chat) => isGroupChat(item) && item?.protected? true : false,
+							dependency: (item: Chat) => isGroupChat(item) && item?.passwordProtected? true : false,
 						}
 					]
 				},

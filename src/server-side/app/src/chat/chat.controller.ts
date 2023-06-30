@@ -35,15 +35,15 @@ export class ChatController {
 	}
 
 	// @UseGuards(PrivilegedGuard)
-	@Delete(':chatId')
-	async deleteChat(@UserId() userId: number, @Param('chatId', new ParseIntPipe()) chatId: number): Promise<boolean>
-	{
-		console.log('delete chat');
-		const resultChat = await this.chatService.deleteChat(chatId);
-		if (!resultChat)
-			throw new NotFoundException('Chat not found');
-		return resultChat;
-	}
+	// @Delete(':chatId')
+	// async deleteChat(@UserId() userId: number, @Param('chatId', new ParseIntPipe()) chatId: number): Promise<boolean>
+	// {
+	// 	console.log('delete chat');
+	// 	const resultChat = await this.chatService.deleteChat(chatId);
+	// 	if (!resultChat)
+	// 		throw new NotFoundException('Chat not found');
+	// 	return resultChat;
+	// }
 
 
 }

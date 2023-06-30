@@ -96,6 +96,7 @@ const UIClientListBox: Function = ({
 			{groupItems.length > 0 && groupName != "Rest" &&
 				<h2 className="groupName">{groupName}</h2>}
 			{groupItems.map((item: any) => (
+				console.log(item),
 			<EntityBox
 				key={item._id}
 				item={item}

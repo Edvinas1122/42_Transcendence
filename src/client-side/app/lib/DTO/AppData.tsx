@@ -53,6 +53,7 @@ interface GroupChat extends Chat {
 	participants: User[];
 	privileged: boolean;
 	protected?: boolean // remove optional field
+	passwordProtected: boolean;
 	type: 'group';
 }
 
