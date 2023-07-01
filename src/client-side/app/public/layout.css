@@ -17,6 +17,8 @@
 }
 
 .Sidebar .Entity{
+	box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.095);
+
 }
 
 .Sidebar .Link {
@@ -69,10 +71,14 @@
 
 .List::-webkit-scrollbar {
 	display: none;
-  }
+}
 
 .List h2 {
-	font-size: 0.8em;
+	/* font-size: 0.8em; */
+	padding: 5px 0px;
+	font-weight: 300;
+	/* text-decoration: underline; */
+	letter-spacing: 1.2px;
 }
 
 .Form {

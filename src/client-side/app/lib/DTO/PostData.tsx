@@ -6,12 +6,10 @@ interface CreateChatRequest {
 }
 
 class SendMessageDto {
-	constructor(message: string, password?: string) {
+	constructor(message: string) {
 		this.content = message;
-		this.password = password;
 	}
 	content: string;
-	password?: string;
 }
 
 export type { CreateChatRequest, SendMessageDto };

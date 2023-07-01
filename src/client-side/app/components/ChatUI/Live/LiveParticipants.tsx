@@ -110,7 +110,7 @@ const LiveParticipants: Function = ({
 		.addToggleButton({
 			// available to owner
 			dependency: (item: User) => item?.Role !== RoleType.Admin ? true : false,
-			type: "simple",
+			type: "linkToggle",
 			unitOne: {
 				name: "Promote",
 				endpointTemplate: `/chat/roles/${chatID}/promote`,
@@ -147,7 +147,7 @@ const LiveParticipants: Function = ({
 		.addToggleButton({
 			// available to owner
 			dependency: (item: User) => item?.Role !== RoleType.Blocked ? true : false,
-			type: "simple",
+			type: "linkToggle",
 			unitOne: {
 				name: "Ban",
 				endpointTemplate: `/chat/roles/${chatID}/ban`,
@@ -180,6 +180,20 @@ const LiveParticipants: Function = ({
 					return item;
 				}
 			}
+		})
+		.addButton({
+			name: "MSG Priv",
+			endpointTemplate: `/chat/messages/user/[id]`,
+			type: "action",
+			fields: [
+				{
+					name: "content",
+					type: "text",
+					dependency: (item: User) => true,
+					autoField: (item: User) => item.name,
+					invisible: true,
+				}
+			],
 		})
 
 

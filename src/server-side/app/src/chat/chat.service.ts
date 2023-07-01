@@ -109,6 +109,7 @@ export class ChatService {
 		const savedChat = await this.chatRepository.save(chat);
 		await this.roleService.addRelativeToChat(RoleType.Participant, savedChat, sender);
 		await this.roleService.addRelativeToChat(RoleType.Participant, savedChat, user2);
+		this.updateEvent(savedChat, RoomEventType.NewAvailable, await this.makeChatDto(savedChat, sender.id));
 
 		return savedChat;
 	}
@@ -167,7 +168,7 @@ export class ChatService {
 		if (!role) {
 			throw new BadRequestException('User not a participant');
 		}
-		if (chat.ownerID == userId) {
+		if (chat.ownerID == userId || chat.personal) {
 			await this.deleteChat(chat.id, userId);
 		} else {
 			await this.roleService.removeChatRelative(chat, userId);
@@ -389,7 +390,9 @@ export class ChatService {
 				});
 			return groupChatDto;
 		} else {
+			console.log('personal chat')
 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
+			console.log(personalChatDto);
 			return personalChatDto;
 		}
 	}

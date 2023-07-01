@@ -94,6 +94,20 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 								data: chatEvent.data,
 							});
 							break;
+						case "promoted":
+							setParticipantEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							break;
+						case "demoted":
+							setParticipantEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							break;
 						default:
 							setChatRoomEvent({
 								roomID: chatEvent.roomId,

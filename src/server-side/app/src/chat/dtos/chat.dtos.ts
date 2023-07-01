@@ -83,7 +83,9 @@ export class PersonalChatDto extends ChatDto {
 	constructor(chat: Chat, participant: UserInfo, messages?: MessageDto[]) {
 		super(chat, true, messages);
 		this.participant = participant || null; // Assuming you can pass the participant during construction
-		this.amParticipant
+		this.amParticipant = true;
+		this.type = "personal";
+		this.personal = true;
 	}
 	participant: UserInfo;
 }

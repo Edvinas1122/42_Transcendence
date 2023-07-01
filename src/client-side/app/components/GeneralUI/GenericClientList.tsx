@@ -307,7 +307,6 @@ const EntityBox: Function = ({
 		</div>
 	);
 
-	console.log("building enity box", item);
 	return linkDefinition && linkActive ? (
 		<LinkBox
 			item={entityState}

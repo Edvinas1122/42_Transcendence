@@ -41,6 +41,7 @@ chat/
 		:chatId/promote (POST) - {"user":"herename"} - demote user
 		:chatId/ban  (POST) - {"user":"herename"} 
 		:chatId/unban (POST) - {"user":"herename"} 
+		...|analogic| -> mute unmute
 	
 	messages/
 		:chatId - get chat messages

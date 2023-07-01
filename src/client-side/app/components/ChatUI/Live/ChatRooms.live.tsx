@@ -65,7 +65,7 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: Chat[] }) => {
 			switch (chatEvent.subtype) {
 				case "new-available":
 					chatEvent.data.amParticipant = meParticipant(chatEvent.data, id.id);
-					chatEvent.data.mine = chatEvent.data.owner._id == id.id;
+					chatEvent.data.mine = chatEvent.data?.owner?._id == id.id ? false: true;
 					console.log("new chat chat rooms live ", chatEvent.data);
 					setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
 					break;
@@ -105,7 +105,24 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: Chat[] }) => {
 						console.log("I am banned!!");
 						setItems((prevChats: Chat[]) => prevChats.filter((currentChat: Chat) => currentChat._id !== chatEvent.data._id));
 						router.replace("/chat");
-						DisplayPopUp("Ahh.. yayks!.", "You been blocked from chat " + chatEvent.data.name, 3000, "warning");
+						DisplayPopUp("Ahh.. yayks!.", "You've been blocked from chat " + chatEvent.data.name, 3000, "warning");
+					}
+					break;
+				case "unbanned":
+					console.log("someone is unbanned", chatEvent.data);
+					if (chatEvent.data.kickedId === id.id) {
+						/// replace chat with new one
+						console.log("I am unbanned!!");
+						const newChat = {
+							name: chatEvent.data.name,
+							_id: chatEvent.data._id,
+							owner: chatEvent.data.owner,
+							amParticipant: false,
+							Participants: [],
+							mine: false,
+							personal: false,
+						}
+						setItems((prevChats: Chat[]) => [...prevChats, newChat]);
 					}
 					break;
 				case "invite":
@@ -181,7 +198,7 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: Chat[] }) => {
 		.setEntityInterface(ChatInterface)
 		.addCategory({
 			name: "Private Chats",
-			dependency: (item: Chat): boolean => item.personal
+			dependency: (item: Chat): boolean => item.type === "personal"
 		})
 		.addCategory({
 			name: "My Group Chats",
