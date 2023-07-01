@@ -12,6 +12,12 @@ enum RoomEventType {
 	NewAvailable = 'new-available',
 	Deleted = 'deleted',
 	Kicked = 'kicked',
+	Banned = 'banned',
+	Unbanned = 'unbanned',
+	Promoted = 'promoted',
+	Demoted = 'demoted',
+	Muted = 'muted',
+	Unmuted = 'unmuted',
 }
 
 enum MessageEventType {
@@ -19,6 +25,10 @@ enum MessageEventType {
 	Edit = 'edit',
 	Delete = 'delete',
 }
+
+// interface EventData {
+// 	initiatorId: string;
+// }
 
 class ChatData {
 	roomId: number;

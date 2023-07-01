@@ -82,6 +82,18 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 							});
 							DisplayPopUp("User Kicked", "Chat room " + chatEvent.roomId);
 							break;
+						case 'invited':
+							setChatRoomEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							setParticipantEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							break;
 						default:
 							setChatRoomEvent({
 								roomID: chatEvent.roomId,

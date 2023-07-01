@@ -4,6 +4,8 @@ interface FormField {
 	type?: string;
 	value?: string;
 	dependency?: (item: any) => boolean;
+	autoField?: (item: any) => string;
+	invisible?: boolean;
 }
 
 /*
@@ -19,6 +21,7 @@ interface ButtonConfig<T extends HasId> {
 	type: "simple" | "grayout" | "delete" | "toggle" | "action",
 	displayDependency?: (item: T) => boolean,
 	fields?: FormField[],
+	editEntity?: (item: T) => any,
 }
 
 interface UnitRouter {
@@ -31,10 +34,11 @@ interface ToggleUnit {
 	endpointTemplate: string,
 	fields?: FormField[],
 	link?: UnitRouter,
+	editEntity?: (item: any) => any,
 }
 
 interface ToggleButtonConf<T extends HasId> {
-	dependency: (item: T) => boolean,
+	dependency?: (item: T) => boolean,
 	type: "linkToggle" | "simple",
 	unitOne: ToggleUnit,
 	unitTwo: ToggleUnit,
@@ -45,11 +49,11 @@ interface HasId {
 }
 
 
-type EntityInterfaceBuilder<T extends HasId> = {
-	addButton: (props: ButtonConfig<T>) => EntityInterfaceBuilder<T>,
-	addToggleButton: (props: ToggleButtonConf<T>) => EntityInterfaceBuilder<T>,
-	getButtons: (item: T, callBackBehaviourMap: BehaviouralMap) => JSX.Element[],
-};
+interface EntityInterfaceBuilder<T extends HasId> {
+	addButton: (props: ButtonConfig<T>) => EntityInterfaceBuilder<T>;
+	addToggleButton: (props: ToggleButtonConf<T>) => EntityInterfaceBuilder<T>;
+	getButtons: (item: T, callBackBehaviourMap: BehaviouralMap, setEntityState: (item: any) => void, linkStatus?: boolean) => JSX.Element[];
+  }
 
 interface BehaviouralMap {
 	[key: string]: {

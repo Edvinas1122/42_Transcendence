@@ -5,6 +5,8 @@ import { Chat } from '../chat/entities/chat.entity';
 import { Message } from '../chat/entities/message.entity';
 import { Role } from '../chat/entities/role.entity';
 import { Event } from '../events/entities/event.entity';
+import { Sanction } from '../chat/entities/sanction.entity';
+
 export const typeOrmConfig: TypeOrmModuleOptions = {
 	type: 'postgres',
 	host: process.env.DB_HOST || 'db',
@@ -13,7 +15,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
 	password: process.env.POSTGRES_PASSWORD || 'example',
 	database: process.env.POSTGRES_DB || 'transcendence',
 	entities: [User, Relationship, Chat,
-		Message, Role, Event],
+		Message, Role, Event, Sanction],
 	synchronize: true,
 	// logging: true // Add this line
 };

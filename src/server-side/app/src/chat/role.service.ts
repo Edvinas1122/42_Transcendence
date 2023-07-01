@@ -27,11 +27,25 @@ export class RoleService {
 		return relatives.filter(relative => relative && relative.user).map(relative => new UserInfo(relative.user, relative.type)); // online status not implemented
 	}
 
-	async getChatRoleRelatives(chat: Chat, role: RoleType = RoleType.Blocked): Promise<UserInfo[]> {
+	async getChatRoleRelatives(
+		chat: Chat,
+		except: RoleType = RoleType.Blocked,
+	): Promise<UserInfo[]> {
 		const relatives = await this.roleRepository.find({
 			where: { 
 				chat: { id: chat.id },
-				type: Not(role),
+				type: Not(except),
+			},
+			relations: ['user'],
+		});
+		return relatives.map(relative => new UserInfo(relative.user, relative.type));
+	}
+
+	async getBlockedChatMembers(chat: Chat): Promise<UserInfo[]> {
+		const relatives = await this.roleRepository.find({
+			where: {
+				chat: { id: chat.id },
+				type: RoleType.Blocked,
 			},
 			relations: ['user'],
 		});
@@ -79,7 +93,6 @@ export class RoleService {
 			conditions['type'] = expectedRole;
 		}
 	
-		console.log("here we are");
 	
 		// Try to find the role first
 		const role = await this.roleRepository.findOne({where: conditions});
@@ -129,14 +142,24 @@ export class RoleService {
 
 	async isPermited(userId: number, chatId: number): Promise<boolean> {
 		const relative = await this.roleRepository.findOne({
-			where: { user: { id: userId }, type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant]), chat: { id: chatId } },
+			where: { 
+				user: { id: userId },
+				// type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant]),
+				type: Not(RoleType.Blocked),
+				chat: { id: chatId }
+			},
 		});
 		return !!relative;
 	}
 
 	async isParticipant(userId: number, chatId: number): Promise<boolean> {
 		const relative = await this.roleRepository.findOne({
-			where: { user: { id: userId }, type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant, RoleType.Invited]), chat: { id: chatId } },
+			where: {
+				user: { id: userId },
+				// type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant, RoleType.Invited]),
+				type: Not(RoleType.Blocked),
+				chat: { id: chatId }
+			},
 		});
 		return relative !== null ? true : false;
 	}

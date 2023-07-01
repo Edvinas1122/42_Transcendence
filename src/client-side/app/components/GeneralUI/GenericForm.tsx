@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useContext, ChangeEvent } from 'react';
-// import { AuthorizedFetchContext } from '../ContextProviders/authContext';
+import React, { useState } from 'react';
 import "@/public/layout.css";
 import { serverFetch } from '@/lib/fetch.util';
+import DisplayPopUp from '../EventsInfoUI/EventsInfo';
 
 interface GenericField {
     name: string;
@@ -48,9 +48,12 @@ const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = f
 				{ 'Content-Type': 'application/json' },
 				JSON.stringify(formState)
 			);
+			if (response?.error) {
+				throw new Error(JSON.stringify(response.message));
+			}
 			if (resetAfterSubmit) resetForm();
-		} catch (error) {
-			console.error('Error:', error);
+		} catch (error: any) {
+			DisplayPopUp("Error", error.message, 1500, "danger");
 		}
 	};
 

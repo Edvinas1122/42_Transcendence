@@ -97,7 +97,8 @@ interface ChatGroup {
 	messages?: MessageDto[];
 	type?: "group";
 	amParticipant?: boolean;
-
+	kickedId?: number; // single case
+	pritvate?: boolean;
 }
 
 export class GroupChatDto extends ChatDto {
@@ -110,6 +111,8 @@ export class GroupChatDto extends ChatDto {
 		this.mine = props.mine || false;
 		this.amParticipant = props.amParticipant || false;
 		this.passwordProtected = (props.chat.password !== "" && props.chat.password !== null);
+		this.kickedId = props.kickedId;
+		this.isPrivate = props.chat.private;
 	}
 	owner: UserInfo;
 	participants: UserInfo[];
@@ -118,4 +121,6 @@ export class GroupChatDto extends ChatDto {
 	amParticipant?: boolean;
 	type?: "group";
 	passwordProtected: boolean;
+	kickedId?: number;
+	isPrivate?: boolean;
 }

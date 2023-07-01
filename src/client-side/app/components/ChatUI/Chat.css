@@ -118,3 +118,7 @@
 .Participants button {
     padding: 5px 10px !important;
 }
+
+.Participants .Unit input[type="number"] {
+    width: 4em !important;
+}

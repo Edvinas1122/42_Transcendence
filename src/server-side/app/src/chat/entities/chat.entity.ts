@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToMany, ManyToO
 import { Message } from './message.entity';
 import { User } from '../../users/entities/user.entity';
 import { Role } from './role.entity';
+import { Sanction } from './sanction.entity';
 
 @Entity('chat')
 export class Chat {
@@ -41,4 +42,7 @@ export class Chat {
 
 	@OneToMany(() => Message, message => message.chat, { onDelete: 'CASCADE' })
 	messages: Message[];
+
+	@OneToMany(() => Sanction, sanction => sanction.chat, { onDelete: 'CASCADE' })
+	sanctions: Sanction[];
 }

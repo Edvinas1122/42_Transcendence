@@ -17,7 +17,7 @@ export enum RoleType {
 	Invited = 'Invited',
 	Blocked = 'Blocked',
 	Owner = 'Owner', // carefull
-	Any = 'Any', // carefull
+	Any = 'Any', // extra carefull
 }
 
 @Entity()

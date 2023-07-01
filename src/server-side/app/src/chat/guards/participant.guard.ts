@@ -21,7 +21,7 @@ export class ParticipantGuard implements CanActivate {
 		const chatId = request["params"]["chatId"];
 
 		const role = await this.rolesService.getRole(chatId, userId);
-		if (role && role.type !== RoleType.Blocked)
+		if (role && (role.type !== RoleType.Blocked && role.type !== RoleType.Invited))
 			return true;
 
 		throw new ForbiddenException('You are not authorized to perform this operation.');

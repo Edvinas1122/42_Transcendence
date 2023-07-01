@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MongoRuntimeError, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserProfileInfo, UserInfo } from './dtos/user.dto';
 import { MachHistory } from './dtos/game-stats.dto';
@@ -101,6 +101,26 @@ export class UsersService {
 		}
 		user.avatar = avatar;
 		return await this.userRepository.save(user);
+	}
+
+	async isBlocked(userId: number, anotherUserId: number): Promise<boolean> {
+		const userWithRelationships = await this.userRepository.findOne({
+			where: { id: userId },
+			relations: ['relationshipsInitiated']
+		});
+	
+		if (userWithRelationships?.relationshipsInitiated === undefined) {
+			throw new Error('User relationshipsInitiated is undefined');
+		}
+	
+		const blockedRelationship = userWithRelationships.relationshipsInitiated.find(
+			relationship => relationship.user2ID === anotherUserId && relationship.status === RelationshipStatus.BLOCKED
+		);
+		if (blockedRelationship === undefined) {
+			return false;
+		}
+	
+		return !!blockedRelationship;
 	}
 
 	private setToUsers(users: User[], filter?: number[]): UserInfo[] {

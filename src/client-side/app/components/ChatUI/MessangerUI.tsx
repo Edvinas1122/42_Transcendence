@@ -1,4 +1,3 @@
-
 import UIListBox from "../GeneralUI/GenericList";
 import LiveParticipants from "./Live/LiveParticipants";
 import GenericForm from "../GeneralUI/GenericForm";
@@ -23,6 +22,20 @@ const SendMessageBox: Function = ({id}: {id: string}) => {
 	);
 }
 
+const InviteUserBox: Function = ({id}: {id: string}) => {
+	return (
+		<GenericForm 
+			endpoint={`/chat/roles/${id}/invite`}
+			method="POST"
+			fields={[
+				{ name: 'user', value: '', type: 'text', placeholder: 'Type the user to invite here...' },
+			]}
+			// className="MessageForm"
+			resetAfterSubmit = {true}
+		/>
+	);
+}
+
 const MessangerUI: Function = ({ params }: { params: { id: string } }) => {
 
 	return (
@@ -41,8 +54,8 @@ const MessangerUI: Function = ({ params }: { params: { id: string } }) => {
 					<h1>
 						Particaipants Display
 					</h1>
-
 					<LiveParticipants initialParticipants={`/chat/roles/${params.id}/Any`} chatID={params.id} />
+					<InviteUserBox id={params.id} /> {/*conditionally render !!!*/}
 				</div>
 			</div>
 	  	</>

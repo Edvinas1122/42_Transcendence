@@ -46,20 +46,28 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 		// const url = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/events/sse/?token=${token}`;
 		const url = `http://localhost:3000/events/sse/?token=${token}`;
 		const es = new EventSource(url);
+		setEventSource(es);
 
-		es.onmessage = (event) => {
+		es.onmessage = (event: MessageEvent | null) => {
+			if (!event) {
+				return;
+			}
 			const parsedData: EventSourceData = JSON.parse(event.data);
 
+			console.log("received event", event);
 			switch (parsedData.type) {
 				case 'chat':
 					setChatEvent(parsedData.data);
+					break;
 				case 'user':
 					switch (parsedData.data.event) {}
 					break;
 			}
+			setTimeout(() => {
+				setChatEvent(null);
+			}, 100);
 		};
 
-		setEventSource(es);
 
 	return () => {
 		// Close EventSource connection when component unmounts

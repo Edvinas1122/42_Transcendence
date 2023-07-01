@@ -16,19 +16,15 @@ export class EventService {
 	private eventSubjects = new Map<string, Subject<any>>();
 
 	connectUser(userId: string) {
-		console.log('disconnectUser', userId);
-		console.log("total connected users: ", this.eventSubjects.size);
 		this.eventSubjects.set(userId, new Subject<any>());
 	}
 
 	disconnectUser(userId: string) {
-		console.log('disconnectUser', userId);
 		this.eventSubjects.get(userId)?.complete();
 		this.eventSubjects.delete(userId);
 	}
 
 	sendEvent(userId: string, data: SseMessage): boolean {
-		console.log('sendEventToUser', userId, data);
 		const subject = this.eventSubjects.get(userId);
 		if (subject) {
 			subject.next(new MessageEvent(data));
@@ -40,7 +36,6 @@ export class EventService {
 	}
 	
 	async sendStoredEvent(userId: string, data: SseMessage): Promise<boolean> {
-		console.log('sendEventToUser', userId, data);
 		const subject = this.eventSubjects.get(userId);
 
 		const event = new Event();
@@ -63,7 +58,6 @@ export class EventService {
 
 	async sendToAll(data: SseMessage, except?: number[]): Promise<void> {
 		const users = this.eventSubjects.keys();
-		console.log('sendToAll', users);
 		for (const user of users) {
 			if (!except || !except.includes(Number(user))) {
 				this.sendEvent(user, data);

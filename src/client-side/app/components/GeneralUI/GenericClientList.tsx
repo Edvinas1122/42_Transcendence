@@ -58,20 +58,18 @@ const UIClientListBox: Function = ({
 
 	const endOfListRef = useRef<HTMLDivElement | null>(null);
 	const [Items, setItems] = useState<any[]>([]);
-	const [error, setError] = useState<string | null>(null);
-
-	useEffect(() => {
-		if (error) {
-			notFound();
-			// throw new Error(error);
-		}
-	}, [error]);
 
 	useEffect(() => {
 		if (typeof initialItems === "string") {
-			serverFetch<any[]>(initialItems).then((data) => setItems(data)).catch((error) => {
-				setError(error);
-				// throw new Error(error);
+			serverFetch<any[]>(initialItems).then(
+				(data: any) => {
+					if (data.error){
+						notFound();
+					}
+					setItems(data)	
+				}).catch((error) => {
+					// notFound();
+					throw new Error(error);
 			});
 		} else if (Array.isArray(initialItems)) {
 			setItems(initialItems);
@@ -83,7 +81,7 @@ const UIClientListBox: Function = ({
 	}, [editItemsCallback]);
 	
 	useEffect(() => {
-		endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
+		endOfListRef.current?.scrollIntoView({ behavior: "instant" });
 	}, [Items]);
 
 	const removeItemFromList = (item: any): void => {
@@ -284,6 +282,8 @@ const EntityBox: Function = ({
 		linkDefinition && typeof linkDefinition.dependency === 'function' ?
 		linkDefinition.dependency(item) : true
 	);
+	const [entityState, setEntityState] = useState<any>(item);
+
 
 	const setLinkStatus = (status: boolean): void => {
 		setLinkActiveStatus(status);
@@ -294,22 +294,23 @@ const EntityBox: Function = ({
 	const EntityInternals = () => (
 		<div className={"Entity " + theStyle}>
 			<BoxComponent
-				item={item}
+				item={entityState}
 				childnode={interfaceBuilder && <EntityInterface
-					item={item}
+					item={entityState}
 					interfaceBuilder={interfaceBuilder}
 					removeItemFromList={removeItemFromList}
 					setLinkActiveStatus={setLinkStatus}
 					linkStatus={linkActive}
+					setEntityState={setEntityState}
 				/>}
 			/>
 		</div>
 	);
 
-
+	console.log("building enity box", item);
 	return linkDefinition && linkActive ? (
 		<LinkBox
-			item={item}
+			item={entityState}
 			childnode={<EntityInternals />}
 			linkDef={linkDefinition}
 			/>

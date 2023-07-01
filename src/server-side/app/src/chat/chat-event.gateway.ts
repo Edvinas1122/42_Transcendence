@@ -18,9 +18,7 @@ export class ChatEventGateway {
 
 	async updateOnlineUsersChatEvent(chat: Chat, eventType: RoomEventType, info?: any): Promise<boolean> {
 		const data: ChatRoomEvent = new ChatRoomEvent(chat.id, eventType, info);
-		
-		console.log('ChatEvent', eventType, data);
-		const users = await this.roleService.getChatRoleRelatives(chat, RoleType.Blocked); // exclude blocked users
+		const users = await this.roleService.getBlockedChatMembers(chat); // exclude blocked users
 		await this.eventService.sendToAll(data as SseMessage, users.map(user => user._id));
 		return true;
 	}
@@ -42,16 +40,18 @@ export class ChatEventGateway {
 		return true;
 	}
 
-	async updateOnlineUsersMessageEvent(chat: Chat, message: MessageDto, eventType: MessageEventType = MessageEventType.New): Promise<boolean> {
-		const data: MessageEvent = new MessageEvent(chat.id, eventType, message);
-		const users = await this.roleService.getChatRoleRelatives(chat, RoleType.Blocked); // exclude blocked users
-		await this.eventService.sendToAll(data as SseMessage, users.map(user => user._id));
-		return true;
-	}
+	// async updateOnlineUsersMessageEvent(chat: Chat, message: MessageDto, eventType: MessageEventType = MessageEventType.New): Promise<boolean> {
+	// 	const data: MessageEvent = new MessageEvent(chat.id, eventType, message);
+	// 	const users = await this.roleService.getBlockedChatMembers(chat); // exclude blocked users
+
+	// 	await this.eventService.sendToAll(data as SseMessage, users.map(user => user._id));
+	// 	return true;
+	// }
 
 	async updateParticipantsOfMessageEvent(chat: Chat, message: MessageDto, eventType: MessageEventType = MessageEventType.New): Promise<boolean> {
 		const data: MessageEvent = new MessageEvent(chat.id, eventType, message);
-		const users = await this.roleService.getChatRoleRelatives(chat, RoleType.Blocked); // exclude blocked users
+		const users = await this.roleService.getChatRoleRelatives(chat, RoleType.Blocked);
+		
 		await this.distributeEventToUsers(users, data as SseMessage, false); // TODO: store message events if chat has no new events
 		return true;
 	}

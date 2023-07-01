@@ -1,3 +1,5 @@
+
+
 .MainWrapper {
 	/* display: flex; */
 }
@@ -59,9 +61,15 @@
 }
 
 .List {
-	overflow-y: scroll;
+	overflow: hidden;
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none;  /* IE and Edge */
 	/* height: 100vh; */
 }
+
+.List::-webkit-scrollbar {
+	display: none;
+  }
 
 .List h2 {
 	font-size: 0.8em;
@@ -132,12 +140,15 @@
 
 }
 
-.Unit input[type="text"], input[type="password"] {
+.Unit input[type="text"], input[type="password"],
+input[type="number"], input[type="email"] {
 	vertical-align: bottom;
 	width: 5em;
 }
 
-form input[type="text"], input[type="password"] {
+form input[type="text"], input[type="password"],
+input[type="number"], input[type="email"]
+{
 
 	border-radius: 5px;
 	height: 2em;

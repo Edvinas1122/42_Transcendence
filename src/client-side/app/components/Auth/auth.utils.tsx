@@ -10,6 +10,7 @@ const validateUser: Function = async (endpoint: string): Promise<boolean> => {
 	try {
 		console.log("Validating user...");
 		const validity = await serverFetch(endpoint);
+		if (validity.error) throw new Error(validity.message);
 		return true;
 	} catch (error) {
 		return false;

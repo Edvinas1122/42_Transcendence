@@ -41,6 +41,7 @@ interface Chat extends HasId {
 	mine?: boolean;
 	type: 'personal' | 'group'; // a fuckup double discriminator
 	amParticipant?: boolean;
+	isPrivate?: boolean;
 }
 
 interface PersonalChat extends Chat {
@@ -71,7 +72,7 @@ interface Message extends HasId {
 	timeSent?: Date;
 }
 
-enum RoleType {
+export enum RoleType {
 	Owner = 'Owner',
 	Admin = 'Admin',
 	Participant = 'Participant',
@@ -85,5 +86,5 @@ interface AppData {
 }
 
 export default AppData;
-export type { User, UserProfile, MachHistory, Chat, Achievement, PersonalChat, GroupChat, Message, RoleType };
+export type { User, UserProfile, MachHistory, Chat, Achievement, PersonalChat, GroupChat, Message };
 export { isGroupChat };

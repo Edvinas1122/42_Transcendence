@@ -9,6 +9,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto, EditRoleDto } from './dtos/chat.dtos'; // import DTOs
 import { PrivilegedGuard } from './guards/privileged.guard';
 import { UserId } from '../utils/user-id.decorator';
+import { NoSanctionGuard } from './guards/noSanction.guard';
+import { SanctionService } from './sanction.service';
 
 
 @UseGuards(JwtAuthGuard)
@@ -37,6 +39,7 @@ export class RolesController {
 		return await this.roleService.getChatRoleRelatives(chat, role);
 	}
 
+	@UseGuards(NoSanctionGuard)
 	@Post(':chatId/join')
 	async joinChat(
 		@UserId() UserId: number,
@@ -44,7 +47,6 @@ export class RolesController {
 		@Body(new ValidationPipe({ transform: true })) body: JoinChatDto
 	): Promise<boolean>
 	{
-		console.log('joinChat triggered', "body", body);
 		const chatDto = await this.chatService.joinChat(UserId, chatId, body.password);
 		return chatDto;
 	}
@@ -58,37 +60,15 @@ export class RolesController {
 		return await this.chatService.leaveChat(UserId, chatId);
 	}
 
-	@Post(':chatId/invite/:userId')
+	@UseGuards(PrivilegedGuard)
+	@Post(':chatId/invite/')
 	async inviteUser(
 		@UserId() UserId: number,
 		@Param('chatId', new ParseIntPipe()) chatId,
-		@Param('userId', new ParseIntPipe()) userId,
+		@Body('user') userName: string, // validation pipe
 	): Promise<boolean>
 	{
-		const chat = await this.chatService.getChat(chatId);
-		const user = await this.userService.getUser(userId);
-		return await this.roleService.addRelativeToChat(RoleType.Invited, chat, user);
-	}
-
-	@Post(':chatId/invite/accept')
-	async acceptInvite(
-		@UserId() UserId: number,
-		@Param('chatId', new ParseIntPipe()) chatId,
-	): Promise<boolean>
-	{
-		const chat = await this.chatService.getChat(chatId);
-		const user = await this.userService.getUser(UserId);
-		return await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);
-	}
-
-	@Post(':chatId/invite/decline')
-	async declineInvite(
-		@UserId() UserId: number,
-		@Param('chatId', new ParseIntPipe()) chatId,
-	): Promise<boolean>
-	{
-		const chat = await this.chatService.getChat(chatId);
-		return await this.roleService.removeChatRelative(chat, UserId);
+		return await this.chatService.inviteToChat(UserId, chatId, userName);
 	}
 
 	@UseGuards(PrivilegedGuard)  // KICK USER
@@ -96,35 +76,93 @@ export class RolesController {
 	async removeChatRelative(
 		@UserId() UserId: number,
 		@Param('chatId', new ParseIntPipe()) chatId: number,
-		@Param('userId', new ParseIntPipe()) userId: number
+		@Param('userId', new ParseIntPipe()) userId: number,
+		@Body('duration', new ParseIntPipe()) duration: number = 0,
 	): Promise<boolean>
 	{
-		return await this.chatService.kickFromChat(UserId, chatId, userId);
+		return await this.chatService.kickFromChat(UserId, chatId, userId, duration);
 	}
 
-	// @UseGuards(PrivilegedGuard) // KICK MANY USERS
-	// @Delete(':chatId/')
-	// async removeChatRelatives(
+	@UseGuards(PrivilegedGuard)
+	@Post(':chatId/promote')
+	async promoteUser(
+		@UserId() UserId: number,
+		@Param('chatId', new ParseIntPipe()) chatId: number,
+		@Body('user') userName: string, // validation pipe
+	): Promise<boolean>
+	{
+		return await this.chatService.promoteUser(UserId, chatId, userName);
+	}
+
+	@UseGuards(PrivilegedGuard)
+	@Post(':chatId/demote')
+	async demoteUser(
+		@UserId() UserId: number,
+		@Param('chatId', new ParseIntPipe()) chatId: number,
+		@Body('user') userName: string, // validation pipe
+	): Promise<boolean>
+	{
+		return await this.chatService.demoteUser(UserId, chatId, userName);
+	}
+
+	@UseGuards(PrivilegedGuard)
+	@Post(':chatId/ban')
+	async banUser(
+		@UserId() UserId: number,
+		@Param('chatId', new ParseIntPipe()) chatId: number,
+		@Body('user') userName: string, // validation pipe
+	): Promise<boolean>
+	{
+		return await this.chatService.banUser(UserId, chatId, userName);
+	}
+
+	@UseGuards(PrivilegedGuard)
+	@Post(':chatId/unban')
+	async unbanUser(
+		@UserId() UserId: number,
+		@Param('chatId', new ParseIntPipe()) chatId: number,
+		@Body('user') userName: string, // validation pipe
+	): Promise<boolean>
+	{
+		return await this.chatService.unbanUser(UserId, chatId, userName);
+	}
+
+	@UseGuards(PrivilegedGuard)
+	@Post(':chatId/mute')
+	async muteUser(
+		@UserId() UserId: number,
+		@Param('chatId', new ParseIntPipe()) chatId: number,
+		@Body('user') userName: string, // validation pipe
+	): Promise<boolean>
+	{
+		console.log('muteUser triggered', "userName", userName);
+		return await this.chatService.muteUser(UserId, chatId, userName);
+	}
+
+	@UseGuards(PrivilegedGuard)
+	@Post(':chatId/unmute')
+	async unmuteUser(
+		@UserId() UserId: number,
+		@Param('chatId', new ParseIntPipe()) chatId: number,
+		@Body('user') userName: string, // validation pipe
+	): Promise<boolean>
+	{
+		return await this.chatService.unmuteUser(UserId, chatId, userName);
+	}
+
+
+
+	// @UseGuards(PrivilegedGuard)
+	// @Patch('chats/:chatId/:userId')
+	// async editRole(
 	// 	@Param('chatId', new ParseIntPipe()) chatId: number,
-	// 	@Body('userIds') userIds: number[]
-	// ): Promise<void>
+	// 	@Param('userId', new ParseIntPipe()) userId: number,
+	// 	@Body('newRole', new ValidationPipe()) info: EditRoleDto
+	// ): Promise<boolean>
 	// {
 	// 	const chat = await this.chatService.getChat(chatId);
-	// 	await this.roleService.removeChatRelatives(chat, userIds);
+	// 	const user = await this.userService.getUser(userId);
+	// 	const roleObj = await this.roleService.getRole(chat.id, user.id);
+	// 	return await this.roleService.editRole(roleObj, info.newRole);
 	// }
-
-
-	@UseGuards(PrivilegedGuard) // 
-	@Patch('chats/:chatId/:userId')
-	async editRole(
-		@Param('chatId', new ParseIntPipe()) chatId: number,
-		@Param('userId', new ParseIntPipe()) userId: number,
-		@Body('newRole', new ValidationPipe()) info: EditRoleDto
-	): Promise<boolean>
-	{
-		const chat = await this.chatService.getChat(chatId);
-		const user = await this.userService.getUser(userId);
-		const roleObj = await this.roleService.getRole(chat.id, user.id);
-		return await this.roleService.editRole(roleObj, info.newRole);
-	}
 }

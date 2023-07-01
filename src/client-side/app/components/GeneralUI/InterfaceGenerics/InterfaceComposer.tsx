@@ -49,18 +49,24 @@ const InterfaceUnit = ({
 	httpmethod,
 	item,
 	fields,
+	// autoField,
 	callBackBehaviour,
 	renderDependency,
 	link,
+	setEntityState,
+	editEntity,
 }: {
 	name: string,
 	endpointTemplate: string,
 	httpmethod?: "POST" | "DELETE";
 	item: any,
 	fields?: FormField[],
+	// autoField?: (item: any) => string,
 	callBackBehaviour?: (item: any, response?: EntityUpdateResponse) => void,
 	renderDependency?: (item: any) => boolean,
 	link?: UnitRouter,
+	setEntityState?: (item: any) => void,
+	editEntity?: (item: any) => any,
 }) => {
 	const pathname = usePathname();
 	// const pageId = pathname.split("/").pop() || ''; // fallback to empty string if no value
@@ -70,8 +76,11 @@ const InterfaceUnit = ({
 	// const [visible, setVisible] = useState(true);
 	const [error, setError] = useState(false);
 	const [fieldValues, setFieldValues] = useState<Record<string, any>>(
-		fields?.reduce((acc, field) => ({ ...acc, [field.name]: field.value }), {}) || {}
-		);
+		fields?.reduce((acc, field) => ({
+		  ...acc,
+		  [field.name]: field.autoField ? field.autoField(item) : field.value
+		}), {}) || {}
+	);
 	const method = httpmethod || "POST";
 	const router = useRouter();
 	const interfaceUnitLinksTo = link ? link.link?.replace("[id]", item._id) : "";
@@ -106,7 +115,25 @@ const InterfaceUnit = ({
 	const onClickFunction = () => {
 		(async () => {
 			setLoading(true);
-			setFieldValues(fields?.reduce((acc, field) => ({ ...acc, [field.name]: '' }), {}) || {});
+			if (fields) {
+				setFieldValues(prevState =>
+				  fields.reduce((acc, field) => {
+					// If it's an autofilled field, keep its current value
+					if (field.autoField) {
+					  return {
+						...acc,
+						[field.name]: prevState[field.name]
+					  };
+					}
+					// Else reset its value
+					return {
+					  ...acc,
+					  [field.name]: ''
+					};
+				  }, {} as Record<string, any>)
+				);
+			  }
+			// setFieldValues(fields?.reduce((acc, field) => ({ ...acc, [field.name]: '' }), {}) || {});
 			try {
 				console.log("endpoint", endpoint, "field Values", fieldValues);
 				const response = await serverFetch<Promise<EntityUpdateResponse>>(endpoint, method, { 'Content-Type': 'application/json' }, JSON.stringify(fieldValues));
@@ -115,6 +142,7 @@ const InterfaceUnit = ({
 				}
 				setLoading(false);
 				callBackBehaviour && callBackBehaviour(item, response);
+				editEntity && setEntityState && setEntityState(editEntity(item));
 				linkHanlder();
 				return response;	
 			} catch (error: any) {
@@ -129,9 +157,30 @@ const InterfaceUnit = ({
 		})();
 	};
 
+	useEffect(() => {
+		if (fields) {
+		  setFieldValues(prevState => (
+			fields.reduce((acc, field) => {
+			  if (field.autoField) {
+				return {
+				  ...acc,
+				  [field.name]: field.autoField(item)
+				};
+			  }
+			  return acc;
+			}, prevState)
+		  ));
+		}
+	  }, [item, fields]);
+
 	const onInputChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+		const field = fields?.find(field => field.name === name);
+		if (field?.autoField) {
+		  // Ignore user input for auto-filled fields
+		  return;
+		}
 		setFieldValues(prevState => ({...prevState, [name]: event.target.value}));
-	};
+	  };
 
 	return (
 		<div className="Unit">
@@ -143,13 +192,14 @@ const InterfaceUnit = ({
 		{fields && visible && !loading && (
 			<form onSubmit={onSubmitFunction}>
 				{fields.map((field, index) => {
-					if (field.dependency && field.dependency(item)) {
+					if (field.dependency === undefined || field.dependency(item)) {
 						return (
 							<input 
 								key={index} 
-								type={field.type || 'text'} 
+								type={field.invisible ? 'hidden' : field.type || 'text'}
 								value={fieldValues[field.name] || ''} 
-								onChange={onInputChange(field.name)} 
+								onChange={onInputChange(field.name)}
+								onClick={(e) => e.stopPropagation()}
 								placeholder={field.name + "..."} // This line adds the placeholder text
 							/>
 						);
@@ -168,19 +218,24 @@ export const ToggleInterfaceUnit = ({
 	item,
 	dependency,
 	toggleBehaviour,
-	initialToggleState
+	initialToggleState,
+	setEntityState,
 }: {
 	unitOne: ToggleUnit,
 	unitTwo: ToggleUnit,
 	item: any,
-	dependency: (item: any) => boolean,
+	dependency?: (item: any) => boolean,
 	toggleBehaviour?: (status: boolean) => void
-	initialToggleState?: boolean
+	initialToggleState?: boolean,
+	setEntityState?: (item: any) => void,
 }) => {
-	const dependencyState = typeof initialToggleState !== 'undefined' ? initialToggleState : dependency(item);
+	const individualToggleDependency = dependency? dependency : (item: any) => true;
+	const dependencyState = dependency ? individualToggleDependency(item) : initialToggleState;
+	// const dependencyState = typeof initialToggleState !== 'undefined' ? initialToggleState : individualToggleDependency(item) ;
 	const [visibleUnit, setVisibleUnit] = useState(unitOne);
 	const [hiddenUnit, setHiddenUnit] = useState(unitTwo);
 
+	// console.log("dependencyState", item, dependency(item), initialToggleState);
 	useEffect(() => {
 		if (dependencyState) {
 			setVisibleUnit(unitOne);
@@ -200,7 +255,7 @@ export const ToggleInterfaceUnit = ({
 	return (
 		<>
 			<InterfaceUnit
-				// key={visibleUnit.name}
+				key={visibleUnit.name}
 				name={visibleUnit.name}
 				endpointTemplate={visibleUnit.endpointTemplate}
 				item={item}
@@ -208,6 +263,8 @@ export const ToggleInterfaceUnit = ({
 				httpmethod={"POST"}
 				callBackBehaviour={toggleUnit}
 				link={visibleUnit.link}
+				setEntityState={setEntityState}
+				editEntity={visibleUnit.editEntity}
 			/>
 		</>
 	);
@@ -217,7 +274,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 	let buttonConfigs: ButtonConfig<T>[] = [];
 	let toggleConfigs: ToggleButtonConf<T>[] = [];
 
-	const getButtons = (item: T, callBackBehaviourMap: BehaviouralMap, linkStatus?: boolean): JSX.Element[] => {
+	const getButtons = (item: T, callBackBehaviourMap: BehaviouralMap, setEntityState: (item: any) => void, linkStatus?: boolean): JSX.Element[] => {
 		const regularButtons = buttonConfigs.map((button, index) => 
 			<InterfaceUnit
 				key={`interface-${index}`}
@@ -228,6 +285,8 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 				httpmethod={callBackBehaviourMap[button.type].method}
 				callBackBehaviour={callBackBehaviourMap[button.type].sucessBehaviour}
 				renderDependency={button.displayDependency}
+				setEntityState={setEntityState}
+				editEntity={button.editEntity}
 			/>
 		);
 
@@ -239,7 +298,8 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 				item={item}
 				dependency={toggle.dependency}
 				toggleBehaviour={callBackBehaviourMap[toggle.type]?.togggledBehaviour}
-
+				initialToggleState={linkStatus}
+				setEntityState={setEntityState}
 			/>
 		);
 
@@ -265,7 +325,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 			toggleConfigs = [...toggleConfigs, props];
 			return builder;
 		},
-		getButtons: (item: T, callBackBehaviourMap: BehaviouralMap, linkStatus?: boolean) => {
+		getButtons: (item: T, callBackBehaviourMap: BehaviouralMap, setEntityState: (item: any) => void, linkStatus?: boolean) => {
 			const regularButtons = buttonConfigs.map((button, index) => 
 			  <InterfaceUnit
 				key={`button-${index}`}
@@ -276,6 +336,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 				httpmethod={callBackBehaviourMap[button.type].method}
 				callBackBehaviour={callBackBehaviourMap[button.type].sucessBehaviour}
 				renderDependency={button.displayDependency}
+				setEntityState={setEntityState}
 			  />
 			);
 
@@ -288,9 +349,10 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 				dependency={toggle.dependency}
 				toggleBehaviour={callBackBehaviourMap[toggle.type]?.togggledBehaviour}
 				initialToggleState={linkStatus}
+				setEntityState={setEntityState}
 			/>
 		  );
-	
+
 		  return [...regularButtons, ...toggleButtons];
 		},
 	};
@@ -309,13 +371,15 @@ export const EntityInterface = ({
 		interfaceBuilder,
 		removeItemFromList,
 		setLinkActiveStatus,
-		linkStatus
+		linkStatus,
+		setEntityState
 	}: {
 		item: any,
 		interfaceBuilder: any,
 		removeItemFromList: (item: any) => void,
-		setLinkActiveStatus: (status: boolean) => void
-		linkStatus: boolean
+		setLinkActiveStatus: (status: boolean) => void,
+		linkStatus: boolean,
+		setEntityState: (item: any) => void
 }) => {
 	const [buttons, setButtons] = useState<JSX.Element[]>([]);
 
@@ -336,6 +400,10 @@ export const EntityInterface = ({
 			togggledBehaviour: setLinkActiveStatus,
 			method: "POST",
 		},
+		// linkToggle: {
+		// 	// togggledBehaviour: setLinkActiveStatus,
+		// 	method: "POST",
+		// },
 		action: {
 			sucessBehaviour: (item: any, response?: EntityUpdateResponse) => {response && DisplayPopUp(response.title, response.message, 1500)},
 			method: "POST",
@@ -343,7 +411,7 @@ export const EntityInterface = ({
 	};
 
 	useEffect(() => {
-		setButtons(interfaceBuilder.getButtons(item, callBackBehaviourMap, linkStatus));
+		setButtons(interfaceBuilder.getButtons(item, callBackBehaviourMap, setEntityState, linkStatus));
 	}, [item]);
 
 	return (

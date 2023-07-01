@@ -4,7 +4,7 @@ import React, { useState, useEffect, useContext, useCallback } from "react";
 import UIClientListBox, {UIClientListBoxClassBuilder} from "@/components/GeneralUI/GenericClientList";
 import { ParticipantSourceContext } from "../ChatEventProvider";
 import { EntityInterfaceBuilder } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
-import { User } from "@/lib/DTO/AppData";
+import { RoleType, User } from "@/lib/DTO/AppData";
 import "../Chat.css"
 
 interface ParticipantBoxProps {
@@ -69,6 +69,13 @@ const LiveParticipants: Function = ({
 			endpointTemplate: `/chat/roles/${chatID}/[id]`,
 			type: "delete",
 			displayDependency: (item: User) => item.Role === "Owner" ? false : true,
+			fields: [
+				{
+					name: "duration",
+					type: "number",
+					dependency: (item: User) => true,
+				}
+			],
 		})
 		.addToggleButton({
 			// available to admins and owners
@@ -77,25 +84,104 @@ const LiveParticipants: Function = ({
 			unitOne: {
 				name: "Mute",
 				endpointTemplate: `/chat/roles/${chatID}/mute`,
+				fields: [
+					{
+						name: "user",
+						type: "text",
+						autoField: (item: User) => item.name,
+						invisible: true,
+					},
+				],
+
 			},
 			unitTwo: {
 				name: "Unmute",
 				endpointTemplate: `/chat/roles/${chatID}/unmute`,
+				fields: [
+					{
+						name: "user",
+						type: "text",
+						autoField: (item: User) => item.name,
+						invisible: true,
+					},
+				],
 			}
 		})
 		.addToggleButton({
 			// available to owner
-			dependency: (item: User) => item?.Role == "Admin" ? true : false,
+			dependency: (item: User) => item?.Role !== RoleType.Admin ? true : false,
 			type: "simple",
 			unitOne: {
-				name: "Make Admin",
+				name: "Promote",
 				endpointTemplate: `/chat/roles/${chatID}/promote`,
+				fields: [
+					{
+						name: "user",
+						type: "text",
+						autoField: (item: User) => item.name,
+						invisible: true,
+					},
+				],
+				editEntity: (item: User) => {
+					item.Role = RoleType.Admin;
+					return item;
+				}
 			},
 			unitTwo: {
 				name: "Demote",
 				endpointTemplate: `/chat/roles/${chatID}/demote`,
+				fields: [
+					{
+						name: "user",
+						type: "text",
+						autoField: (item: User) => item.name,
+						invisible: true,
+					},
+				],
+				editEntity: (item: User) => {
+					item.Role = RoleType.Participant;
+					return item;
+				}
 			}
 		})
+		.addToggleButton({
+			// available to owner
+			dependency: (item: User) => item?.Role !== RoleType.Blocked ? true : false,
+			type: "simple",
+			unitOne: {
+				name: "Ban",
+				endpointTemplate: `/chat/roles/${chatID}/ban`,
+				fields: [
+					{
+						name: "user",
+						type: "text",
+						autoField: (item: User) => item.name,
+						invisible: true,
+					},
+				],
+				editEntity: (item: User) => {
+					item.Role = RoleType.Blocked;
+					return item;
+				}
+			},
+			unitTwo: {
+				name: "Unban",
+				endpointTemplate: `/chat/roles/${chatID}/unban`,
+				fields: [
+					{
+						name: "user",
+						type: "text",
+						autoField: (item: User) => item.name,
+						invisible: true,
+					},
+				],
+				editEntity: (item: User) => {
+					item.Role = RoleType.Participant;
+					return item;
+				}
+			}
+		})
+
 
 
 

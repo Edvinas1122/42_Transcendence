@@ -21,20 +21,24 @@ export class ChatController {
 	) {}
 
 	@Get('available')
-	async findAvailableChats(@UserId() UserId: number): Promise<ChatDto[]> {
+	async findAvailableChats(
+		@UserId() UserId: number
+	): Promise<ChatDto[]> {
 		const chats = await this.chatService.getAllUserChats(UserId);
 		return chats;
 	}
 
 
 	@Post('create')
-	async createChat(@UserId() userId: number, @Body(new ValidationPipe({ transform: true })) createChatDto: CreateChatDto): Promise<Chat | null>
+	async createChat(
+		@UserId() userId: number,
+		@Body(new ValidationPipe({ transform: true })) createChatDto: CreateChatDto
+	): Promise<Chat | null>
 	{
 		createChatDto.ownerID = userId;
 		createChatDto.invitedUsersID = createChatDto.invitedUsersID ? [...createChatDto.invitedUsersID, userId] : [userId];
 		const resultChat = await this.chatService.createGroupChat(createChatDto);
-		if (resultChat)
-		{
+		if (resultChat) {
 			return resultChat;
 		}
 		return null;

@@ -3,11 +3,12 @@ import UIClientListBox, { UIClientListBoxClassBuilder, CategoryDisisplay } from 
 import { EntityInterfaceBuilder } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
 import { AuthContext } from "@/components/ContextProviders/authContext";
 import { ChatRoomSourceContext } from "@/components/ChatUI/ChatEventProvider";
-import { Chat, GroupChat, isGroupChat, User } from "@/lib/DTO/AppData";
+import { Chat, GroupChat, isGroupChat, RoleType, User } from "@/lib/DTO/AppData";
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useContext, useCallback } from "react";
 import "@/public/layout.css";
 import "../Chat.css";
+import DisplayPopUp from "@/components/EventsInfoUI/EventsInfo";
 
 interface ChatRoomBoxProps {
 	item: Chat,
@@ -33,31 +34,34 @@ const ChatRoomBox: React.FC<ChatRoomBoxProps> = ({
 const meParticipant = (chat: Chat, id: number): boolean => {
 	if (isGroupChat(chat)) {
 		console.log("me participant", chat.participants, id);
-		return chat.participants.some((participant: User) => participant._id == id);
+		return chat.participants.some((participant: User) => participant._id == id && participant?.Role !== RoleType.Invited);
 	}
 	return true;
 }
 
-function doIleaveChat(router: any, pathname: string, chat: Chat, myId: number): boolean {
-	if (isGroupChat(chat)) {
-		if (!chat.participants.some((participant: User) => participant._id == myId)) {
-			router.push("/chat");
-			return true;
-		}
-	}
-	return false;
-}
+// function doIleaveChat(router: any, PageId: number, chat: Chat, myId: number): boolean {
+// 	console.log("do I leave chat", chat);
+// 	if (isGroupChat(chat)) {
+// 		if (!chat.participants.some((participant: User) => participant._id == myId)) {
+// 			router.push("/chat");
+// 			return true;
+// 		}
+// 	}
+// 	console.log("I do not leave chat the chat");
+// 	return false;
+// }
 
-const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
+const ChatRoomsLive: Function = ({ serverChats}: { serverChats: Chat[] }) => {
 
 	const chatEvent = useContext(ChatRoomSourceContext);
 	const id = useContext(AuthContext);
 	const pathname = usePathname();
+	const PageId = parseInt(pathname.split("/")[2]);
 	const router = useRouter();
 
 	const handleNewEvent = useCallback((setItems: Function) => {
 		if (chatEvent) {
-			console.log("chat event", chatEvent.data);
+			// console.log("chat event", chatEvent.data);
 			switch (chatEvent.subtype) {
 				case "new-available":
 					chatEvent.data.amParticipant = meParticipant(chatEvent.data, id.id);
@@ -67,14 +71,59 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 					break;
 				case "deleted":
 					setItems((prevChats: Chat[]) => prevChats.filter((chat: Chat) => chat._id.toString() != chatEvent.roomID));
-					doIleaveChat(router, pathname, chatEvent.data, id.id);
+					console.log("deleted chat chat rooms live ", chatEvent.data._id, PageId);
+					if (chatEvent.data._id.toString() == PageId) {
+						router.replace("/chat");
+					}
 					break;
 				case "kicked":
-					console.log("kicked chat rooms live ", chatEvent.data);
-					if (doIleaveChat(router, pathname, chatEvent.data, id.id)) {
-						/// replace chat with new one
-						console.log("I am kicked!!");
+					console.log("someone is kicked", chatEvent.data);
+					if (chatEvent.data.kickedId === id.id) { // fail to change state, I remove item
 						setItems((prevChats: Chat[]) => prevChats.filter((currentChat: Chat) => currentChat._id !== chatEvent.data._id));
+						const newChat = {
+							name: chatEvent.data.name,
+							_id: chatEvent.data._id,
+							owner: chatEvent.data.owner,
+							amParticipant: false,
+							Participants: [],
+							mine: false,
+							personal: false,
+						}
+						if (!chatEvent.data.isPrivate) {
+							setTimeout(() => {
+								setItems((prevChats: Chat[]) => [...prevChats, newChat]);
+							}, 3000);
+						}
+						router.replace("/chat");
+						DisplayPopUp("You Kicked", "You are kicked from chat " + chatEvent.data.name, 3000, "warning");
+					}
+					break;
+				case "banned":
+					console.log("someone is banned", chatEvent.data);
+					if (chatEvent.data.kickedId === id.id) {
+						/// replace chat with new one
+						console.log("I am banned!!");
+						setItems((prevChats: Chat[]) => prevChats.filter((currentChat: Chat) => currentChat._id !== chatEvent.data._id));
+						router.replace("/chat");
+						DisplayPopUp("Ahh.. yayks!.", "You been blocked from chat " + chatEvent.data.name, 3000, "warning");
+					}
+					break;
+				case "invite":
+					console.log("someone is invited", chatEvent.data);
+					if (chatEvent.data.kickedId === id.id) {
+						/// replace chat with new one
+						console.log("I am invited!!");
+						const newChat = {
+							name: chatEvent.data.name,
+							_id: chatEvent.data._id,
+							owner: chatEvent.data.owner,
+							amParticipant: false,
+							Participants: [],
+							mine: false,
+							personal: false,
+							isPrivate: true,
+						}
+						setItems((prevChats: Chat[]) => [...prevChats, newChat]);
 					}
 					break;
 				default:
@@ -90,7 +139,7 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 				name: "Change Password",
 				endpointTemplate: "/chat/[id]/edit",
 				type: "action",
-				displayDependency: (item: Chat) => isGroupChat(item) && item?.mine? true : false,
+				displayDependency: (item: Chat) => isGroupChat(item) && item?.mine && !item?.isPrivate ? true : false,
 				fields: [
 					{
 						name: "password",
@@ -102,7 +151,7 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 		)
 		.addToggleButton(
 			{
-				dependency: (item: Chat) => item?.amParticipant? true : false,
+				// dependency: (item: Chat) => item?.amParticipant? true : false,
 				type: "linkToggle",
 				unitOne: {
 					name: "Leave",
