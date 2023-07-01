@@ -81,7 +81,7 @@ const UIClientListBox: Function = ({
 	}, [editItemsCallback]);
 	
 	useEffect(() => {
-		endOfListRef.current?.scrollIntoView({ behavior: "instant" });
+		endOfListRef.current?.scrollIntoView( );
 	}, [Items]);
 
 	const removeItemFromList = (item: any): void => {
