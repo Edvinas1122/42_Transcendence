@@ -8,11 +8,11 @@ import	{ JwtModule } from '@nestjs/jwt';
 import	{ TmpTokenStore } from './tmpTokenStore.service';
 
 
-	@Module({
-		controllers: [AuthController],
-		imports: [UsersModule, JwtModule.register(JwtParams)],
-		providers: [AuthService, FourtyTwoStrategy, JwtStrategy, TmpTokenStore],
-		exports: [AuthService],
-	})
+@Module({
+	controllers: [AuthController],
+	imports: [UsersModule, JwtModule.register(JwtParams)],
+	providers: [AuthService, FourtyTwoStrategy, JwtStrategy, TmpTokenStore],
+	exports: [AuthService],
+})
 
-	export class AuthModule {}
+export class AuthModule {}

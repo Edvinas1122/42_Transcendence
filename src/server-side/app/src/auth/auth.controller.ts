@@ -92,6 +92,7 @@ export class AuthController
 	@UseGuards(JwtAuthGuard)
 	async validate(@UserId() currentUserId: number): Promise<any>
 	{
+		console.log("currentUserId", currentUserId);
 		return {validated: true};
 	}
 }

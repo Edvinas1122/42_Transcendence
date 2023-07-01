@@ -42,8 +42,10 @@ export const SidebarElement = (props: SidebarElementProps) => {
 	const ActiveStyle = "/" + pathname.split('/')[1] === props.link ? 'Active' : '';
 
 	return (
-		<div className={`Entity ${ActiveStyle}`} style={{ cursor: 'pointer' }} onClick={handleLinkClick}>
-			<span><FontAwesomeIcon icon={props.icon} size="1x" /> {props.name}</span>
+		<div className="Entity">
+			<div className={`Link ${ActiveStyle}`} style={{ cursor: 'pointer' }} onClick={handleLinkClick}>
+				<span><FontAwesomeIcon icon={props.icon} size="1x" /> {props.name}</span>
+			</div>
 		</div>
 	);
 }

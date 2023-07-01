@@ -1,35 +1,52 @@
 "use client";
-import UIClientListBox, { EntityInterfaceBuilder, UIClientListBoxClassBuilder, CategoryDisisplay } from "@/components/GeneralUI/GenericClientList";
-import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
-import { ChatRoomSourceContext } from "@/components/ChatUI/ChatEventProvider";
-import Link from "next/link";
-import { Chat, GroupChat, isGroupChat } from "@/lib/DTO/AppData";
-import "../Chat.css";
-import "@/public/layout.css";
-import { serverFetch } from "@/lib/fetch.util";
-import { usePathname, useRouter } from 'next/navigation';
+import UIClientListBox, { UIClientListBoxClassBuilder, CategoryDisisplay } from "@/components/GeneralUI/GenericClientList";
+import { EntityInterfaceBuilder } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
 import { AuthContext } from "@/components/ContextProviders/authContext";
+import { ChatRoomSourceContext } from "@/components/ChatUI/ChatEventProvider";
+import { Chat, GroupChat, isGroupChat, User } from "@/lib/DTO/AppData";
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useContext, useCallback } from "react";
+import "@/public/layout.css";
+import "../Chat.css";
 
-const ChatRoomBox: Function = ({ item, style }: { item: Chat, style?: string }) => {
-	const pathname = usePathname();
-	const router = useRouter();
-	const openChatLink = () => router.replace(`/chat/${item._id}`);
+interface ChatRoomBoxProps {
+	item: Chat,
+	childnode: React.ReactNode
+}
+
+const ChatRoomBox: React.FC<ChatRoomBoxProps> = ({
+	item,
+	childnode
+}) => {
 
 	return (
-		<div onClick={openChatLink} style={{ cursor: 'pointer' }}>
+		<>
 			<p>
 				<strong>{item.name}</strong>
 				<span>{item.personal}</span>
 			</p>
-		</div>
+			{childnode}
+		</>
 	);
 }
 
-// const amParticipant = (chat: GroupChat, tokenBearerID: number) => {
-// 	if (isGroupChat(chat)) return true;
-// 	if (chat.owner._id == tokenBearerID.toString()) return true;
-// 	return chat.participants.some((participant) => participant._id == tokenBearerID.toString());
-// }
+const meParticipant = (chat: Chat, id: number): boolean => {
+	if (isGroupChat(chat)) {
+		console.log("me participant", chat.participants, id);
+		return chat.participants.some((participant: User) => participant._id == id);
+	}
+	return true;
+}
+
+function doIleaveChat(router: any, pathname: string, chat: Chat, myId: number): boolean {
+	if (isGroupChat(chat)) {
+		if (!chat.participants.some((participant: User) => participant._id == myId)) {
+			router.push("/chat");
+			return true;
+		}
+	}
+	return false;
+}
 
 const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 
@@ -40,77 +57,96 @@ const ChatRoomsLive: Function = ({ serverChats }: { serverChats: Chat[] }) => {
 
 	const handleNewEvent = useCallback((setItems: Function) => {
 		if (chatEvent) {
-			// chatEvent.data.meParticipant = amParticipant(chatEvent.data, id);
+			console.log("chat event", chatEvent.data);
 			switch (chatEvent.subtype) {
 				case "new-available":
-					console.log("new chat", chatEvent.data);
+					chatEvent.data.amParticipant = meParticipant(chatEvent.data, id.id);
+					chatEvent.data.mine = chatEvent.data.owner._id == id.id;
+					console.log("new chat chat rooms live ", chatEvent.data);
 					setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
 					break;
 				case "deleted":
 					setItems((prevChats: Chat[]) => prevChats.filter((chat: Chat) => chat._id.toString() != chatEvent.roomID));
-					if (pathname.split('/')[2] == chatEvent.roomID.toString()) {
-						router.push("/chat");
-						console.log("Kick user from chat");
+					doIleaveChat(router, pathname, chatEvent.data, id.id);
+					break;
+				case "kicked":
+					console.log("kicked chat rooms live ", chatEvent.data);
+					if (doIleaveChat(router, pathname, chatEvent.data, id.id)) {
+						/// replace chat with new one
+						console.log("I am kicked!!");
+						setItems((prevChats: Chat[]) => prevChats.filter((currentChat: Chat) => currentChat._id !== chatEvent.data._id));
 					}
-					break;
-				case "join":
-					console.log("join chat", chatEvent.data);
-					setItems((prevChats: Chat[]) => {
-						return prevChats.map((chat: Chat) => 
-							chat._id.toString() === chatEvent.roomID
-							? chatEvent.data : chat
-						);
-					});
-					break;
-				case "quit":
 					break;
 				default:
 					break;
 			}
 		}
-	}, [chatEvent, router]);
+	}, [chatEvent]);
 
-	const deleteChat = (item: Chat): void => {
-		serverFetch(`/chat/${item._id}`, "DELETE");
-	}
 
-	const joinChat = async (item: Chat): Promise<void> => {
-		const response = await serverFetch(`/chat/roles/${item._id}/join`, "POST");
-		console.log("join chat", response);
-	}
-
-	const quitChat = async (item: Chat): Promise<void> => {
-		const response = await serverFetch(`/chat/roles/${item._id}/leave`, "POST");
-		console.log("leave chat", response);
-	}
-
-	const isRouteActiveStyle = (item: Chat): string => {
-		return item._id.toString() == pathname.split('/')[2] ? "Active" : "";
-	}
-
-	const ChatRoomInterface = new EntityInterfaceBuilder()
-		.addRemoveButton("remove chat", deleteChat, (item: Chat) => item.mine ? true : false)
-		.addRemoveButton("dev remove chat", deleteChat) // delete this line
-		.addInteractButton("join chat", joinChat, (item: Chat): boolean => {
-			return isGroupChat(item) && !item.amParticipant && !item.mine ? true : false;
-		})
-		.addInteractButton("leave chat", quitChat, (item: Chat) => item.mine ? false : true)
-		.addConditionalStyle(isRouteActiveStyle)
-		.build();
-
+	const ChatInterface = EntityInterfaceBuilder<Chat>()
+		.addButton(
+			{
+				name: "Change Password",
+				endpointTemplate: "/chat/[id]/edit",
+				type: "action",
+				displayDependency: (item: Chat) => isGroupChat(item) && item?.mine? true : false,
+				fields: [
+					{
+						name: "password",
+						type: "password",
+						dependency: (item: Chat) => true,
+					}
+				]
+			}
+		)
+		.addToggleButton(
+			{
+				dependency: (item: Chat) => item?.amParticipant? true : false,
+				type: "linkToggle",
+				unitOne: {
+					name: "Leave",
+					endpointTemplate: "/chat/roles/[id]/leave",
+					link: {link: "/chat", currentActiveOnly: "/chat/[@]"},
+				},
+				unitTwo: {
+					name: "Join",
+					endpointTemplate: "/chat/roles/[id]/join",
+					// link: "/chat/[id]",
+					fields: [
+						{
+							name: "password",
+							type: "password",
+							dependency: (item: Chat) => isGroupChat(item) && item?.passwordProtected? true : false,
+						}
+					]
+				},
+			}
+		)
+	
 	const ChatRoomList = new UIClientListBoxClassBuilder()
 		.setInitialItems(serverChats)
 		.setBoxComponent(ChatRoomBox)
-		.setListStyle("AvailableChats")
-		.setEntityInterface(ChatRoomInterface)
 		.setEditItemsCallback(handleNewEvent)
+		.setListStyle("AvailableChats")
+		.setEntityInterface(ChatInterface)
 		.addCategory({
 			name: "Private Chats",
 			dependency: (item: Chat): boolean => item.personal
 		})
 		.addCategory({
-			name: "Group Chats",
+			name: "My Group Chats",
+			dependency: (item: Chat): boolean => item.mine ? true : false
+		})
+		.addCategory({
+			name: "Available Chats",
 			dependency: (item: Chat): boolean => !item.personal
+		})
+		.setLinkDefinition({
+			linktemplate: "/chat/[id]",
+			samePage: true,
+			// highlightOnly: true,
+			dependency: (item: Chat): boolean => item?.amParticipant? true : false
 		})
 		.build();
 

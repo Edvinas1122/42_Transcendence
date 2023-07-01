@@ -3,12 +3,12 @@
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 export interface AuthContextType {
 	token: string | null;
-	id: number | null;
+	id: number;
 }
 
 export const AuthContext = createContext<AuthContextType>({
 	token: null,
-	id: null,
+	id: 0,
 });
 
 const getTokensId = (token: string): number => {
@@ -31,7 +31,7 @@ const getCookie = (name: string): string | null => {
 export const AuthProvider = ({ children }: { children?: ReactNode }) => {
 
 	const [token, setToken] = useState<string | null>(null);
-	const [id, setId] = useState<number | null>(null);
+	const [id, setId] = useState<number>(0);
 
 	useEffect(() => {
 		const token = getCookie('access_token');

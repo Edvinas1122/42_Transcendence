@@ -40,15 +40,56 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 
 	useEffect(() => {
 		if (chatEvent && id) {
+			console.log(chatEvent);
 			switch (chatEvent.event) {
 				case 'room':
-					setChatRoomEvent({
-						roomID: chatEvent.roomId,
-						subtype: chatEvent.subType,
-						data: chatEvent.data,
-					});
-					if (chatEvent.subType == 'new-available')
-						DisplayPopUp("New ChatRoom Available", "ChatRoom " + chatEvent.roomId + " is now available");
+					switch (chatEvent.subType) {
+						case 'new-available':
+							setChatRoomEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							if (chatEvent.subType == 'new-available')
+								DisplayPopUp("New ChatRoom Available", "ChatRoom " + chatEvent.roomId + " is now available");
+							break;
+						case 'join':
+							setParticipantEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							DisplayPopUp("User Joined", "Chat room " + chatEvent.roomId);
+							break;
+						case 'leave':
+							setParticipantEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							DisplayPopUp("User Left", "Chat room " + chatEvent.roomId);
+							break;
+						case 'kicked':
+							setChatRoomEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							setParticipantEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							DisplayPopUp("User Kicked", "Chat room " + chatEvent.roomId);
+							break;
+						default:
+							setChatRoomEvent({
+								roomID: chatEvent.roomId,
+								subtype: chatEvent.subType,
+								data: chatEvent.data,
+							});
+							break;
+						}
 					break;
 				case 'participant':
 					setParticipantEvent({
@@ -56,16 +97,11 @@ export const ChatEventProvider = ({ children }: { children: React.ReactNode }) =
 						subtype: chatEvent.subType,
 						data: chatEvent.data,
 					});
-					setChatRoomEvent({
-						roomID: chatEvent.roomId,
-						subtype: 'join',
-						data: chatEvent.data,
-					});
 					break;
 				case 'message':
 					let newMessage: Message = chatEvent.data as unknown as Message;
 					newMessage.chatID = parseInt(chatEvent.roomId);
-					newMessage.me = (newMessage.user._id == id.toString()) ? true : false;
+					newMessage.me = (newMessage.user._id == id) ? true : false;
 					setNewMessage(newMessage);
 					if (pathname.split('/')[2] != chatEvent.roomId.toString())
 						DisplayPopUp("Message from " + newMessage.user.name, "ChatRoom " + newMessage.chatID + " " + newMessage.content);

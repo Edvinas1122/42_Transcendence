@@ -2,17 +2,19 @@
 import React, { useEffect, useRef, useState, Suspense } from "react";
 import "@/public/layout.css";
 import { serverFetch } from "@/lib/fetch.util";
-import { notFound } from "next/navigation";
+import { notFound, usePathname, useRouter } from "next/navigation";
 import SpinnerLoader from "@/components/GeneralUI/Loader";
+import { EntityInterface } from "./InterfaceGenerics/InterfaceComposer";
+import { HasId } from "./InterfaceGenerics/InterfaceComposer.lib";
 
 /*
-    Generic client Entity list component
-    
-    Designed for dynamic lists modification:
-        - editItemsCallback: callback function to set items
-    
+	Generic client Entity list component
+	
+	Designed for dynamic lists modification:
+		- editItemsCallback: callback function to set items
+	
 	And for interactive entity boxes:
-		- entityInterface: interface for interactive entity boxes
+		- interfaceBuilder: interface for interactive entity boxes
 		- interactItemEntityCallbackEffects: array of buttons to interact with the entity
 		- removeItemEntityCallbackEffects: array of buttons to remove the entity
 		- conditionalStyle: function to apply to conditional style to the entity box based on the item
@@ -24,84 +26,91 @@ import SpinnerLoader from "@/components/GeneralUI/Loader";
 		LiveMessages.tsx
 */
 
-export interface EntityButton {
-	name: string,
-	onClick: Function,
-	dependency?: (item: any) => boolean,
-}
-
-export interface EntityBoxInterface {
-	interactItemEntityCallbackEffects?: EntityButton[],
-	removeItemEntityCallbackEffects?: EntityButton[],
-	conditionalStyle?: Function,
-}
-
 export interface CategoryDisisplay {
 	name: string,
 	dependency: (item: any) => boolean,
 }
 
 interface UIClientListBoxProps {
-    initialItems: any[] | string,
-    BoxComponent: Function,
-    ListStyle?: string,
-    BoxStyle?: string,
-    editItemsCallback?: Function
-	entityInterface?: EntityBoxInterface,
-	categories?: CategoryDisisplay[]
+	initialItems: any[] | string,
+	BoxComponent: Function,
+	ListStyle?: string,
+	BoxStyle?: string,
+	conditionalStyle?: Function,
+	editItemsCallback?: Function,
+	editLinkGate?: Function,
+	interfaceBuilder?: any,
+	categories?: CategoryDisisplay[],
+	linkDefinition?: LinkDefinition
 }
 
 const UIClientListBox: Function = ({ 
-    initialItems,
-    BoxComponent,
-    ListStyle,
-    BoxStyle,
-    editItemsCallback,
-	entityInterface,
+	initialItems,
+	BoxComponent,
+	ListStyle,
+	BoxStyle,
+	editItemsCallback,
+	conditionalStyle,
+	interfaceBuilder,
 	categories,
+	linkDefinition
 }: UIClientListBoxProps ) => {
 
-    const endOfListRef = useRef<HTMLDivElement | null>(null);
-    const [Items, setItems] = useState<any[]>([]);
+	const endOfListRef = useRef<HTMLDivElement | null>(null);
+	const [Items, setItems] = useState<any[]>([]);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (error) {
+			notFound();
+			// throw new Error(error);
+		}
+	}, [error]);
 
 	useEffect(() => {
 		if (typeof initialItems === "string") {
-			serverFetch<any[]>(initialItems).then((data) => setItems(data)); // not found error bug
+			serverFetch<any[]>(initialItems).then((data) => setItems(data)).catch((error) => {
+				setError(error);
+				// throw new Error(error);
+			});
 		} else if (Array.isArray(initialItems)) {
 			setItems(initialItems);
 		}
 	}, [initialItems]);
 
-    useEffect(() => {
-        editItemsCallback && editItemsCallback(setItems);
-    }, [editItemsCallback]);
-    
-    useEffect(() => {
-        endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [Items]);
+	useEffect(() => {
+		editItemsCallback && editItemsCallback(setItems);
+	}, [editItemsCallback]);
+	
+	useEffect(() => {
+		endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [Items]);
 
-	const removeItemFromList = (itemToRemove: any) => {
-		setItems((prevItems: any[]) => prevItems.filter(item => item._id !== itemToRemove._id));
+	const removeItemFromList = (item: any): void => {
+		setItems((prevItems: any[]) => 
+			prevItems.filter(currentItem => currentItem._id !== item._id));
 	};
 
 	const renderGroup = (groupItems: any[], groupName: string) => {
 		return (
-		  <div key={groupName}>
-			{/* <h2>{groupName}</h2> */}
+		<div key={groupName}>
+			{groupItems.length > 0 && groupName != "Rest" &&
+				<h2 className="groupName">{groupName}</h2>}
 			{groupItems.map((item: any) => (
-			  <EntityBox
+			<EntityBox
 				key={item._id}
 				item={item}
 				style={BoxStyle}
 				BoxComponent={BoxComponent}
-				entityInterface={entityInterface}
 				removeItemFromList={removeItemFromList}
-				conditionalStyle={entityInterface?.conditionalStyle}
-			  />
+				interfaceBuilder={interfaceBuilder}
+				conditionalStyle={conditionalStyle}
+				linkDefinition={linkDefinition}
+			/>
 			))}
-		  </div>
+		</div>
 		);
-	  };
+	};
 
 	let restItems = [...Items];
 	const categorizedItems = categories?.map((category) => {
@@ -110,17 +119,25 @@ const UIClientListBox: Function = ({
 		return { name: category.name, items: categoryItems };
 	});
 
-    return (
+	return (
 		<div className={"List " + ListStyle}>
 			<Suspense fallback={<SpinnerLoader />}>
 			{categorizedItems && categorizedItems.map((category, index) => 
 				renderGroup(category.items, category.name)
-			)}
+				)}
 			{restItems.length > 0 && renderGroup(restItems, 'Rest')}
 			<div ref={endOfListRef} />
 			</Suspense>
 		</div>
-    );
+	);
+}
+
+interface LinkDefinition {
+	linktemplate: string,
+	samePage?: boolean,
+	toggleGateway?: boolean,
+	dependency?: (item: any) => boolean,
+	highlightOnly?: boolean,
 }
 
 export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
@@ -129,8 +146,10 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 	public ListStyle: string = "";
 	public BoxStyle: string = "";
 	public editItemsCallback?: Function;
-	public entityInterface?: EntityBoxInterface;
+	public interfaceBuilder?: any
+	public conditionalStyle?: Function;
 	public categories?: CategoryDisisplay[];
+	public linkDefinition?: LinkDefinition;
 
 	public setInitialItems(initialItems: any[] | string) {
 		this.initialItems = initialItems;
@@ -139,6 +158,12 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 
 	public setBoxComponent(BoxComponent: Function) {
 		this.BoxComponent = BoxComponent;
+		return this;
+	}
+
+	public setLinkDefinition(linkDefinition: LinkDefinition) {
+		this.linkDefinition = linkDefinition;
+		this.linkDefinition.samePage = this.linkDefinition.samePage || false;
 		return this;
 	}
 
@@ -157,8 +182,8 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 		return this;
 	}
 
-	public setEntityInterface(entityInterface: EntityBoxInterface) {
-		this.entityInterface = entityInterface;
+	public setEntityInterface(interfaceBuilder: any) {
+		this.interfaceBuilder = interfaceBuilder;
 		return this;
 	}
 
@@ -172,6 +197,11 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 		return this;
 	}
 
+	public setConditionalStyle(conditionalStyle: Function) {
+		this.conditionalStyle = conditionalStyle;
+		return this;
+	}
+
 	public build() {
 		return Object.freeze({
 			initialItems: this.initialItems,
@@ -179,117 +209,117 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 			ListStyle: this.ListStyle,
 			BoxStyle: this.BoxStyle,
 			editItemsCallback: this.editItemsCallback,
-			entityInterface: this.entityInterface,
+			interfaceBuilder: this.interfaceBuilder,
 			categories: this.categories,
+			conditionalStyle: this.conditionalStyle,
+			linkDefinition: this.linkDefinition,
 		});
 	}
 }
 
+const LinkBox: React.FC<{
+	item: any,
+	childnode: React.ReactNode, 
+	linkDef: LinkDefinition,
+}> = ({
+	item,
+	childnode,
+	linkDef,
+}) => {
+	const pathname = usePathname();
+	const router = useRouter();
+	const routedLink = linkDef.linktemplate.replace("[id]", item._id);
+	const level = linkDef.linktemplate.split('/').indexOf('[id]');
+	const openSpecifiedLink = () => {
+			if (linkDef.samePage && pathname.split('/').length > level) {
+				router.replace(routedLink);
+			}
+			else {
+				router.push(routedLink);
+			}
+		}
+	const isRouteActiveStyle = (item: HasId): string => {
+		return item._id.toString() == pathname.split('/')[level] ? "Active" : "";
+	}
+
+	const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => { // to handle propagation issue
+		if (!linkDef.highlightOnly) {
+			openSpecifiedLink();
+		}
+	}
+
+	const LinkStyle = linkDef.highlightOnly ? isRouteActiveStyle(item) : "Link " + isRouteActiveStyle(item);
+
+	const style = !linkDef.highlightOnly ? { cursor: 'pointer' } : {};
+
+	return (
+		<div onClick={handleClick} className={LinkStyle} style={style}>
+			{childnode}
+		</div>
+	);
+}
+
 interface EntityBoxProps {
-    item: any,
-    BoxComponent: Function,
-    style?: string,
-	entityInterface?: EntityBoxInterface,
-	removeItemFromList: Function,
+	item: any,
+	BoxComponent: Function,
+	style?: string,
+	removeItemFromList: (item: any) => void,
 	conditionalStyle?: Function,
+	interfaceBuilder?: any,
+	linkDefinition?: LinkDefinition,
+	
 }
 
 const EntityBox: Function = ({
 	item,
 	BoxComponent,
 	style,
-	entityInterface,
 	removeItemFromList,
 	conditionalStyle,
+	interfaceBuilder,
+	linkDefinition,
 }: EntityBoxProps) => {
 
-	if (conditionalStyle) {
-		style = conditionalStyle(item);
+	const [linkActive, setLinkActiveStatus] = useState<boolean>(
+		linkDefinition && typeof linkDefinition.dependency === 'function' ?
+		linkDefinition.dependency(item) : true
+	);
+
+	const setLinkStatus = (status: boolean): void => {
+		setLinkActiveStatus(status);
 	}
 
-	return (
-		<div className={"Entity " + style}>
+	const theStyle = conditionalStyle ? style + " " + conditionalStyle(item): style;
+
+	const EntityInternals = () => (
+		<div className={"Entity " + theStyle}>
 			<BoxComponent
 				item={item}
+				childnode={interfaceBuilder && <EntityInterface
+					item={item}
+					interfaceBuilder={interfaceBuilder}
+					removeItemFromList={removeItemFromList}
+					setLinkActiveStatus={setLinkStatus}
+					linkStatus={linkActive}
+				/>}
 			/>
-			<div className="Interface">
-			{entityInterface?.interactItemEntityCallbackEffects?.map((button, index) => {
-				if (!button.dependency || button.dependency(item)) {
-					return <button key={index} onClick={() => button.onClick(item)}>{button.name}</button>
-				}
-				return null;
-			})}
-			{entityInterface?.removeItemEntityCallbackEffects?.map((button, index) => {
-				if (!button.dependency || button.dependency(item)) {
-					return <button 
-					key={index}
-					onClick={async () => {
-						if (isAsync(button.onClick)) {
-							await button.onClick(item);
-						} else {
-							button.onClick(item);
-						}
-						removeItemFromList(item);
-					}}
-					>{button.name}</button>
-				}
-				return null;
-			})}
-			</div>
 		</div>
+	);
+
+
+	return linkDefinition && linkActive ? (
+		<LinkBox
+			item={item}
+			childnode={<EntityInternals />}
+			linkDef={linkDefinition}
+			/>
+	) : (
+		<EntityInternals />
 	);
 }
 
-function isAsync(fn: Function) {
-    return Object.prototype.toString.call(fn) === '[object AsyncFunction]';
-}
-
-/*
-	A hellper class to build the entity interface
-
-	Offers methods to add buttons to the entity interface
-		and a build method to return a frozen copy of the object
-		so to avoid encapsulation problems
-
-*/
-export class EntityInterfaceBuilder implements EntityBoxInterface {
-    public removeItemEntityCallbackEffects: EntityButton[] = [];
-    public interactItemEntityCallbackEffects: EntityButton[] = [];
-	public conditionalStyle?: Function;
-
-    addRemoveButton(name: string, onClick: Function, dependency?: (item: any) => boolean) {
-        const button: EntityButton = {
-            name,
-            onClick,
-            dependency
-        }
-        this.removeItemEntityCallbackEffects.push(button);
-        return this;
-    }
-
-    addInteractButton(name: string, onClick: Function, dependency?: (item: any) => boolean) {
-        const button: EntityButton = {
-            name,
-            onClick,
-            dependency
-        }
-        this.interactItemEntityCallbackEffects.push(button);
-        return this;
-    }
-
-	addConditionalStyle(conditionalStyle: Function) {
-		this.conditionalStyle = conditionalStyle;
-		return this;
-	}
-
-    build(): EntityBoxInterface {
-        // return a "frozen" copy of the object
-        return Object.freeze({
-            removeItemEntityCallbackEffects: [...this.removeItemEntityCallbackEffects],
-            interactItemEntityCallbackEffects: [...this.interactItemEntityCallbackEffects],
-			conditionalStyle: this.conditionalStyle,
-        });
-    }
-}
+// function isAsync(fn: Function) {
+//     return Object.prototype.toString.call(fn) === '[object AsyncFunction]';
+// }
 
 export default UIClientListBox;

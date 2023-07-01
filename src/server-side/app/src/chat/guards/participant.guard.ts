@@ -1,10 +1,11 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+
 import { RoleType } from '../entities/role.entity';  // import your RolesService
 import { RoleService } from '../role.service';
 
 @Injectable()
-export class OwnerGuard implements CanActivate {
+export class ParticipantGuard implements CanActivate {
 	constructor(
 		private reflector: Reflector,
 		private rolesService: RoleService
@@ -20,7 +21,7 @@ export class OwnerGuard implements CanActivate {
 		const chatId = request["params"]["chatId"];
 
 		const role = await this.rolesService.getRole(chatId, userId);
-		if (role && role.type === RoleType.Owner)
+		if (role && role.type !== RoleType.Blocked)
 			return true;
 
 		throw new ForbiddenException('You are not authorized to perform this operation.');

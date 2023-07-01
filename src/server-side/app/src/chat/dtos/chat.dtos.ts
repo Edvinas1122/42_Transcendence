@@ -30,14 +30,16 @@ export class ChatIdDto {
 	chatId: number;
 }
 
-export class UpdateChatDto extends CreateChatDto {
-	id: number;
+export class UpdateChatDto {
+	@IsString()
+	@MinLength(1)
+	password?: string | undefined;
 }
 
 export class JoinChatDto {
 	@IsString()
 	@IsOptional()
-	chatPassword?: string;
+	password?: string;
   }
 export class SendMessageDto {
 	@IsString()
@@ -89,12 +91,13 @@ export class PersonalChatDto extends ChatDto {
 interface ChatGroup {
 	chat: Chat;
 	owner: UserInfo;
-	privileged: boolean;
+	privileged?: boolean;
 	mine?: boolean;
 	participants?: UserInfo[];
 	messages?: MessageDto[];
 	type?: "group";
 	amParticipant?: boolean;
+
 }
 
 export class GroupChatDto extends ChatDto {
@@ -105,12 +108,14 @@ export class GroupChatDto extends ChatDto {
 		this.privileged = props.privileged || false; // Assuming you can pass the privileged status during construction
 		this.type = "group";
 		this.mine = props.mine || false;
+		this.amParticipant = props.amParticipant || false;
+		this.passwordProtected = (props.chat.password !== "" && props.chat.password !== null);
 	}
 	owner: UserInfo;
 	participants: UserInfo[];
 	privileged: boolean;
-	passwordProtected: boolean;
 	mine?: boolean;
 	amParticipant?: boolean;
 	type?: "group";
+	passwordProtected: boolean;
 }

@@ -1,34 +1,33 @@
 "use client";
 
-interface MatchHistory {
-	_id: string;
-	opponent: string;
+interface HasId {
+	_id: number;
+}
+
+interface MachHistory extends HasId {
+	opeonent: string;
 	userScore: number;
 	opponentScore: number;
 	created?: Date;
 	completed: boolean;
 }
 
-interface Achievement {
-	_id: number;
+interface Achievement extends HasId {
 	name: string;
 	description: string;
 	achievedOn?: Date;
 	icon?: any;
 }
 
-// added ? to date because it was causing problems in testing, can be deleted later
-// also added icon 
-// also changed id to number
-
-interface User {
-	_id: string;
+interface User extends HasId {
 	name: string;
 	avatar: string;
 	Online?: boolean; // non Current user context
 	Ingame?: boolean; 
 	Role?: RoleType; // chat context
-	friend?: string;
+	Muted?: boolean; // chat context
+	Banned?: boolean; // chat context
+	friend?: boolean;
 }
 
 interface UserProfile extends User {
@@ -36,13 +35,12 @@ interface UserProfile extends User {
 	Achievements: Achievement[];
 }
 
-interface Chat {
-	_id: number;
+interface Chat extends HasId {
 	name: string;
 	messages: Message[];
-	personal: boolean;
+	personal: boolean; // a fuckup double discriminator
 	mine?: boolean;
-	type: 'personal' | 'group';
+	type: 'personal' | 'group'; // a fuckup double discriminator
 	amParticipant?: boolean;
 }
 
@@ -55,15 +53,18 @@ interface GroupChat extends Chat {
 	owner: User;
 	participants: User[];
 	privileged: boolean;
+	protected?: boolean // remove optional field
+	passwordProtected: boolean;
 	type: 'group';
 }
 
-function isGroupChat(chat: Chat): chat is GroupChat { // discriminator
+function isGroupChat(chat: Chat): chat is GroupChat { // discrimination
+	if (!chat?.type)
+		return false;	
     return chat.type === 'group';
 }
 
-interface Message {
-	_id: number;
+interface Message extends HasId {
 	content: string;
 	user: User;
 	me?: boolean;
@@ -72,6 +73,7 @@ interface Message {
 }
 
 enum RoleType {
+	Owner = 'Owner',
 	Admin = 'Admin',
 	Participant = 'Participant',
 	Muted = 'Muted',

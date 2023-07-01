@@ -5,7 +5,7 @@ import UserProfileUI from "@/components/UserUI/UserProfileUI";
 
 const Users = async () => {
 
-	const id = CurrentUserId();
+	const id: number = CurrentUserId();
 	const user: User = await fetchWithToken<User>(`/users/profile/${id}`);
 
 	return (

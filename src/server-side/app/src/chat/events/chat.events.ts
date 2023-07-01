@@ -11,6 +11,7 @@ enum RoomEventType {
 	Leave = 'leave',
 	NewAvailable = 'new-available',
 	Deleted = 'deleted',
+	Kicked = 'kicked',
 }
 
 enum MessageEventType {

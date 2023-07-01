@@ -6,7 +6,7 @@ import { RoleType, Role, AcceptedRoleType } from './entities/role.entity';
 import { Repository, In, Not } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserInfo } from '../users/dtos/user.dto';
-import { EventService } from '../events/events.service';
+import { ChatEventGateway } from './chat-event.gateway';
 
 
 @Injectable()
@@ -14,8 +14,6 @@ export class RoleService {
 	constructor(
 		@InjectRepository(Role)
 		private roleRepository: Repository<Role>,
-		@Inject(EventService)
-		private eventService: EventService,
 	) {}
 
 	
@@ -26,14 +24,14 @@ export class RoleService {
 			},
 			relations: ['user'],
 		});
-		return relatives.map(relative => new UserInfo(relative.user, relative.type));
+		return relatives.filter(relative => relative && relative.user).map(relative => new UserInfo(relative.user, relative.type)); // online status not implemented
 	}
 
 	async getChatRoleRelatives(chat: Chat, role: RoleType = RoleType.Blocked): Promise<UserInfo[]> {
 		const relatives = await this.roleRepository.find({
 			where: { 
 				chat: { id: chat.id },
-				type: role
+				type: Not(role),
 			},
 			relations: ['user'],
 		});

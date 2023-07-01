@@ -70,12 +70,13 @@ export class MessageService {
 	}
 
 	public async updateEvent(chat: Chat, eventType: MessageEventType = MessageEventType.New, message?: MessageDto) {
-		if (chat.personal || chat.private) {
+		// if (chat.personal || chat.private ) {
+		if (true ) {
 			await this.chatEventGateway.updateParticipantsOfMessageEvent(chat, message, eventType);
 		}
-		else {
-			await this.chatEventGateway.updateOnlineUsersMessageEvent(chat, message, eventType);
-		}
+		// else {
+		// 	await this.chatEventGateway.updateOnlineUsersMessageEvent(chat, message, eventType);
+		// }
 	}
 }
 
