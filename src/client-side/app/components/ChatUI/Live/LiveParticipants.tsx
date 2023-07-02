@@ -41,7 +41,6 @@ const LiveParticipants: Function = ({
 	
 	const handleNewEvent = useCallback((setItems: Function) => {
 		if (participantsEvent) {
-			console.log("participantsEvent", participantsEvent);
 			if (participantsEvent.data._id == chatID) {
 				switch (participantsEvent.subtype) {
 					case "join":
@@ -147,7 +146,7 @@ const LiveParticipants: Function = ({
 		.addToggleButton({
 			// available to owner
 			dependency: (item: User) => item?.Role !== RoleType.Blocked ? true : false,
-			type: "linkToggle",
+			type: "linkToggle", // toggles links/ unwanted
 			unitOne: {
 				name: "Ban",
 				endpointTemplate: `/chat/roles/${chatID}/ban`,

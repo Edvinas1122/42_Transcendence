@@ -115,6 +115,7 @@
 }
 
 .Link {
+	transition: background-color 0.1s ease-in-out;
 }
 
 .Link:hover{

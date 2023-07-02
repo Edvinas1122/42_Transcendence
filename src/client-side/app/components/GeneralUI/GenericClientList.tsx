@@ -58,9 +58,11 @@ const UIClientListBox: Function = ({
 
 	const endOfListRef = useRef<HTMLDivElement | null>(null);
 	const [Items, setItems] = useState<any[]>([]);
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
 		if (typeof initialItems === "string") {
+			setIsLoading(true);
 			serverFetch<any[]>(initialItems).then(
 				(data: any) => {
 					if (data.error){
@@ -71,6 +73,7 @@ const UIClientListBox: Function = ({
 					// notFound();
 					throw new Error(error);
 			});
+			setIsLoading(false);
 		} else if (Array.isArray(initialItems)) {
 			setItems(initialItems);
 		}
@@ -83,6 +86,10 @@ const UIClientListBox: Function = ({
 	useEffect(() => {
 		endOfListRef.current?.scrollIntoView( );
 	}, [Items]);
+
+	if (isLoading) {
+		return <SpinnerLoader />; // causes spinnergendon
+	}
 
 	const removeItemFromList = (item: any): void => {
 		setItems((prevItems: any[]) => 
