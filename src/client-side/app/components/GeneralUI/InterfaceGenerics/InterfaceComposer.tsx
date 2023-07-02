@@ -4,6 +4,7 @@ import { serverFetch } from '@/lib/fetch.util';
 import { useServerFetch } from '@/lib/fetch.client';
 import { SpinnerLoaderSmall } from '../Loader';
 import { usePathname, useRouter } from 'next/navigation';
+import { ListItemContext } from '../GenericClientList';
 import {
 	ButtonConfig,
 	ToggleUnit,
@@ -68,9 +69,12 @@ const InterfaceUnit = ({
 	setEntityState?: (item: any) => void,
 	editEntity?: (item: any) => any,
 }) => {
+	const {itemDispached} = React.useContext(ListItemContext);
+	console.log("itemDispached", itemDispached);
 	const pathname = usePathname();
 	// const pageId = pathname.split("/").pop() || ''; // fallback to empty string if no value
-	const endpoint = endpointTemplate.replace("[id]", item._id)
+	const endpoint = endpointTemplate.replace("[id]", itemDispached._id);
+	// const endpoint = endpointTemplate.replace("[id]", item._id);
 	// .replace("[@]", pageId);
 	const [loading, setLoading] = useState(false);
 	// const [visible, setVisible] = useState(true);

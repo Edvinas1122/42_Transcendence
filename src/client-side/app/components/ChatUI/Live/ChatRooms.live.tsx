@@ -51,6 +51,8 @@ const meParticipant = (chat: Chat, id: number): boolean => {
 // 	return false;
 // }
 
+
+
 const ChatRoomsLive: Function = ({ serverChats}: { serverChats: Chat[] }) => {
 
 	const chatEvent = useContext(ChatRoomSourceContext);
@@ -59,95 +61,95 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: Chat[] }) => {
 	const PageId = parseInt(pathname.split("/")[2]);
 	const router = useRouter();
 
-	const handleNewEvent = useCallback((setItems: Function) => {
-		if (chatEvent) {
-			// console.log("chat event", chatEvent.data);
-			switch (chatEvent.subtype) {
-				case "new-available":
-					chatEvent.data.amParticipant = meParticipant(chatEvent.data, id.id);
-					chatEvent.data.mine = chatEvent.data?.owner?._id == id.id ? false: true;
-					console.log("new chat chat rooms live ", chatEvent.data);
-					setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
-					break;
-				case "deleted":
-					setItems((prevChats: Chat[]) => prevChats.filter((chat: Chat) => chat._id.toString() != chatEvent.roomID));
-					console.log("deleted chat chat rooms live ", chatEvent.data._id, PageId);
-					if (chatEvent.data._id.toString() == PageId) {
-						router.replace("/chat");
-					}
-					break;
-				case "kicked":
-					console.log("someone is kicked", chatEvent.data);
-					if (chatEvent.data.kickedId === id.id) { // fail to change state, I remove item
-						setItems((prevChats: Chat[]) => prevChats.filter((currentChat: Chat) => currentChat._id !== chatEvent.data._id));
-						const newChat = {
-							name: chatEvent.data.name,
-							_id: chatEvent.data._id,
-							owner: chatEvent.data.owner,
-							amParticipant: false,
-							Participants: [],
-							mine: false,
-							personal: false,
-						}
-						if (!chatEvent.data.isPrivate) {
-							setTimeout(() => {
-								setItems((prevChats: Chat[]) => [...prevChats, newChat]);
-							}, 3000);
-						}
-						router.replace("/chat");
-						DisplayPopUp("You Kicked", "You are kicked from chat " + chatEvent.data.name, 3000, "warning");
-					}
-					break;
-				case "banned":
-					console.log("someone is banned", chatEvent.data);
-					if (chatEvent.data.kickedId === id.id) {
-						/// replace chat with new one
-						console.log("I am banned!!");
-						setItems((prevChats: Chat[]) => prevChats.filter((currentChat: Chat) => currentChat._id !== chatEvent.data._id));
-						router.replace("/chat");
-						DisplayPopUp("Ahh.. yayks!.", "You've been blocked from chat " + chatEvent.data.name, 3000, "warning");
-					}
-					break;
-				case "unbanned":
-					console.log("someone is unbanned", chatEvent.data);
-					if (chatEvent.data.kickedId === id.id) {
-						/// replace chat with new one
-						console.log("I am unbanned!!");
-						const newChat = {
-							name: chatEvent.data.name,
-							_id: chatEvent.data._id,
-							owner: chatEvent.data.owner,
-							amParticipant: false,
-							Participants: [],
-							mine: false,
-							personal: false,
-						}
-						setItems((prevChats: Chat[]) => [...prevChats, newChat]);
-					}
-					break;
-				case "invite":
-					console.log("someone is invited", chatEvent.data);
-					if (chatEvent.data.kickedId === id.id) {
-						/// replace chat with new one
-						console.log("I am invited!!");
-						const newChat = {
-							name: chatEvent.data.name,
-							_id: chatEvent.data._id,
-							owner: chatEvent.data.owner,
-							amParticipant: false,
-							Participants: [],
-							mine: false,
-							personal: false,
-							isPrivate: true,
-						}
-						setItems((prevChats: Chat[]) => [...prevChats, newChat]);
-					}
-					break;
-				default:
-					break;
-			}
-		}
-	}, [chatEvent]);
+	// const handleNewEvent = useCallback((setItems: Function) => {
+	// 	if (chatEvent) {
+	// 		// console.log("chat event", chatEvent.data);
+	// 		switch (chatEvent.subtype) {
+	// 			case "new-available":
+	// 				chatEvent.data.amParticipant = meParticipant(chatEvent.data, id.id);
+	// 				chatEvent.data.mine = chatEvent.data?.owner?._id == id.id ? false: true;
+	// 				console.log("new chat chat rooms live ", chatEvent.data);
+	// 				setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
+	// 				break;
+	// 			case "deleted":
+	// 				setItems((prevChats: Chat[]) => prevChats.filter((chat: Chat) => chat._id.toString() != chatEvent.roomID));
+	// 				console.log("deleted chat chat rooms live ", chatEvent.data._id, PageId);
+	// 				if (chatEvent.data._id.toString() == PageId) {
+	// 					router.replace("/chat");
+	// 				}
+	// 				break;
+	// 			case "kicked":
+	// 				console.log("someone is kicked", chatEvent.data);
+	// 				if (chatEvent.data.kickedId === id.id) { // fail to change state, I remove item
+	// 					setItems((prevChats: Chat[]) => prevChats.filter((currentChat: Chat) => currentChat._id !== chatEvent.data._id));
+	// 					const newChat = {
+	// 						name: chatEvent.data.name,
+	// 						_id: chatEvent.data._id,
+	// 						owner: chatEvent.data.owner,
+	// 						amParticipant: false,
+	// 						Participants: [],
+	// 						mine: false,
+	// 						personal: false,
+	// 					}
+	// 					if (!chatEvent.data.isPrivate) {
+	// 						setTimeout(() => {
+	// 							setItems((prevChats: Chat[]) => [...prevChats, newChat]);
+	// 						}, 3000);
+	// 					}
+	// 					router.replace("/chat");
+	// 					DisplayPopUp("You Kicked", "You are kicked from chat " + chatEvent.data.name, 3000, "warning");
+	// 				}
+	// 				break;
+	// 			case "banned":
+	// 				console.log("someone is banned", chatEvent.data);
+	// 				if (chatEvent.data.kickedId === id.id) {
+	// 					/// replace chat with new one
+	// 					console.log("I am banned!!");
+	// 					setItems((prevChats: Chat[]) => prevChats.filter((currentChat: Chat) => currentChat._id !== chatEvent.data._id));
+	// 					router.replace("/chat");
+	// 					DisplayPopUp("Ahh.. yayks!.", "You've been blocked from chat " + chatEvent.data.name, 3000, "warning");
+	// 				}
+	// 				break;
+	// 			case "unbanned":
+	// 				console.log("someone is unbanned", chatEvent.data);
+	// 				if (chatEvent.data.kickedId === id.id) {
+	// 					/// replace chat with new one
+	// 					console.log("I am unbanned!!");
+	// 					const newChat = {
+	// 						name: chatEvent.data.name,
+	// 						_id: chatEvent.data._id,
+	// 						owner: chatEvent.data.owner,
+	// 						amParticipant: false,
+	// 						Participants: [],
+	// 						mine: false,
+	// 						personal: false,
+	// 					}
+	// 					setItems((prevChats: Chat[]) => [...prevChats, newChat]);
+	// 				}
+	// 				break;
+	// 			case "invite":
+	// 				console.log("someone is invited", chatEvent.data);
+	// 				if (chatEvent.data.kickedId === id.id) {
+	// 					/// replace chat with new one
+	// 					console.log("I am invited!!");
+	// 					const newChat = {
+	// 						name: chatEvent.data.name,
+	// 						_id: chatEvent.data._id,
+	// 						owner: chatEvent.data.owner,
+	// 						amParticipant: false,
+	// 						Participants: [],
+	// 						mine: false,
+	// 						personal: false,
+	// 						isPrivate: true,
+	// 					}
+	// 					setItems((prevChats: Chat[]) => [...prevChats, newChat]);
+	// 				}
+	// 				break;
+	// 			default:
+	// 				break;
+	// 		}
+	// 	}
+	// }, [chatEvent]);
 
 
 	const ChatInterface = EntityInterfaceBuilder<Chat>()
@@ -193,7 +195,7 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: Chat[] }) => {
 	const ChatRoomList = new UIClientListBoxClassBuilder()
 		.setInitialItems(serverChats)
 		.setBoxComponent(ChatRoomBox)
-		.setEditItemsCallback(handleNewEvent)
+		// .setEditItemsCallback(handleNewEvent)
 		.setListStyle("AvailableChats")
 		.setEntityInterface(ChatInterface)
 		.addCategory({

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState, Suspense } from "react";
+import React, { useEffect, useRef, useState, Suspense, useReducer } from "react";
 import "@/public/layout.css";
 import { serverFetch } from "@/lib/fetch.util";
 import { notFound, usePathname, useRouter } from "next/navigation";
@@ -31,6 +31,13 @@ export interface CategoryDisisplay {
 	dependency: (item: any) => boolean,
 }
 
+interface ItemsContextInterface {
+	items: any[],
+	dispatch: React.Dispatch<any>
+  }
+  
+const ListItemsContext = React.createContext<ItemsContextInterface | null>(null);
+
 interface UIClientListBoxProps {
 	initialItems: any[] | string,
 	BoxComponent: Function,
@@ -43,6 +50,19 @@ interface UIClientListBoxProps {
 	categories?: CategoryDisisplay[],
 	linkDefinition?: LinkDefinition
 }
+
+const itemsReducer = (state: any[], action: any) => {
+	switch (action.type) {
+	  case "ADD":
+		return [...state, action.payload];
+	  case "REMOVE":
+		return state.filter((item) => item._id !== action.payload._id);
+	  case "UPDATE":
+		return state.map((item) => item._id === action.payload._id ? action.payload : item);
+	  default:
+		throw new Error();
+	}
+  };
 
 const UIClientListBox: Function = ({ 
 	initialItems,
@@ -57,7 +77,8 @@ const UIClientListBox: Function = ({
 }: UIClientListBoxProps ) => {
 
 	const endOfListRef = useRef<HTMLDivElement | null>(null);
-	const [Items, setItems] = useState<any[]>([]);
+	// const [Items, setItems] = useState<any[]>([]);
+	const [Items, dispatch] = useReducer(itemsReducer, []);
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
@@ -80,7 +101,8 @@ const UIClientListBox: Function = ({
 	}, [initialItems]);
 
 	useEffect(() => {
-		editItemsCallback && editItemsCallback(setItems);
+		// editItemsCallback && editItemsCallback(setItems);
+		editItemsCallback && editItemsCallback(dispatch);
 	}, [editItemsCallback]);
 	
 	useEffect(() => {
@@ -144,6 +166,8 @@ interface LinkDefinition {
 	dependency?: (item: any) => boolean,
 	highlightOnly?: boolean,
 }
+
+const ListItemContext = React.createContext<any | null>(null);
 
 export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 	public initialItems: any[] | string = [];
@@ -272,8 +296,28 @@ interface EntityBoxProps {
 	conditionalStyle?: Function,
 	interfaceBuilder?: any,
 	linkDefinition?: LinkDefinition,
-	
+	reducer?: React.Reducer<any, any>,
 }
+
+const noOpReducer = (state: any) => state;
+
+const ListItemProvider = ({
+	children,
+	initialItem,
+	itemReducer,
+}: {
+	children: React.ReactNode,
+	initialItem: any,
+	itemReducer?: React.Reducer<any, any>,
+}) => {
+	const [itemDispached, dispatch] = useReducer(itemReducer? itemReducer : noOpReducer, initialItem);
+  
+	return (
+	  <ListItemContext.Provider value={{ itemDispached, dispatch }}>
+		{children}
+	  </ListItemContext.Provider>
+	);
+};
 
 const EntityBox: Function = ({
 	item,
@@ -283,14 +327,14 @@ const EntityBox: Function = ({
 	conditionalStyle,
 	interfaceBuilder,
 	linkDefinition,
+	reducer,
 }: EntityBoxProps) => {
 
 	const [linkActive, setLinkActiveStatus] = useState<boolean>(
 		linkDefinition && typeof linkDefinition.dependency === 'function' ?
 		linkDefinition.dependency(item) : true
-	);
+		);
 	const [entityState, setEntityState] = useState<any>(item);
-
 
 	const setLinkStatus = (status: boolean): void => {
 		setLinkActiveStatus(status);
@@ -300,6 +344,7 @@ const EntityBox: Function = ({
 
 	const EntityInternals = () => (
 		<div className={"Entity " + theStyle}>
+			<ListItemProvider initialItem={item} itemReducer={reducer} key={item._id}>
 			<BoxComponent
 				item={entityState}
 				childnode={interfaceBuilder && <EntityInterface
@@ -309,8 +354,10 @@ const EntityBox: Function = ({
 					setLinkActiveStatus={setLinkStatus}
 					linkStatus={linkActive}
 					setEntityState={setEntityState}
-				/>}
+					/>}
 			/>
+			</ListItemProvider>
+
 		</div>
 	);
 
@@ -330,3 +377,4 @@ const EntityBox: Function = ({
 // }
 
 export default UIClientListBox;
+export {ListItemContext, ListItemsContext};

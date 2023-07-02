@@ -39,26 +39,26 @@ const LiveParticipants: Function = ({
 	
 	const participantsEvent = useContext(ParticipantSourceContext);
 	
-	const handleNewEvent = useCallback((setItems: Function) => {
-		if (participantsEvent) {
-			if (participantsEvent.data._id == chatID) {
-				switch (participantsEvent.subtype) {
-					case "join":
-						setItems(participantsEvent.data.participants);
-						break;
-					case "leave":
-						setItems(participantsEvent.data.participants);
-						break;
-					case "kicked":
-						setItems(participantsEvent.data.participants);
-						break;
-					default:
-						setItems(participantsEvent.data.participants);
-						break;
-				}
-			}
-		}
-	}, [participantsEvent]);
+	// const handleNewEvent = useCallback((setItems: Function) => {
+	// 	if (participantsEvent) {
+	// 		if (participantsEvent.data._id == chatID) {
+	// 			switch (participantsEvent.subtype) {
+	// 				case "join":
+	// 					setItems(participantsEvent.data.participants);
+	// 					break;
+	// 				case "leave":
+	// 					setItems(participantsEvent.data.participants);
+	// 					break;
+	// 				case "kicked":
+	// 					setItems(participantsEvent.data.participants);
+	// 					break;
+	// 				default:
+	// 					setItems(participantsEvent.data.participants);
+	// 					break;
+	// 			}
+	// 		}
+	// 	}
+	// }, [participantsEvent]);
 
 
 	const ParticipantRoleInterface = EntityInterfaceBuilder<User>()
@@ -202,7 +202,7 @@ const LiveParticipants: Function = ({
 		.setInitialItems(initialParticipants)
 		.setBoxComponent(ParticipantBox)
 		.setEntityInterface(ParticipantRoleInterface)
-		.setEditItemsCallback(handleNewEvent)
+		// .setEditItemsCallback(handleNewEvent)
 		.setListStyle("ParticipantsList")
 		.addCategory({
 			name: "Owner",

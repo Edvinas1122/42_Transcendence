@@ -35,16 +35,16 @@ const LiveMessages: Function = ({ initialMessages, chatID }: { initialMessages: 
 	
 	const newMessage: Message | null = useContext(MessageSourceContext);
 
-	const handleNewMessage = useCallback((setItems: Function) => {
-		if (newMessage && newMessage.chatID == chatID) {
-			setItems((prevMessages: Message[]) => [...prevMessages, newMessage]);
-		}
-	}, [newMessage, chatID]);
+	// const handleNewMessage = useCallback((setItems: Function) => {
+	// 	if (newMessage && newMessage.chatID == chatID) {
+	// 		setItems((prevMessages: Message[]) => [...prevMessages, newMessage]);
+	// 	}
+	// }, [newMessage, chatID]);
 
 	return (
 		<UIClientListBox
 			initialItems={initialMessages}
-			editItemsCallback={handleNewMessage}
+			// editItemsCallback={handleNewMessage}
 			BoxComponent={MessageBox}
 			ListStyle="MessageList"
 			BoxStyle="MessageArea"
