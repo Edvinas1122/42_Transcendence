@@ -5,10 +5,9 @@ export const serverFetch = async <T = any>(
     uri: string, 
     method: "GET" | "POST" | "DELETE" = "GET", 
     params?: any, 
-    body?: any // does it work
+    body?: any,
 ): Promise<T> => {
     "use server";
-
     return await fetchWithToken<T>(uri, null, params, method, body);
 }
 

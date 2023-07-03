@@ -8,7 +8,6 @@ export default function UserLayout({
 {
 	return (
 		<section className="Display">
-			<h1>UserPage</h1>
 			{children}
 		</section>
 	);

@@ -20,6 +20,8 @@ import { HttpsRedirectMiddleware } from './utils/http.middleware';
 		EventsModule,
 		ChatModule,
 		DriveModule,
+		UsersModule,
+		ProfileManagementModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

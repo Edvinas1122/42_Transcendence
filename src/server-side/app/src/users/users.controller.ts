@@ -1,10 +1,15 @@
-import { Controller, Get, Req, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body, Param, ParseIntPipe, ValidationPipe } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
-import { UserProfileInfo, UserInfo } from './dtos/user.dto';
+import { UserProfileInfo, UserInfo, UpdateUsernameDto } from './dtos/user.dto';
 import { UserId } from '../utils/user-id.decorator';
+
+interface UserUpdateResponse {
+	title: string;
+	message: string;
+}
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -34,5 +39,20 @@ export class UsersController {
 	{
 		const requestee = await this.usersService.getUserProfile(requesteeId);
 		return requestee;
+	}
+
+	@Post('edit')
+	async editUsername(@Body() newName: UpdateUsernameDto, @UserId() userId: number
+	): Promise<UserUpdateResponse | null>
+	{
+		const resultUser = await this.usersService.updateUserName(userId, newName.newName);
+		if (resultUser) {
+			const response: UserUpdateResponse = {
+				title: 'Username updated',
+				message: `Username updated to ${resultUser.name}`
+			};
+			return response;
+		}
+		return null;
 	}
 }
