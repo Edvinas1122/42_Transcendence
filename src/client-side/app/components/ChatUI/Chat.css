@@ -1,0 +1,124 @@
+.AvailableChats {
+    height: 80vh !important;
+}
+
+
+.MessageComponent {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-width: 400px;
+    /* justify-content: space-between; */
+}
+
+.MessageComponent .List {
+    flex-grow: 1;
+    overflow: auto;
+    /* max-width: 800px; */
+}
+
+.MessageComponent .Form {
+    flex-shrink: 0;
+}
+
+.MessageArea {
+	display: flex;
+	flex-direction: column;
+}
+
+.MessageSpace {
+	/* flex-grow: 4; */
+}
+
+.Message {
+    align-self: flex-start;
+    min-width: 200px;
+    max-width: 38%;
+}
+/* Different styles for messages from the user vs others */
+.Message.user {
+    align-self: flex-end;
+}
+
+.Message.user p{
+    background-color: #007bff;
+    color: #fff;
+}
+
+.Message p {
+    word-wrap: break-word;
+    background-color: #e6e6e6;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    padding: 20px;
+}
+
+
+.MessageForm {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-top: 1px solid #e6e6e6;
+    padding: 10px;
+    background-color: #f5f5f5;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+}
+
+.MessageForm input[type="text"] {
+    resize: vertical; /* Allow vertical resize */
+    overflow: auto; /* Add scroll if text overflows */
+    flex-grow: 1 !important;
+    flex-shrink: 1 !important;
+    flex-basis: 0 !important;
+    padding: 10px 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    overflow: auto;
+    height: 60px;
+    text-align: left;
+}
+
+.MessageForm input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    flex-shrink: 0; /* Prevents the button from shrinking */
+    width: 80px; /* Sets a fixed width for the button */
+    text-align: right; /* Aligns the text to the right */
+}
+
+.Participants {
+    /* width: 32%; */
+    min-width: 350px;
+}
+
+.Participants .Entity {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.Participants .Entity p strong {
+    margin-right: 10px;
+}
+
+.Participants .Interface {
+    display: flex;
+}
+
+.Participants button {
+    padding: 5px 10px !important;
+}
+
+.Participants .Unit input[type="number"] {
+    width: 4em !important;
+}

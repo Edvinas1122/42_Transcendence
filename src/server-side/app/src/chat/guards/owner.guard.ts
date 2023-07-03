@@ -1,11 +1,10 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-
 import { RoleType } from '../entities/role.entity';  // import your RolesService
 import { RoleService } from '../role.service';
 
 @Injectable()
-export class PrivilegedGuard implements CanActivate {
+export class OwnerGuard implements CanActivate {
 	constructor(
 		private reflector: Reflector,
 		private rolesService: RoleService
@@ -13,17 +12,16 @@ export class PrivilegedGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
-		const userId = request.user.id;
-		const chatId = request.params.id; // not sure here
 
-		const isOwnerOrAdmin = await this.rolesService.isPrivileged(userId, chatId);
-		
-		// UpdateChatDto should be attached to request.body
-		const updateChatDto = request.body;
-		
-		if (isOwnerOrAdmin && updateChatDto.owner === undefined) {
+		if (!request["params"] || !request["params"]["chatId"])
+			throw new BadRequestException('ChatId is not provided.');
+
+		const userId = request['user']['id'];
+		const chatId = request["params"]["chatId"];
+
+		const role = await this.rolesService.getRole(chatId, userId);
+		if (role && role.type === RoleType.Owner)
 			return true;
-		}
 
 		throw new ForbiddenException('You are not authorized to perform this operation.');
 	}

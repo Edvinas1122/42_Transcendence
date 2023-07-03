@@ -1,0 +1,15 @@
+.Invited {
+	height: 30vh;
+}
+
+.Invited .List {
+	height: 40vh !important;
+}
+
+.Friends {
+	height: 70vh;
+}
+
+.AllUsers {
+	height: 100vh;
+}

@@ -14,17 +14,24 @@ RUN mkdir app/
 COPY app/tsconfig.json ./
 
 
-RUN npm install js-cookie
+# RUN npm install js-cookie
+RUN npm install --save @types/js-cookie
 # RUN npm install socket.io-client bufferutil utf-8-validate
-RUN npm install react-router-dom
+RUN npm install @types/react @types/react-dom @types/node
 RUN npm install axios
-RUN npm install
 
-# Build the Next.js app
-RUN npm run build
+#GRAPHICS RELATED modules
+	#functional
+RUN npm install react-notifications-component
+	#styling
+RUN npm install @fortawesome/react-fontawesome @fortawesome/free-solid-svg-icons
+# RUN npm install -D tailwindcss postcss autoprefixer
+
 # Copy the rest of the application
 COPY app/ ./
 
+# Build the Next.js app
+RUN npm run build
 
 
 # Expose the port that the Next.js app will run on
@@ -32,4 +39,6 @@ EXPOSE 3030
 
 # Start the Next.js app
 CMD ["npm", "run", "dev"]
+
+
 # CMD ["npm", "run", "start"]

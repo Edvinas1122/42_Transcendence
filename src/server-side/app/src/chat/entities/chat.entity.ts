@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToMany, ManyToO
 import { Message } from './message.entity';
 import { User } from '../../users/entities/user.entity';
 import { Role } from './role.entity';
+import { Sanction } from './sanction.entity';
 
 @Entity('chat')
 export class Chat {
@@ -30,7 +31,7 @@ export class Chat {
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
 	createdAt: Date;
 
-	@OneToMany(() => Role, role => role.chat)
+	@OneToMany(() => Role, role => role.chat, { onDelete: 'CASCADE' })
 	roles: Role[];
 
 	@Column({ nullable: true })
@@ -39,6 +40,9 @@ export class Chat {
 	@Column({ default: false })
 	deleted: boolean;
 
-	@OneToMany(() => Message, message => message.chat)
+	@OneToMany(() => Message, message => message.chat, { onDelete: 'CASCADE' })
 	messages: Message[];
+
+	@OneToMany(() => Sanction, sanction => sanction.chat, { onDelete: 'CASCADE' })
+	sanctions: Sanction[];
 }

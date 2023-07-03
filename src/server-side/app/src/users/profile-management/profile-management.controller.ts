@@ -49,16 +49,19 @@ export class ProfileManagementController {
 		return this.profileManagementService.unblockUser(currentUserId, blockeeId);
 	}
 
-	@Get('get-all')
-	async getAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
-	{
-		return this.profileManagementService.getAllNotBlockedUsers(currentUserId);
-	}
+	// @Get('get-all')
+	// async getAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
+	// {
+	// 	return this.profileManagementService.getAllNotBlockedUsers(currentUserId);
+	// }
 
 	@Get('get-all-pending-friend-request')
 	async getPendingFriendRequest(@UserId() currentUserId: number): Promise<UserInfo[]> 
 	{
-		return this.profileManagementService.getUsersSentRequestTo(currentUserId);
+		console.log("get all pending friend request", currentUserId);
+		const users = await this.profileManagementService.getAllPendingFriendRequest(currentUserId);
+		console.log("get all pending friend request", users);
+		return users;
 	}
 
 	@Get('get-last-pending-friend-request')
@@ -67,7 +70,7 @@ export class ProfileManagementController {
 		return this.profileManagementService.getLastPendingFriendRequest(currentUserId);
 	}
 
-	@Get('get-all-friends')
+	@Get('friends')
 	async getAllFriends(@UserId() currentUserId: number): Promise<UserInfo[]> 
 	{
 		return this.profileManagementService.getAllFriends(currentUserId);

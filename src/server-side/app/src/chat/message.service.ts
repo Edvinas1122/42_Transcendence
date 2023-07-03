@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './entities/message.entity';
@@ -24,39 +24,57 @@ export class MessageService {
 		private readonly chatEventGateway: ChatEventGateway,
 	) {}
 
-	async getChatMessages(chatId: number): Promise<MessageDto[]> {
-		console.log('getChatMessages');
+	async getChatMessages(
+		chatId: number,
+		userId: number,
+	): Promise<MessageDto[]> {
 		const chat = await this.chatService.getChat(chatId);
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
-		console.log(chat);
-		console.log('returning messages');
-		const messages = await this.messagesRepository.find({where: { chat: chat }});
-		console.log(messages);
-		// Map each Message to a MessageDto
-		const messageDtos = messages.map(message => new MessageDto(message));
-		return messageDtos;
+		const messages = await this.messagesRepository.find({where: { chatID: chat.id }, relations: ['sender']});
+	
+		// Map over the messages and for each one return a promise
+		const promises = messages.map(async message => {
+			const isBlocked = await this.usersService.isBlocked(userId, message.sender.id);
+			if(!isBlocked){
+				return new MessageDto(message, userId, message.sender);
+			}
+		});
+		
+		// Use Promise.all to resolve all promises in parallel
+		const messageDtos = await Promise.all(promises);
+	
+		// Filter out any undefined values
+		const messageDtosFiltered = messageDtos.filter(message => message !== undefined);
+
+		// Reverse the order of the array
+		return [...messageDtosFiltered].reverse();
 	}
 
-	async sendMessageToChat(content: string, senderId: number, password: string, chatId: number): Promise<MessageDto> {
+	async sendMessageToChat(
+		content: string,
+		senderId: number,
+		// password: string,
+		chatId: number
+	): Promise<MessageDto> {
 		const chat = await this.chatService.getChat(chatId);
 		const sender = await this.usersService.findUser(senderId);
 
 		if (!chat || !sender) {
 			throw new NotFoundException('Chat or sender not found');
 		}
-		if (chat.password && chat.password !== password || chat.password === '' && password !== '') {
-			throw new UnauthorizedException('Wrong password');
-		}
-
 		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
-		const returnedMessage: MessageDto = new MessageDto(message);
+		const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
 		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
 		return returnedMessage;
 	}
 
-	async sendMessageToUser(content: string, senderId: number, recipientId: number): Promise<MessageDto> {
+	async sendMessageToUser(
+		content: string,
+		senderId: number,
+		recipientId: number
+	): Promise<MessageDto> {
 	
 		const sender = await this.usersService.findUser(senderId);
 		
@@ -71,18 +89,23 @@ export class MessageService {
 	
 		// Now we have a chat, either found or newly created, so we can send the message
 		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
-		const returnedMessage: MessageDto = new MessageDto(message);
+		const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
 		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
 		return returnedMessage;
 	}
 
-	public async updateEvent(chat: Chat, eventType: MessageEventType = MessageEventType.New, message?: MessageDto) {
-		if (chat.personal || chat.private) {
-			await this.chatEventGateway.updateParticipantsOfMessageEvent(chat, message, eventType);
-		}
-		else {
-			await this.chatEventGateway.updateOnlineUsersMessageEvent(chat, message, eventType);
-		}
+	public async updateEvent(
+		chat: Chat,
+		eventType: MessageEventType = MessageEventType.New,
+		message?: MessageDto
+	) {
+		// if (chat.personal || chat.private ) {
+		// if (true ) {
+		await this.chatEventGateway.updateParticipantsOfMessageEvent(chat, message, eventType); // who else needs to know? ha ha
+		// }
+		// else {
+		// 	await this.chatEventGateway.updateOnlineUsersMessageEvent(chat, message, eventType);
+		// }
 	}
 }
 

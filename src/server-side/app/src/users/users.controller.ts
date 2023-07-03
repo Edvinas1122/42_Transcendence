@@ -3,7 +3,7 @@ import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
-import { UserProfileInfo } from './dtos/user.dto';
+import { UserProfileInfo, UserInfo } from './dtos/user.dto';
 import { UserId } from '../utils/user-id.decorator';
 
 @UseGuards(JwtAuthGuard)
@@ -13,11 +13,14 @@ export class UsersController {
 		private readonly usersService: UsersService,
 	) {}
 
-	// @Get('all')
-	// async findAllUsers(@UserId() currentUserId: number): Promise<User[]>
-	// {
-	// 	return await this.usersService.findAll();
-	// }
+	@Get('all')
+	async findAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
+	{
+		const users = await this.usersService.findAllUsersNotBlocked(currentUserId);
+
+		// const users = await this.usersService.findAll();
+		return users;
+	}
 
 	@Get('me')
 	async findCurrentUser(@UserId() currentUser: number): Promise<UserProfileInfo>

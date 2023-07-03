@@ -1,0 +1,195 @@
+
+
+.MainWrapper {
+	/* display: flex; */
+}
+
+.Sidebar {
+	background: linear-gradient(
+		to bottom,
+		transparent,
+		rgb(var(--background-end-rgb))
+		)
+		rgb(var(--background-start-rgb));
+
+	position: fixed;
+	width: 100px;
+}
+
+.Sidebar .Entity{
+	box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.095);
+
+}
+
+.Sidebar .Link {
+	padding: 1em;
+}
+
+.Sidebar svg {
+	width: 100%;
+	font-size: 5.5em;
+}
+
+.MainDisplay {
+	margin-left: 100px;
+	position: fixed;
+	width: 100%;
+}
+
+.Display {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;  /* Align horizontally */
+    align-items: center;      /* Align vertically */
+	width: 100%;
+	height: 100vh;
+}
+
+.Segment
+{
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	background-color: #fff;
+	border: 1px solid #e6e6e6;
+	border-radius: 3px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	height: 100vh;
+	width: 100%;
+}
+
+.Component {
+	width: 100% !important;
+}
+
+.List {
+	overflow: hidden;
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none;  /* IE and Edge */
+	/* height: 100vh; */
+}
+
+.List::-webkit-scrollbar {
+	display: none;
+}
+
+.List h2 {
+	/* font-size: 0.8em; */
+	padding: 5px 0px;
+	font-weight: 300;
+	/* text-decoration: underline; */
+	letter-spacing: 1.2px;
+}
+
+.Form {
+	/* display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	border-top: 1px solid #e6e6e6;
+	padding: 10px;
+	background-color: #f5f5f5;
+	width: 100%;
+	left: 0;
+	bottom: 0; */
+}
+
+.Form div {
+	display: contents;
+}
+
+.Form input {
+	width: 100%;
+	padding: 10px;
+	border: none;
+	border-radius: 3px;
+}
+
+.Entity {
+	height: auto;
+	position:relative;
+
+}
+
+.Active {
+	background: #3b3b3b41 !important;
+}
+
+.Link {
+	transition: background-color 0.1s ease-in-out;
+}
+
+.Link:hover{
+	background:#9595957f;
+	cursor:pointer;
+}
+
+/* .Entity span, strong {
+	margin: 0;
+	padding: 10px;
+} */
+
+
+.Interface {
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	width: 100%;
+}
+
+.Unit {
+	display: contents;
+}
+
+.Unit form {
+	/* display: flex; */
+	/* flex-direction: row; */
+	/* flex-grow: 1; */
+
+}
+
+.Unit input[type="text"], input[type="password"],
+input[type="number"], input[type="email"] {
+	vertical-align: bottom;
+	width: 5em;
+}
+
+form input[type="text"], input[type="password"],
+input[type="number"], input[type="email"]
+{
+
+	border-radius: 5px;
+	height: 2em;
+	border: 1px solid #ccc;
+}
+
+
+
+.Interface button, button.waiting {
+	font-size: 0.8em;
+	margin: 0px 4px;
+	background-color: #007bff;
+	align-self: flex-end;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.Interface button.waiting {
+	background-color: #659dd8 !important;
+}
+
+.Entity p strong{
+	font-weight:600;
+	font-size:15px;
+	color:#597a96;  
+}
+
+/* .Entity p span{
+	font-size:13px;
+	font-weight:400;
+	color:#aab8c2;
+} */

@@ -1,18 +1,8 @@
-import React from 'react';
-import RootUI, {AppData} from '@/app/Routes';
-import dynamic from 'next/dynamic';
-import { AppProps } from 'next/app';
+import { redirect } from 'next/navigation'
 
-/*
-	Declare the Root component as client-side only.
-*/
-const DynamicComponent = dynamic(
-	() => import('@/app/Routes'),
-	{ ssr: false }
-);
+const Page: Function = async () => {
 
-function Home({ Component, pageProps }: AppProps) {
-	return <DynamicComponent {...pageProps} />;
+	redirect('/user');
 }
 
-export default Home;
+export default Page;

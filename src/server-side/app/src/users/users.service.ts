@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MongoRuntimeError, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserProfileInfo, UserInfo } from './dtos/user.dto';
 import { MachHistory } from './dtos/game-stats.dto';
+import { RelationshipStatus } from './profile-management/entities/relationship.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,8 +13,23 @@ export class UsersService {
 	private userRepository: Repository<User>,
 	) {}
 
-	async findAll(): Promise<User[]> {
-		return this.userRepository.find();
+	async findAll(): Promise<UserInfo[]> {
+		const users = await this.userRepository.find();
+		return users.map(user => new UserInfo(user));
+	}
+
+	async findAllUsersNotBlocked(id: number): Promise<UserInfo[]> {
+		console.log('id', id);
+		const users = await this.userRepository
+		.createQueryBuilder('user')
+		.where('user.id NOT IN ' +
+			`(SELECT "user2ID" FROM "relationship" WHERE "status" = :status AND "user1ID" = :id 
+			UNION ALL 
+			SELECT "user1ID" FROM "relationship" WHERE "status" = :status AND "user2ID" = :id)`,
+			{ id, status: RelationshipStatus.BLOCKED })
+			.getMany();
+
+		return this.setToUsers(users, [id]);
 	}
 
 	async findOne(name: string): Promise<User | null> {
@@ -85,6 +101,37 @@ export class UsersService {
 		}
 		user.avatar = avatar;
 		return await this.userRepository.save(user);
+	}
+
+	async isBlocked(userId: number, anotherUserId: number): Promise<boolean> {
+		const userWithRelationships = await this.userRepository.findOne({
+			where: { id: userId },
+			relations: ['relationshipsInitiated']
+		});
+	
+		if (userWithRelationships?.relationshipsInitiated === undefined) {
+			throw new Error('User relationshipsInitiated is undefined');
+		}
+	
+		const blockedRelationship = userWithRelationships.relationshipsInitiated.find(
+			relationship => relationship.user2ID === anotherUserId && relationship.status === RelationshipStatus.BLOCKED
+		);
+		if (blockedRelationship === undefined) {
+			return false;
+		}
+	
+		return !!blockedRelationship;
+	}
+
+	private setToUsers(users: User[], filter?: number[]): UserInfo[] {
+		const result: UserInfo[] = [];
+		// set all users to UserInfo except that has id in filter
+		users.forEach(user => {
+			if (!filter || !filter.includes(user.id)) {
+				result.push(new UserInfo(user));
+			}
+		});
+		return result;
 	}
 
 }

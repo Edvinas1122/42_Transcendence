@@ -1,12 +1,11 @@
 import { Injectable, Inject, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-// import { User } from '../entities/user.entity';
 import { Relationship, RelationshipStatus } from './entities/relationship.entity';
 import { User } from '../entities/user.entity';
 import { Repository, Not } from 'typeorm';
-// import { RelationshipNotificationMessage } from './utils/messages.types';
 import { UserInfo } from '../dtos/user.dto';
 import { UserEventGateway, RelationshipType } from '../user-event.gateway';
+
 
 @Injectable()
 export class ProfileManagementService {
@@ -18,6 +17,8 @@ export class ProfileManagementService {
 	) {}
 
 	async sendFriendRequest(senderId: number, receiverId: number): Promise<Relationship>{
+		if (senderId == receiverId)
+			throw new HttpException('You cannot send friend request to yourself', HttpStatus.BAD_REQUEST);
 		const relationship = new Relationship();
 		relationship.user1ID = senderId;
 		relationship.user2ID = receiverId;
@@ -39,13 +40,19 @@ export class ProfileManagementService {
 		return info;
 	}
 
-	async getPendingFriendRequest(senderId: number, receiverId: number): Promise<Relationship> {
-		return this.relationshipsRepository.findOne({
-			where: [
-				{ user1ID: senderId, user2ID: receiverId, status: RelationshipStatus.PENDING },
-				{ user1ID: receiverId, user2ID: senderId, status: RelationshipStatus.PENDING }
-			]
+	async getAllPendingFriendRequest(receiverId: number): Promise<UserInfo[]> {
+		console.log('receiverId', receiverId);
+		const pending = await this.relationshipsRepository.find({
+			where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
+			relations: ["user1"]
 		});
+
+		console.log(pending);
+		// Extract users from the relationships
+		const users = pending.map(rel => rel.user1);
+		const usersInfo = users.map(user => new UserInfo(user));
+
+		return usersInfo;
 	}
 
   
@@ -65,8 +72,8 @@ export class ProfileManagementService {
 
 	async getLastPendingFriendRequest( receiverId: number): Promise<UserInfo> {
 		const relationship = await this.relationshipsRepository.findOne({
-		where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
-		relations: ["user1"]
+			where: { user2ID: receiverId, status: RelationshipStatus.PENDING },
+			relations: ["user1"]
 		});
 
 		const user = relationship.user1;
@@ -202,7 +209,7 @@ export class ProfileManagementService {
 				return rel.user1;
 			}
 		);
-		const usersInfo = users.map(user => new UserInfo(user));
+		const usersInfo = this.setToUsers(users);
 		await this.setUsersOnlineStatus(usersInfo);
 		return usersInfo;
 	}
@@ -221,25 +228,27 @@ export class ProfileManagementService {
 		return usersInfo;
 	}
 
-	async getAllNotBlockedUsers(userId: number): Promise<UserInfo[]> {
-		const users = this.relationshipsRepository.find({
-		  where: [
-			{ user1ID: userId, status: Not(RelationshipStatus.BLOCKED) },
-			{ user2ID: userId, status: Not(RelationshipStatus.BLOCKED) },
-		  ],
-		  relations: ['user1', 'user2'],
-		});
+	// async getAllNotBlockedUsers(userId: number): Promise<UserInfo[]> {
+	// 	// const users = await this.relationshipsRepository.find({
+	// 	//   where: [
+	// 	// 	{ user1ID: userId,  },
+	// 	// 	{ user2ID: userId,  },
+	// 	//   ],
+	// 	//   relations: ['user1', 'user2'],
+	// 	// });
+	// 	const users = await this.usersService.getAllUsers();
+	// 	console.log(users);
 
-		const usersInfo = (await users).map(user => {
-			if (user.user1ID === userId)
-			return new UserInfo(user.user2);
-			else
-			return new UserInfo(user.user1);
-		});
-		await this.setUsersOnlineStatus(usersInfo);
+	// 	const usersInfo = (await users).map(user => {
+	// 		if (user.user1ID === userId)
+	// 		return new UserInfo(user.user2);
+	// 		else
+	// 		return new UserInfo(user.user1);
+	// 	});
+	// 	// await this.setUsersOnlineStatus(usersInfo);
 
-		return usersInfo;
-	  }
+	// 	return usersInfo;
+	//   }
 
 
 	private async setUsersOnlineStatus(users: UserInfo[]): Promise<UserInfo[]> {
@@ -271,5 +280,16 @@ export class ProfileManagementService {
 		);
 		const usersInfo = users.map(user => new UserInfo(user));
 		return usersInfo;
+	}
+
+	private setToUsers(users: User[], filter?: number[]): UserInfo[] {
+		const result: UserInfo[] = [];
+		// set all users to UserInfo except that has id in filter
+		users.forEach(user => {
+			if (!filter || !filter.includes(user.id)) {
+				result.push(new UserInfo(user));
+			}
+		});
+		return result;
 	}
 }

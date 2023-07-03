@@ -6,7 +6,7 @@ import { RoleType, Role, AcceptedRoleType } from './entities/role.entity';
 import { Repository, In, Not } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserInfo } from '../users/dtos/user.dto';
-import { EventService } from '../events/events.service';
+import { ChatEventGateway } from './chat-event.gateway';
 
 
 @Injectable()
@@ -14,31 +14,41 @@ export class RoleService {
 	constructor(
 		@InjectRepository(Role)
 		private roleRepository: Repository<Role>,
-		@Inject(EventService)
-		private eventService: EventService,
 	) {}
 
 	
 	async getChatRelatives(chat: Chat): Promise<UserInfo[]> {
 		const relatives = await this.roleRepository.find({
-			where: { id: chat.id },
-			relations: ['user'],
-		});
-		
-		return relatives.map(relative => new UserInfo(relative.user, relative.type));
-	}
-
-	async getChatRoleRelatives(chat: Chat, role: RoleType = RoleType.Blocked): Promise<UserInfo[]> {
-		console.log('Relatives', role);
-		const relatives = await this.roleRepository.find({
-			where: { 
+			where: {
 				chat: { id: chat.id },
-				type: role
 			},
 			relations: ['user'],
 		});
-		console.log('Relatives', relatives);
-		
+		return relatives.filter(relative => relative && relative.user).map(relative => new UserInfo(relative.user, relative.type)); // online status not implemented
+	}
+
+	async getChatRoleRelatives(
+		chat: Chat,
+		except: RoleType = RoleType.Blocked,
+	): Promise<UserInfo[]> {
+		const relatives = await this.roleRepository.find({
+			where: { 
+				chat: { id: chat.id },
+				type: Not(except),
+			},
+			relations: ['user'],
+		});
+		return relatives.map(relative => new UserInfo(relative.user, relative.type));
+	}
+
+	async getBlockedChatMembers(chat: Chat): Promise<UserInfo[]> {
+		const relatives = await this.roleRepository.find({
+			where: {
+				chat: { id: chat.id },
+				type: RoleType.Blocked,
+			},
+			relations: ['user'],
+		});
 		return relatives.map(relative => new UserInfo(relative.user, relative.type));
 	}
 
@@ -69,29 +79,37 @@ export class RoleService {
 			await this.roleRepository.save(newRole);
 			return true;
 		} catch (error) {
-			console.error(error);
-		return false;
+			return false;
 		}
 	}
 
 	async removeChatRelative(chat: Chat, userId: number, expectedRole?: RoleType): Promise<boolean> {
-		const conditions = {
-		  chat: chat,
-		  user: { id: userId } as User,
+		const conditions: any = {
+			chat: { id: chat.id },
+			user: { id: userId },
 		};
 		
 		if (expectedRole) {
-		  conditions['role'] = expectedRole;
+			conditions['type'] = expectedRole;
 		}
-	  
-		const result = await this.roleRepository.delete(conditions);
+	
+	
+		// Try to find the role first
+		const role = await this.roleRepository.findOne({where: conditions});
 		
-		if (result.affected === 0) {
-		  throw new HttpException('The user does not have the expected role', HttpStatus.BAD_REQUEST);
+		// If no role found or role type doesn't match expectedRole, throw an exception
+		if (!role || (expectedRole && role.type !== expectedRole)) {
+			throw new HttpException('The user does not have the expected role', HttpStatus.BAD_REQUEST);
 		}
 		
+		// Delete the role
+		await this.roleRepository.remove(role);
+		
+		// report the event
+
+
 		return true;
-	  }
+	}
 
 	async removeChatRelatives(chat: Chat, userIds: number[]): Promise<boolean> {
 		await this.roleRepository.delete({
@@ -108,22 +126,12 @@ export class RoleService {
 		return !!relative;
 	}
 
-	async getRole(chatId: number, userId: number): Promise<Role> {
+	async getRole(chatId: number, userId: number): Promise<Role | null> {
 		const role = await this.roleRepository.findOne({
-				where: { chat: { id: chatId }, user: { id: userId }}
-			});
-		if (!role) {
-			throw new NotFoundException('Role not found');
-		}
+			where: { chat: { id: chatId }, user: { id: userId }}
+		});
 		return role;
 	}
-
-	// async userHasRole(userId: number, role: RoleType): Promise<boolean> {
-	// 	const relative = await this.roleRepository.findOne({
-	// 		where: { user: { id: userId }, type: role },
-	// 	});
-	// 	return !!relative;
-	// }
 
 	async isPrivileged(userId: number, chatId: number): Promise<boolean> {
 		const relative = await this.roleRepository.findOne({
@@ -134,29 +142,27 @@ export class RoleService {
 
 	async isPermited(userId: number, chatId: number): Promise<boolean> {
 		const relative = await this.roleRepository.findOne({
-			where: { user: { id: userId }, type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant]), chat: { id: chatId } },
+			where: { 
+				user: { id: userId },
+				// type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant]),
+				type: Not(RoleType.Blocked),
+				chat: { id: chatId }
+			},
 		});
 		return !!relative;
 	}
-	// async userOwnerOfChat(userId: number, chatId: number): Promise<boolean> {
-	// 	const relative = await this.roleRepository.findOne({
-	// 		where: { user: { id: userId }, type: RoleType.Owner, chat: { id: chatId } },
-	// 	});
-	// 	return !!relative;
-	// }
 
-	// async editRole(chat: Chat, user: User, role: RoleType): Promise<boolean> {
-
-	// 	const relative = await this.roleRepository.findOne({
-	// 		where: { chat: {id: chat.id}, user: {id: user.id} },
-	// 	});
-	// 	if (!relative) {
-	// 		throw new NotFoundException('Relative not found');
-	// 	}
-	// 	relative.type = role;
-	// 	await this.roleRepository.save(relative);
-	// 	return true;
-	// }
+	async isParticipant(userId: number, chatId: number): Promise<boolean> {
+		const relative = await this.roleRepository.findOne({
+			where: {
+				user: { id: userId },
+				// type: In([RoleType.Owner, RoleType.Admin, RoleType.Participant, RoleType.Invited]),
+				type: Not(RoleType.Blocked),
+				chat: { id: chatId }
+			},
+		});
+		return relative !== null ? true : false;
+	}
 
 	async editRole(role: Role, roleType: RoleType): Promise<boolean> {
 		role.type = roleType;

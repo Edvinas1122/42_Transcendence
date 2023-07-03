@@ -19,6 +19,11 @@ services:
       - db
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   next-app:
     build: 
@@ -30,9 +35,12 @@ services:
       - 3030:3030
     volumes:
       - ./src/client-side/app/app:/app/app
+      - ./src/client-side/app/lib:/app/lib
       - ./src/client-side/app/components:/app/components
-      - ./src/client-side/app/pages:/app/pages
-      - file_storage:/app/public/avatar
+      # - file_storage:/app/public/avatar
+      - ./src/client-side/app/public:/app/public
+    depends_on:
+      - nest-app
 
   nest-app:
     build: 

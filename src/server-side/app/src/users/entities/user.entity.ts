@@ -4,6 +4,7 @@ import { Chat } from '../../chat/entities/chat.entity';
 import { Message } from '../../chat/entities/message.entity';
 import { Role } from '../../chat/entities/role.entity';
 import { Event } from '../../events/entities/event.entity';
+import { Sanction } from '../../chat/entities/sanction.entity';
 
 @Entity()
 export class User {
@@ -45,4 +46,7 @@ export class User {
 
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
 	createdAt: Date;
+
+	@OneToMany(() => Sanction, sanction => sanction.user)
+	sanctions: Sanction[];
 }

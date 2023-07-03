@@ -23,16 +23,18 @@ RUN mkdir /uploads
 RUN npm install --save @nestjs/typeorm typeorm pg
 RUN npm install @nestjs/passport passport passport-42
 RUN npm install passport-jwt @nestjs/jwt
-# also not needed anymore kinda 
-RUN npm install cookie-parser 
 
-RUN npm i --save @nestjs/websockets @nestjs/platform-socket.io
+# RUN npm i --save @nestjs/websockets @nestjs/platform-socket.io
 RUN npm install class-validator class-transformer
 
 # file upload
 RUN npm install npm i -D @types/multer
+RUN npm install cookie-parser
 
 COPY app/ ./
+
+# Generate SSL certificate
+# RUN mkdir -p /etc/ssl/certs && openssl req -x509 -newkey rsa:4096 -nodes -out /etc/ssl/certs/cert.pem -keyout /etc/ssl/certs/key.pem -days 365 -subj '/CN=localhost'
 
 
 # Expose the port that the application will run on
