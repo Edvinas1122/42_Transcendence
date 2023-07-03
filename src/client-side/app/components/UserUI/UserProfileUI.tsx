@@ -25,7 +25,7 @@ const MatchHistoryDummy: MatchHistory[] = [
 const UserInfoBox = ({ user }: { user: UserProfile }) => {
 	return (
 		<div className="Component">
-			{user.avatar && <Image src={user.avatar} alt={`Profile Image for ${user.name}`}/>}
+			{user.avatar && <Image src={"/public/" + user.avatar} alt={`Profile Image for ${user.name}`} width={60} height={60}/>}
 			<h1>{user.name}</h1>
 			<p>{user.Online ? user.Ingame ? "In game" : "Idle" : "Offline"}</p>
 		</div>
