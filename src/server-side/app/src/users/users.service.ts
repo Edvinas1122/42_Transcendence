@@ -106,7 +106,6 @@ export class UsersService {
 		return await this.userRepository.save(user);
 	}
 
-<<<<<<< HEAD
 	async isBlocked(userId: number, anotherUserId: number): Promise<boolean> {
 		const userWithRelationships = await this.userRepository.findOne({
 			where: { id: userId },
@@ -125,7 +124,8 @@ export class UsersService {
 		}
 	
 		return !!blockedRelationship;
-=======
+	}
+
 	async updateUserName(id: number, newName: string): Promise<User | null> {
 		let user = await this.getUser(id);
 		if (!user) {
@@ -140,7 +140,6 @@ export class UsersService {
 			user.name = newName;
 		}
 		return await this.userRepository.save(user);
->>>>>>> Jasper_2
 	}
 
 	private setToUsers(users: User[], filter?: number[]): UserInfo[] {
