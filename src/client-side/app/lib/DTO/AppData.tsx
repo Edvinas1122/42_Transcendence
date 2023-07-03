@@ -4,8 +4,8 @@ interface HasId {
 	_id: number;
 }
 
-interface MachHistory extends HasId {
-	opeonent: string;
+interface MatchHistory extends HasId {
+	opponent: string;
 	userScore: number;
 	opponentScore: number;
 	created?: Date;
@@ -27,7 +27,7 @@ interface User extends HasId {
 	Role?: RoleType; // chat context
 	Muted?: boolean; // chat context
 	Banned?: boolean; // chat context
-	friend?: boolean;
+	friend?: string;
 }
 
 interface UserProfile extends User {

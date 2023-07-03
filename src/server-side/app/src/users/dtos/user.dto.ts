@@ -1,10 +1,14 @@
 import { RoleType } from '../../chat/entities/role.entity';
 import { User } from '../entities/user.entity';
 import { Relationship, RelationshipStatus } from '../profile-management/entities/relationship.entity';
+import { IsString, MinLength,} from 'class-validator';
 
+export class UpdateUsernameDto {
+	newName: string;
+}
 export class UpdateUserDto {
-	name: string;
-	avatar: string;
+	name?: string;
+	avatar?: string;
 }
 
 export class UserInfo {

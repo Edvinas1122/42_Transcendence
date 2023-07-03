@@ -6,14 +6,14 @@ import UserInteract from './UserInteract';
 
 const MatchHistoryDummy: MatchHistory[] = [
 	{
-		_id: "1",
+		_id: 1,
 		opponent: "bob",
 		userScore: 7,
 		opponentScore: 8,
 		completed: true
 	},
 	{
-		_id: "2",
+		_id: 2,
 		opponent: "barry",
 		userScore: 65,
 		opponentScore: 3,

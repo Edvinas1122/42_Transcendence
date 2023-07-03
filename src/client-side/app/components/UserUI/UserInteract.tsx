@@ -7,7 +7,7 @@ import GenericMultiStateButton from '../GeneralUI/GenericMultiStateButton';
 import { faUserPlus, faUserXmark, faUserSlash } from '@fortawesome/free-solid-svg-icons'
 import EditAvatar from "../PreferencesUI/EditAvatar";
 
-const GenericFriendButton = ({userID, userStatus}: {userID: string, userStatus: string}) => {
+const GenericFriendButton = ({userID, userStatus}: {userID: number, userStatus: string}) => {
 	switch (userStatus) {
 		case 'received':
 			return(
@@ -63,7 +63,7 @@ const GenericFriendButton = ({userID, userStatus}: {userID: string, userStatus: 
 	}
 }
 
-const FriendInteractions = ({userID, userStatus}: {userID: string, userStatus: string}) => {
+const FriendInteractions = ({userID, userStatus}: {userID: number, userStatus: string}) => {
 	return (
 		<div className="Component">
 			<GenericFriendButton userID={userID} userStatus={userStatus}/>
@@ -84,19 +84,23 @@ const FriendInteractions = ({userID, userStatus}: {userID: string, userStatus: s
 const UserEdit = () => {
 	return (
 		<div className="Component">
-			{/* <GenericForm
-			endpoint="/drive/upload"
-			method="POST"
-			fields={[
-				{ name: 'Change Avatar', value: '', type: 'file'}
-			]}
-			/> */}
+			<GenericForm
+            endpoint='/users/edit'
+            method='POST'
+            fields={[
+                {name: "newName", 
+                value: "",
+                placeholder: "Update Username...",
+                type:"text"},
+            ]}
+            resetAfterSubmit={true}
+            />
 			<EditAvatar />
 		</div>
 	);
 }
 
-const UserInteract = ({userStatus, userID}: {userStatus: string, userID: string}) => {
+const UserInteract = ({userStatus, userID}: {userStatus: string, userID: number}) => {
 	if (userStatus === "user") {
 		return <UserEdit />
 	} else {

@@ -7,7 +7,7 @@ import "@/public/layout.css";
 import "./Friends.css";
 import GenericButton from "../GeneralUI/GenericButton";
 import { BlockedUserBox, FriendRequestBox } from "./FriendInteract";
-import FriendRequestsLive from "./FriendsLive";
+// import FriendRequestsLive from "./FriendsLive";
 
 const	FriendsDummy: User[] = [
 	{

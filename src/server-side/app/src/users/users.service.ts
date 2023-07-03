@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { UserProfileInfo, UserInfo } from './dtos/user.dto';
+import { UserProfileInfo, UserInfo, UpdateUsernameDto } from './dtos/user.dto';
 import { MachHistory } from './dtos/game-stats.dto';
 import { Relationship, RelationshipStatus } from './profile-management/entities/relationship.entity';
 
@@ -103,6 +103,22 @@ export class UsersService {
 			return null;
 		}
 		user.avatar = avatar;
+		return await this.userRepository.save(user);
+	}
+
+	async updateUserName(id: number, newName: string): Promise<User | null> {
+		let user = await this.getUser(id);
+		if (!user) {
+			return null;
+		}
+		if(newName) {
+			let unique = await this.findOne(newName);
+			if (unique != null) {
+				console.log(unique.name);
+				throw new ConflictException("Username already exists");
+			}
+			user.name = newName;
+		}
 		return await this.userRepository.save(user);
 	}
 
