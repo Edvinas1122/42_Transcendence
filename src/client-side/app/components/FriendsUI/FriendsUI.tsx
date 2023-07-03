@@ -7,6 +7,11 @@ import "@/public/layout.css";
 import "./Friends.css";
 import GenericButton from "../GeneralUI/GenericButton";
 import { BlockedUserBox, FriendRequestBox } from "./FriendInteract";
+import InvitesLive from "./live/InvitesLive";
+import AllUsersLive from "./live/AllUsersLive";
+import UserBox from "./UserBox";
+import FriendsLive from "./live/FriendsLive";
+import BlockedUsersLive from "./live/BlockedUsersLive";
 // import FriendRequestsLive from "./FriendsLive";
 
 const	FriendsDummy: User[] = [
@@ -45,47 +50,38 @@ export const LinkUserBox: Function = ({ item }: { item: User }) => {
 	);
 }
 
-export const UserBox: React.FC<{ item: User }> = ({ item }: { item: User }) => {
-	return (
-	  <div className="Entity">
-		<p>
-		  <strong>{item.name}</strong>
-		  <span>{item.name}</span>
-		</p>
-		  <div className="status"></div>
-	  </div>
-	);
-}
+const	FriendsUI: Function = () => {
 
-const	FriendsUI: Function = async () => {
-
-	const Friends: User[] = await serverFetch<User[]>("/users/manage/friends/");
+	// const Friends: User[] = await serverFetch<User[]>("/users/manage/friends/");
 	// const Friends: User[] = FriendsDummy;
-	const Invites: User[] = await serverFetch<User[]>("/users/manage/get-all-pending-friend-request/");
-	const AllUsers: User[] = await fetchWithToken<User[]>("/users/all");
-	const BlockedUsers: User[] = await serverFetch<User[]>("/users/manage/get-blocked-users/");
+	// const Invites: User[] = await serverFetch<User[]>("/users/manage/get-all-pending-friend-request/");
+	// const AllUsers: User[] = await fetchWithToken<User[]>("/users/all");
+	// const BlockedUsers: User[] = await serverFetch<User[]>("/users/manage/get-blocked-users/");
 
 	return (		
 		<div className="Display">
 			<div className="Segment">
 				<div className="Component">
 					<h1>Invites</h1>
-					{/* <FriendRequestsLive requests={Invites}/> */}
-					{ Invites.length > 0 ? <UIListBox Items={Invites} BoxComponent={FriendRequestBox} ListStyle="Requests"  />
-						: <p>No pending friend requests </p>}
+					{/* { Invites.length > 0 ? <UIListBox Items={Invites} BoxComponent={FriendRequestBox} ListStyle="Requests"  />
+						: <p>No pending friend requests </p>} */}
+					<InvitesLive node={UserBox}/>
 					<h1>Friends</h1>
-					{ Friends.length > 0 ? <UIListBox Items={Friends} BoxComponent={LinkUserBox} ListStyle="Friends"  /> 
-						: <p>No Friends</p>}
+					{/* { Friends.length > 0 ? <UIListBox Items={Friends} BoxComponent={LinkUserBox} ListStyle="Friends"  /> 
+						: <p>No Friends</p>} */}
+					<FriendsLive node={UserBox}/>
 					<h1>Blocked</h1>
-					{ BlockedUsers.length > 0 ? <UIListBox Items={BlockedUsers} BoxComponent={BlockedUserBox} ListStyle="Blocked" /> 
-						: <p>No blocked users</p>}
+					<BlockedUsersLive node={UserBox}/>
+					{/* { BlockedUsers.length > 0 ? <UIListBox Items={BlockedUsers} BoxComponent={BlockedUserBox} ListStyle="Blocked" /> 
+						: <p>No blocked users</p>} */}
 					
 				</div>
 			</div>
 			<div className="Segment">
 				<div className="Component">
 					<h1>All Users</h1>
-					<UIListBox Items={AllUsers} BoxComponent={LinkUserBox} ListStyle="AllUsers" />
+					{/* <UIListBox Items={AllUsers} BoxComponent={LinkUserBox} ListStyle="AllUsers" /> */}
+					<AllUsersLive node={UserBox}/>
 				</div>
 			</div>
 		</div>
