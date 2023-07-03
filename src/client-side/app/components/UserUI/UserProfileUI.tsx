@@ -3,6 +3,7 @@ import { UserProfile, MatchHistory } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
 import GenericAchievement from './Placeholders/DummyAchievements';
 import UserInteract from './UserInteract';
+import Image from 'next/image';
 
 const MatchHistoryDummy: MatchHistory[] = [
 	{
@@ -24,7 +25,7 @@ const MatchHistoryDummy: MatchHistory[] = [
 const UserInfoBox = ({ user }: { user: UserProfile }) => {
 	return (
 		<div className="Component">
-			{user.avatar && <img src={user.avatar} alt={`Profile Image for ${user.name}`}/>}
+			{user.avatar && <Image src={user.avatar} alt={`Profile Image for ${user.name}`}/>}
 			<h1>{user.name}</h1>
 			<p>{user.Online ? user.Ingame ? "In game" : "Idle" : "Offline"}</p>
 		</div>

@@ -20,4 +20,5 @@ const UserBox: React.FC<UserBoxProps> = ({ item, childnode }: UserBoxProps) => {
 	);
 }
 
+export type { UserBoxProps};
 export default UserBox;
