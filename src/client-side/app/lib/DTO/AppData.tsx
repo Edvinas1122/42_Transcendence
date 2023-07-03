@@ -87,5 +87,5 @@ interface AppData {
 }
 
 export default AppData;
-export type { User, UserProfile, MatchHistory, Chat, Achievement, PersonalChat, GroupChat, Message, RoleType };
+export type { User, UserProfile, MatchHistory, Chat, Achievement, PersonalChat, GroupChat, Message};
 export { isGroupChat };

@@ -5,14 +5,9 @@ import { User } from "@/lib/DTO/AppData";
 import fetchWithToken, { serverFetch } from "@/lib/fetch.util";
 import "@/public/layout.css";
 import "./Friends.css";
-<<<<<<< HEAD
-import InvitesLive from "./live/InvitesLive";
-
-=======
 import GenericButton from "../GeneralUI/GenericButton";
 import { BlockedUserBox, FriendRequestBox } from "./FriendInteract";
 // import FriendRequestsLive from "./FriendsLive";
->>>>>>> Jasper_2
 
 const	FriendsDummy: User[] = [
 	{
@@ -75,15 +70,9 @@ const	FriendsUI: Function = async () => {
 			<div className="Segment">
 				<div className="Component">
 					<h1>Invites</h1>
-<<<<<<< HEAD
-
-					{/* <UIListBox Items={Invites} BoxComponent={LinkUserBox} ListStyle="Invited"  /> */}
-					<InvitesLive node={UserBox}/>
-=======
 					{/* <FriendRequestsLive requests={Invites}/> */}
 					{ Invites.length > 0 ? <UIListBox Items={Invites} BoxComponent={FriendRequestBox} ListStyle="Requests"  />
 						: <p>No pending friend requests </p>}
->>>>>>> Jasper_2
 					<h1>Friends</h1>
 					{ Friends.length > 0 ? <UIListBox Items={Friends} BoxComponent={LinkUserBox} ListStyle="Friends"  /> 
 						: <p>No Friends</p>}
