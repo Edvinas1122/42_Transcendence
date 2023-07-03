@@ -51,7 +51,7 @@ const meParticipant = (chat: Chat, id: number): boolean => {
 // 	return false;
 // }
 
-const ChatRoomsLive: Function = ({ serverChats}: { serverChats: Chat[] }) => {
+const ChatRoomsLive: Function = ({ serverChats}: { serverChats: string }) => {
 
 	const chatEvent = useContext(ChatRoomSourceContext);
 	const id = useContext(AuthContext);
@@ -65,7 +65,7 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: Chat[] }) => {
 			switch (chatEvent.subtype) {
 				case "new-available":
 					chatEvent.data.amParticipant = meParticipant(chatEvent.data, id.id);
-					chatEvent.data.mine = chatEvent.data?.owner?._id == id.id ? false: true;
+					chatEvent.data.mine = chatEvent.data?.owner?._id == id.id ? true: false;
 					console.log("new chat chat rooms live ", chatEvent.data);
 					setItems((prevChats: Chat[]) => [...prevChats, chatEvent.data]);
 					break;

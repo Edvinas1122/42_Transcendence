@@ -5,6 +5,7 @@ import { User } from "@/lib/DTO/AppData";
 import fetchWithToken from "@/lib/fetch.util";
 import "@/public/layout.css";
 import "./Friends.css";
+import InvitesLive from "./live/InvitesLive";
 
 
 const	FriendsDummy: User[] = [
@@ -43,7 +44,7 @@ export const LinkUserBox: Function = ({ item }: { item: User }) => {
 	);
 }
 
-export const UserBox: Function = ({ item }: { item: User }) => {
+export const UserBox: React.FC<{ item: User }> = ({ item }: { item: User }) => {
 	return (
 	  <div className="Entity">
 		<p>
@@ -67,7 +68,9 @@ const	FriendsUI: Function = async () => {
 			<div className="Segment">
 				<div className="Component">
 					<h1>Invites</h1>
-					<UIListBox Items={Invites} BoxComponent={LinkUserBox} ListStyle="Invited"  />
+
+					{/* <UIListBox Items={Invites} BoxComponent={LinkUserBox} ListStyle="Invited"  /> */}
+					<InvitesLive node={UserBox}/>
 					<h1>Friends</h1>
 					<UIListBox Items={Friends} BoxComponent={LinkUserBox} ListStyle="Friends"  />
 				</div>
