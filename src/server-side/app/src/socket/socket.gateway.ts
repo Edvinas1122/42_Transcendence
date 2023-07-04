@@ -38,6 +38,11 @@ export class SocketGateway
 	public server: Server;
 	private userSocketMap = new Map<number, Set<Socket>>();
 	private handlers: { [event: string]: {handler: (payload: any) => any | null, responseChannel: string} } = {};
+    private disconnectors: Array<(userId: number) => void> = [];
+
+    public registerDicconnector(disconnector: (userId: number) => void) {
+        this.disconnectors.push(disconnector);
+    }
 
 	public registerHandler(
 		event: string,
@@ -101,18 +106,23 @@ export class SocketGateway
 		this.addToMap(userId, client);
 	}
 
-	handleDisconnect(client: Socket) {
-		for (let [userId, sockets] of this.userSocketMap.entries()) {
-		if (sockets.has(client)) {
-			sockets.delete(client);
-			if (sockets.size === 0) {
-				this.userSocketMap.delete(userId);
-				client.disconnect();
-			}
-			break;
-		}
-		}
-	}
+    handleDisconnect(client: Socket) {
+        for (let [userId, sockets] of this.userSocketMap.entries()) {
+            if (sockets.has(client)) {
+                sockets.delete(client);
+                if (sockets.size === 0) {
+                    this.userSocketMap.delete(userId);
+                    client.disconnect();
+
+                    // Trigger the registered disconnectors for the user
+                    for (let disconnector of this.disconnectors) {
+                        disconnector(userId);
+                    }
+                }
+                break;
+            }
+        }
+    }
 
 	public CheckUserConnection(userId: number): boolean {
 		const sockets = this.userSocketMap.get(userId);

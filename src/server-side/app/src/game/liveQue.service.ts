@@ -1,7 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { SocketGateway } from '../socket/socket.gateway';
 import { UsersService } from '../users/users.service';
-// import { GameService } from '../game/game.service';
+import { GameService } from './pongGame.service';
+
+// export class SocketsDisconnetor {
+// 	constructor(
+// 		@Inject(SocketGateway)
+// 		private socketGateway: SocketGateway,
+// 		(userId: number) => void
+// 	){
+// 		this.socketGateway.registerDicconnector(this.handleDisconnect.bind(this));
+// 	}
+// }
+
+interface MachedData {
+	info: string,
+	gameKey?: string,
+}
 
 @Injectable()
 export class LiveGameQue {
@@ -10,10 +25,11 @@ export class LiveGameQue {
 		private socketGateway: SocketGateway,
 		@Inject(UsersService)
 		private usersService: UsersService,
-		// private gameService: GameService,
+		private gameService: GameService,
 	) {
 		this.socketGateway.registerHandler('joinGame', this.handleJoinGameQue.bind(this), 'liveGameQueResponse');
 		this.socketGateway.registerHandler('leaveGame', this.handleLeaveGameQue.bind(this), 'liveGameQueResponse');
+		this.socketGateway.registerDicconnector(this.handleDisconnect.bind(this));
 	}
 
 	private liveGameQueMap = new Map<number, Set<number>>(); // key: userid, value: gameId
@@ -74,25 +90,34 @@ export class LiveGameQue {
             // Remove the matched players from the queue
             gameQueue.delete(player1Id);
             gameQueue.delete(player2Id);
-            this.liveGameQueMap.set(gameId, gameQueue);
 
-            this.socketGateway.sendToUser('MachMaking', player1Id, `Matched with ${player2Id}`);
-            this.socketGateway.sendToUser('MachMaking', player2Id, `Matched with ${player1Id}`);
+			const announce: MachedData = {
+				info: `Matched`,
+			}
 
-            // Generate the game key
-            const gameKey = this.GenerateGameId();
-
+			const gameKey = this.gameService.handleJoinGameQue(player1Id, player2Id, gameId);
+			const message: MachedData = {
+				info: `Matched`,
+				gameKey: gameKey,
+			}
+            this.socketGateway.sendToUser('MachMaking', player1Id, message);
+            this.socketGateway.sendToUser('MachMaking', player2Id, message);
+			
             // Send the game key to the matched players
-            this.socketGateway.sendToUser('MachMaking', player1Id, gameKey);
-            this.socketGateway.sendToUser('MachMaking', player2Id, gameKey);
-
-            // Create a new game instance with the matched players
-            // this.gameService.createGame(player1Id, player2Id, gameKey);
         }
     }
 
+	handleDisconnect(userId: number) {
+		for (let [gameId, gameQueue] of this.liveGameQueMap.entries()) {
+			if (gameQueue.has(userId)) {
+				gameQueue.delete(userId);
+				console.log(`User ${userId} disconnected from game ${gameId}. Queue size: ${gameQueue.size}`);
 
-	private GenerateGameId(): number {
-		return Math.floor(Math.random() * 1000000);
+				if (gameQueue.size === 0) {
+					this.liveGameQueMap.delete(gameId);
+					console.log(`Game ${gameId} queue is empty and has been removed`);
+				}
+			}
+		}
 	}
 }
