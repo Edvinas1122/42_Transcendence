@@ -96,16 +96,24 @@ export class LiveGameQue {
 			}
 
 			const gameKey = this.gameService.handleJoinGameQue(player1Id, player2Id, gameId);
-			const message: MachedData = {
+			const player1Key: MachedData = {
 				info: `Matched`,
-				gameKey: gameKey,
+				gameKey: this.gameKeyIDAdder(player1Id, gameKey),
 			}
-            this.socketGateway.sendToUser('MachMaking', player1Id, message);
-            this.socketGateway.sendToUser('MachMaking', player2Id, message);
+			const player2Key: MachedData = {
+				info: `Matched`,
+				gameKey: this.gameKeyIDAdder(player2Id, gameKey),
+			}
+            this.socketGateway.sendToUser('MachMaking', player1Id, player1Key);
+            this.socketGateway.sendToUser('MachMaking', player2Id, player2Key);
 			
             // Send the game key to the matched players
         }
     }
+
+	private gameKeyIDAdder(userId: number, gameKey: string): string {
+		return `${gameKey}-${userId}`;
+	}
 
 	handleDisconnect(userId: number) {
 		for (let [gameId, gameQueue] of this.liveGameQueMap.entries()) {

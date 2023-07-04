@@ -1,5 +1,5 @@
 "use client";
-import WebSocketContext, { useWebSocket } from '../MachMakingUI/GameDataProvider';
+import WebSocketContex from '../MachMakingUI/GameDataProvider';
 import React, { useEffect, useContext, useState } from 'react';
 import { GameKeyContext } from './GameKeyProvider';
 import { notFound } from 'next/navigation';
@@ -18,21 +18,22 @@ interface BallPosition {
 }
 
 interface PongGameData {
-	oponent_pong_position: number
-	ball_position: BallPosition
+	// oponent_pong_position: number
+	// ball_position: BallPosition
 }
 
 const PongGameDisplay: React.FC<PongGameData> = ({
-	oponent_pong_position,
-	ball_position,
+	// oponent_pong_position,
+	// ball_position,
 }: PongGameData) => {
 
 	const [player_pong_position, setPlayerPongPosition] = useState<number>(0);
 	const [opponent_pong_position, setOpponentPongPosition] = useState<number>(0);
+	const [ball_position, setBallPosition] = useState<BallPosition>({x: 0, y: 0});
 	const { gameKey } = useContext(GameKeyContext);
-	const Socket = useContext(WebSocketContext);
+	const Socket = useContext(WebSocketContex);
 
-	if (!gameKey) {
+	if (!gameKey || !Socket) {
 		notFound();
 	}
 
@@ -40,18 +41,27 @@ const PongGameDisplay: React.FC<PongGameData> = ({
 		const mouseMoveHandler = (event: MouseEvent) => {
 			// The factor 100 is used to convert pixel to vh (viewport height)
 			setPlayerPongPosition(event.clientY / window.innerHeight * 100 - 50);
+			// console.log("emmit", gameKey);)
 			Socket.emit('events', { event: "pongGamePlayerUpdate", data: {x: event.clientY, gameKey: gameKey}});
 		}
 		window.addEventListener('mousemove', mouseMoveHandler);
 		return () => {
 			window.removeEventListener('mousemove', mouseMoveHandler);
 		}
-	}, []);
+	}, [gameKey, Socket]);
 
 	useEffect(() => {
 		if (gameKey) {
+			Socket.on('pongGamePlayerUpdate', (data: PongGamePlayerUpdate) => {
+				if (data.gameKey === gameKey) {
+					setOpponentPongPosition(data.x / window.innerHeight * 100 - 50);
+				}
+			});
+			return () => {
+				Socket.off('pongGamePlayerUpdate');
+			};
 		}
-	}, [gameKey]);
+	}, [gameKey, Socket]);
 
 	return (
 		<>
@@ -66,38 +76,38 @@ const PongGameDisplay: React.FC<PongGameData> = ({
 
 const PongGame: React.FC = () => {
 	
-	const { gameKey } = useContext(GameKeyContext);
-	const Socket = useWebSocket();
-	const [gameData, setGameData] = useState<PongGameData>({
-		oponent_pong_position: 0,
-		ball_position: {
-			x: 0,
-			y: 0,
-		}
+	// const { gameKey } = useContext(GameKeyContext);
+	// const Socket = useWebSocket();
+	// const [gameData, setGameData] = useState<PongGameData>({
+	// 	oponent_pong_position: 0,
+	// 	ball_position: {
+	// 		x: 0,
+	// 		y: 0,
+	// 	}
 
-	});
+	// });
 
-	const GameActionDisplay = (data: PongGameData) => {
-		setGameData(data);
-	}
+	// const GameActionDisplay = (data: PongGameData) => {
+	// 	setGameData(data);
+	// }
 
-	useEffect(() => {
-		if (gameKey) {
-			Socket.on('PongData', (data: PongGameData) => {
-				console.log(data);
-			});
-			return () => {
-				Socket.off('PongData');
-			};
-		}
-	}, [gameKey]);
+	// useEffect(() => {
+	// 	if (gameKey) {
+	// 		Socket.on('PongData', (data: PongGameData) => {
+	// 			console.log(data);
+	// 		});
+	// 		return () => {
+	// 			Socket.off('PongData');
+	// 		};
+	// 	}
+	// }, [gameKey]);
 
 	return (
 		<>
 		<div className={"Display"}>
 			<PongGameDisplay
-				oponent_pong_position={gameData.oponent_pong_position}
-				ball_position={gameData.ball_position}
+				// oponent_pong_position={gameData.oponent_pong_position}
+				// ball_position={gameData.ball_position}
 			/>
 		</div>
 		</>

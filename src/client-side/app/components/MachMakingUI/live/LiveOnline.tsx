@@ -2,8 +2,8 @@
 import React, {useContext, useState, useEffect} from 'react';
 import WebSocketContext from '../GameDataProvider';
 import { Socket } from "socket.io-client";
-import {useRouter} from 'next/navigation';
-import { setGameKey, GameKeyContext } from '@/components/Pong/GameKeyProvider';
+import { useRouter } from 'next/navigation';
+import { GameKeyContext } from '@/components/Pong/GameKeyProvider';
 
 interface SocketEvent {
 	event: string,
@@ -92,11 +92,13 @@ const Countdown: React.FC<{
 			return;
 		}
 		setServerResponded(true);
+		console.log("redirecting, game key here", gameKey);
 		setGameKey(gameKey);
         router.push(`/game/pong/`);
     };
 
     useEffect(() => {
+		console.log("countdown", countdown)
         if (countdown > 0 && !abort) {
 			socket.on('GameCommence', redirect);
             setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -132,12 +134,15 @@ const LiveOnline: React.FC = () => {
     const Socket = useContext(WebSocketContext);
     const [onlineList, setOnlineList] = useState("");
 	const [gameMachKey, setGameMachKey] = useState<null | string>(null);
+	// const { gameKey, setGameKey } = useContext(GameKeyContext);
 
     useEffect(() => {
+		// setGameKey(null);
         if (!Socket) return;
 
         const handleQueInfoUpdate = (event: any) => {
             console.log("que update", event);
+			setOnlineList(event);
         };
 
         const handleMatchMade = (event: MachMakingData) => {
