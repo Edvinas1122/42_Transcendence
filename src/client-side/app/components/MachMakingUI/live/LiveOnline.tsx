@@ -1,7 +1,9 @@
+"use client";
 import React, {useContext, useState, useEffect} from 'react';
 import WebSocketContext from '../GameDataProvider';
 import { Socket } from "socket.io-client";
 import {useRouter} from 'next/navigation';
+import { setGameKey, GameKeyContext } from '@/components/Pong/GameKeyProvider';
 
 interface SocketEvent {
 	event: string,
@@ -46,15 +48,15 @@ const QueInterface: React.FC<QueInterfaceProps> = ({
 	)
 }
 
-const QueList: React.FC = () => {
+// const QueList: React.FC = () => {
 
 
-	return (
-		<>
+// 	return (
+// 		<>
 
-		</>
-	)
-}
+// 		</>
+// 	)
+// }
 
 interface GameCommenceData {
 	begin: boolean,
@@ -64,7 +66,7 @@ interface GameCommenceData {
 const Countdown: React.FC<{
 	gameKey: string,
 	socket: Socket,
-	setVisibility: (abort: boolean) => void,
+	setVisibility: Function,
 }> = ({
 	gameKey,
 	socket,
@@ -76,8 +78,8 @@ const Countdown: React.FC<{
 	const [starting, setStarting] = useState(false);
 	const [serverResponded, setServerResponded] = useState(false);
 	// const [failure, setFailure] = useState(false);
-	const router = useRouter();
-	// const gameKey = gameKey;
+	const router = useRouter()
+	const { setGameKey } = useContext(GameKeyContext);
 
     const redirect = (event: GameCommenceData) => {
 		console.log("redirect", event);
@@ -90,7 +92,8 @@ const Countdown: React.FC<{
 			return;
 		}
 		setServerResponded(true);
-        router.push(`/game?match=${gameKey}`);
+		setGameKey(gameKey);
+        router.push(`/game/pong/`);
     };
 
     useEffect(() => {
@@ -122,7 +125,7 @@ const Countdown: React.FC<{
 
 interface MachMakingData {
 	info: string,
-	gameKey?: number,
+	gameKey?: string,
 }
 
 const LiveOnline: React.FC = () => {
@@ -157,7 +160,7 @@ const LiveOnline: React.FC = () => {
     return (
         <>
             <p>{onlineList}</p>
-            {gameMachKey && <Countdown
+            {gameMachKey && Socket && <Countdown
 					gameKey={gameMachKey}
 					socket={Socket}
 					setVisibility={setGameMachKey}

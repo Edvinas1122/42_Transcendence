@@ -1,3 +1,5 @@
+import PongGame from "@/components/Pong/Pong";
+
 const GameInstance: Function = ({
 	params
 }: {
@@ -5,7 +7,7 @@ const GameInstance: Function = ({
 }) => {
 	return (
 		<div>
-			<h1>Matchmaking</h1>
+			<PongGame />
 		</div>
 	);
 }

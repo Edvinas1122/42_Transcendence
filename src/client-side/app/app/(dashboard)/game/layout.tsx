@@ -1,4 +1,5 @@
 import { WebSocketProvider } from "@/components/MachMakingUI/GameDataProvider";
+import { GameKeyProvider } from "@/components/Pong/GameKeyProvider";
 import { ReactNode } from "react";
 
 export default function GameLayout({
@@ -9,7 +10,9 @@ export default function GameLayout({
 	return (
 		<section>
 			<WebSocketProvider>
-			{children}
+				<GameKeyProvider>
+				{children}
+				</GameKeyProvider>
 			</WebSocketProvider>
 		</section>
 	);

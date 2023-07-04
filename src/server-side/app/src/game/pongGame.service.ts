@@ -8,6 +8,7 @@ interface PongGameData {
 	player2Pos: number;
 	ballPos: number;
 	gameId: number;
+	run: boolean;
 };
 
 interface GameCommenceData {
@@ -38,6 +39,7 @@ export class GameService {
 				player2Pos: 0,
 				ballPos: 0,
 				gameId: gameId,
+				run: true,
 			});
 		}
 		const GameCommenceInitiateMessage: GameCommenceData = {

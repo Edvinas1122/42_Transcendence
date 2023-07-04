@@ -36,6 +36,14 @@ const WebSocketProvider: React.FC<WebSocketProviderProps> = (
 	);
 };
 
+const useWebSocket = (): Socket => {
+	const context = React.useContext(WebSocketContext);
+	if (context === undefined) {
+		throw new Error('useWebSocket must be used within a WebSocketProvider');
+	}
+	return context;
+};
 
-export { WebSocketProvider };
+
+export { WebSocketProvider, useWebSocket };
 export default WebSocketContext;
