@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+"use client"
 
-const MachMakingUI: React.ReactNode = () => {
+import React, { useState, useContext } from 'react';
+import WebSocketContext from './GameDataProvider';
+import LiveOnline from './live/LiveOnline';
+
+const MachMakingUI: React.FC = () => {
 
 	return (
 		<>
@@ -9,6 +13,7 @@ const MachMakingUI: React.ReactNode = () => {
 		</div>
 		<div className={"Segment"}>
 			<h2>Live Que View</h2>
+			<LiveOnline/>
 		</div>
 		</>
 	);

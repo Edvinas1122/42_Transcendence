@@ -2,7 +2,7 @@ import MachMakingUI from "@/components/MachMakingUI/MachMakingUI";
 
 const MachMakingPage: Function = () => {
 	return (
-		<div className={"Display"}>
+		<div className={"Display"}>	
 			<MachMakingUI/>
 		</div>
 	);

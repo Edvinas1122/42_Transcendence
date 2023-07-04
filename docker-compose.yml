@@ -50,6 +50,7 @@ services:
       - .env
     ports:
       - 3000:3000
+      - 3001:3001
     volumes:
       - ./src/server-side/app/src:/app/src
       - file_storage:/uploads
