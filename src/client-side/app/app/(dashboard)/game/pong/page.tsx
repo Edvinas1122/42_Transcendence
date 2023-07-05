@@ -1,4 +1,9 @@
 import PongGame from "@/components/Pong/Pong";
+import { Oxanium } from 'next/font/google';
+
+const oxanium = Oxanium({ 
+	subsets: ['latin'],
+})
 
 const GameInstance: Function = ({
 	params
@@ -6,7 +11,7 @@ const GameInstance: Function = ({
 	params: { id: string }
 }) => {
 	return (
-		<div>
+		<div className={oxanium.className}>
 			<PongGame />
 		</div>
 	);

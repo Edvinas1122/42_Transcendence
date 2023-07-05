@@ -155,7 +155,7 @@ const LiveOnline: React.FC = () => {
         Socket.on('liveGameQueInfo', handleQueInfoUpdate);
         Socket.on('MachMaking', handleMatchMade);
 
-        // Return a function to clean up the listener when the component unmounts
+
         return () => {
             Socket.off('liveGameQueInfo');
             Socket.off('MachMaking');

@@ -8,6 +8,18 @@
 	width: 80%;
 }
 
+.pong-score {
+    position: absolute; /* Make the score display absolute */
+    top: 0; /* Position it at the top */
+    left: 50%; /* Center it horizontally */
+    transform: translateX(-50%); /* Fine-tune the centering */
+    width: auto; /* Let it auto size based on content */
+    height: 10%;
+    font-size: 10vh;
+    color: #fff;
+    z-index: 10; /* Make it appear on top */
+}
+
 .pong-player, .pong-ball {
 	position: relative;
 	margin: 1vw;

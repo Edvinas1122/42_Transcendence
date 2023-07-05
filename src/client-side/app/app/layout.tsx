@@ -1,6 +1,6 @@
 import '@/public/globals.css'
 import '@/public/layout.css'
-import { Inter } from 'next/font/google'
+import { Inter, Oxanium } from 'next/font/google'
 import { Providers } from '@/components/Providers'
 import Sidebar from '../components/GeneralUI/Sidebar'
 import EventPopUp from '@/components/EventsInfoUI/EventsInfo'
