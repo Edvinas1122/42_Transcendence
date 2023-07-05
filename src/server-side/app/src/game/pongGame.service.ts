@@ -58,7 +58,7 @@ export class GameService {
 		this.socketGateway.registerHandler('pongGamePlayerUpdate', this.handleGameUpdate.bind(this), 'pongGamePlayerUpdateResponse');
 	}
 
-	private liveGameInstancesMap = new Map<string, PongGameData>();
+	private liveGameInstancesMap = new Map<string, PongGameInstance>();
 	
 	public handleJoinGameQue(userId1: number, userId2:number, gameId:number): string {
 		const GAME_BEGIN_DELAY = 2950;
@@ -67,111 +67,46 @@ export class GameService {
 			this.liveGameInstancesMap.delete(gameKey);
 		}
 		if (!this.liveGameInstancesMap.has(gameKey)) {
-			this.liveGameInstancesMap.set(gameKey, {
-				pausedUnitl: Date.now() + GAME_BEGIN_DELAY + 1,
-				score1: 0,
-				score2: 0,
-				ball_movement: {x: 0.5, y: 0.5},
-				player1Id: userId1,
-				player2Id: userId2,
-				player1Pos: 0,
-				player2Pos: 0,
-				ballPos: {x: 0, y: 0},
-				gameId: gameId,
-				run: true,
-				notify: false,
-			});
+			const gameInstance = new PongGameInstance(
+				userId1,
+				userId2,
+				gameId,
+				this.sendtoUser.bind(this),
+			);
+			this.liveGameInstancesMap.set(gameKey, gameInstance);
+			setTimeout(() => {
+				try {
+					gameInstance.Start();
+				} catch (e) {
+					console.error(`Error sending game commence message to user: ${userId1} or ${userId2}`);
+					console.error(e);
+				}
+			}, GAME_BEGIN_DELAY);
 		}
-		const GameCommenceInitiateMessage: GameCommenceData = {begin: true};
-		setTimeout(() => {
-			try {
-				this.sendToUserProtected('GameCommence', userId1, GameCommenceInitiateMessage);
-				this.sendToUserProtected('GameCommence', userId2, GameCommenceInitiateMessage);
-				this.gameInstanceLoop(userId1, userId2, gameKey).then(() => {
-					console.log(`Game instance loop ended for key: ${gameKey as string}`);
-				});
-			} catch (e) {
-				console.error(`Error sending game commence message to user: ${userId1} or ${userId2}`);
-				console.error(e);
-			}
-		}, GAME_BEGIN_DELAY);
 		return gameKey;
 	}
 
-	async gameInstanceLoop(playerId1: number, playerId2: number, gameKey: string)
-	{
-		const GAME_LOOP_DELAY = 20;
-		const MAX_GAME_TIME = 360000; // max game duration
-		const DISCONNECT_CHECK_INTERVAL = 3000; // every 3 seconds
-		const gameStartTime = Date.now();
-
-		const gameInstance = this.liveGameInstancesMap.get(gameKey);
-		console.log(`Game instance loop started for key: ${gameKey as string}`)
-
-		if (!gameInstance) {
-			console.error(`Game instance not found for key: ${gameKey as string}`);
-			return;
-		}
-		let lastDisconnectCheckTime = Date.now();
-		while (gameInstance.run && Date.now() - gameStartTime < MAX_GAME_TIME) {
-			this.GameInstanceLogicHandler(gameInstance);
-			const gameDataForPlaye1: PongGameDataUserUpdate = this.gameUpdateDataForPlayer(gameInstance, playerId1);
-			const invertedInstance = this.invertedGameInstance(gameInstance);
-			const gameDataForPlaye2: PongGameDataUserUpdate = this.gameUpdateDataForPlayer(invertedInstance, playerId2);
-			this.socketGateway.sendToUser('pongGamePlayerUpdate', playerId1, gameDataForPlaye1);
-			this.socketGateway.sendToUser('pongGamePlayerUpdate', playerId2, gameDataForPlaye2);
-			await this.sleep(GAME_LOOP_DELAY);
-			if (Date.now() - lastDisconnectCheckTime > DISCONNECT_CHECK_INTERVAL) {
-				lastDisconnectCheckTime = Date.now();
-				if (!this.userInMap(playerId1) || !this.userInMap(playerId2)) {
-					gameInstance.run = false;
-				}
-			}
-		}
-		const gameDataForPlaye1: PongGameDataUserUpdate = this.gameUpdateDataForPlayer(gameInstance, playerId1, true);
-		const gameDataForPlaye2: PongGameDataUserUpdate = this.gameUpdateDataForPlayer(gameInstance, playerId2, true);
-		this.socketGateway.sendToUser('pongGamePlayerUpdate', playerId1, gameDataForPlaye1);
-		this.socketGateway.sendToUser('pongGamePlayerUpdate', playerId2, gameDataForPlaye2);
-	}
-
-	private sleep(ms: number) {
-		return new Promise(resolve => setTimeout(resolve, ms));
+	sendtoUser(subcription: string, userId: number, message: any) {
+		this.socketGateway.sendToUser(subcription, userId, message);
 	}
 
 	handleGameUpdate(data: PongGamePlayerUpdate): void {
-		const { x, gameKey } = data;
-		const { player1ID, player2ID, currentPlayer } = this.parseGameKey(gameKey);
-		const defaultKey = this.generateGameKey(player1ID, player2ID);
-		this.updateGameInstance(defaultKey, x, currentPlayer);
-	}
-
-	private updateGameInstance(defaultKey: string, x: number, currentPlayerId: number) {
-
-		const gameInstance = this.liveGameInstancesMap.get(defaultKey);
-	
-		if (!gameInstance) {
-			console.error(`Game instance not found for key: ${defaultKey as string}`);
-			return;
-		}
-		if (gameInstance.player1Id === currentPlayerId) {
-			gameInstance.player1Pos = x;
-		} else if (gameInstance.player2Id === currentPlayerId) {
-			gameInstance.player2Pos = x;
-		}
-		this.liveGameInstancesMap.set(defaultKey, gameInstance);
+		const { player1ID, player2ID, currentPlayer } = this.parseGameKey(data.gameKey);
+		const defaultKey = this.defaultGameKey(player1ID, player2ID);
+		this.liveGameInstancesMap.get(defaultKey)?.updateGameInstance(data.x, currentPlayer);
 	}
 
 	private generateGameKey(player1ID: number, player2ID: number): string {
 		return `${player1ID}-${player2ID}`;
 	}
 
-	private sendToUserProtected(subcription: string, userId: number, message: any) {
-		if (this.userInMap(userId)) {
-			this.socketGateway.sendToUser(subcription, userId, message);
-		} else {
-			throw new Error(`User ${userId} not found in map`); // can not be uncought
-		}
-	}
+	// private sendToUserProtected(subcription: string, userId: number, message: any) {
+	// 	if (this.userInMap(userId)) {
+	// 		this.socketGateway.sendToUser(subcription, userId, message);
+	// 	} else {
+	// 		throw new Error(`User ${userId} not found in map`); // can not be uncought
+	// 	}
+	// }
 
 	private parseGameKey(gameKey: string): { player1ID: number, player2ID: number, currentPlayer: number } {
 		const [player1ID, player2ID, currentPlayer] = gameKey.split('-').map(Number);
@@ -179,79 +114,208 @@ export class GameService {
 	}
 
 	handleDisconnect(userId: number) {
-		// ...
-		// Iterate over the keys in the map and remove any game instances involving the disconnected user
-		for (let gameKey of this.liveGameInstancesMap.keys()) {
-			let {player1ID, player2ID, currentPlayer} = this.parseGameKey(gameKey)
-			if (player1ID === userId || player2ID === userId) {
-				this.liveGameInstancesMap.delete(gameKey);
-				
-				// Identify the ID of the other player in the game
-				const otherPlayerId = player1ID === userId ? player2ID : player1ID;
-				
-				const gameInstance = this.liveGameInstancesMap.get(gameKey);
-				if (gameInstance) {
-					gameInstance.run = false;
-					this.liveGameInstancesMap.set(gameKey, gameInstance);
-				}
-				// Send a message to the other player to notify them that the user has disconnected
-				this.socketGateway.sendToUser('GameCommence', otherPlayerId, `Player ${userId} has disconnected.`);
+		const allKeys = Array.from(this.liveGameInstancesMap.keys());
+		const gameKey = allKeys.find((key) => {
+			const { player1ID, player2ID } = this.parseGameKey(key);
+			return player1ID === userId || player2ID === userId;
+		});
+		if (gameKey) {
+			const { player1ID, player2ID } = this.parseGameKey(gameKey);
+			const gameInstance = this.liveGameInstancesMap.get(this.defaultGameKey(player1ID, player2ID));
+			if (gameInstance) {
+				gameInstance.Stop();
 			}
+			this.liveGameInstancesMap.delete(this.defaultGameKey(player1ID, player2ID));
+			const otherPlayerId = player1ID === userId ? player2ID : player1ID;
+			this.socketGateway.sendToUser('GameCommence', otherPlayerId, `Player ${userId} has disconnected.`);
 		}
 		console.log(`User ${userId} disconnected. Live game instances: ${this.liveGameInstancesMap.size}`);
 	}
 
 	private userInMap(userId: number): boolean {
-		for (let gameInstance of this.liveGameInstancesMap.values()) {
-			if (gameInstance.player1Id === userId || gameInstance.player2Id === userId) {
+		const allKeys = Array.from(this.liveGameInstancesMap.keys());
+		for (let key of allKeys) {
+			const { player1ID, player2ID } = this.parseGameKey(key);
+			if (player1ID === userId || player2ID === userId) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private gameUpdateDataForPlayer(gameInstance: PongGameData, playerId: number, end: boolean = false): PongGameDataUserUpdate {
+	private defaultGameKey(playerId1: number, playerId2: number): string {
+		return `${playerId1}-${playerId2}`;
+	}
+}
 
-		const gameDataForPlayer: PongGameDataUserUpdate = {
-			oponent_pong_position: gameInstance.player1Id === playerId ? gameInstance.player2Pos : gameInstance.player1Pos,
-			ball_position: {
-				x: gameInstance.ballPos.x,
-				y: gameInstance.ballPos.y,
-			},
-			end_game: end,
-			score1: gameInstance.notify ? gameInstance.score1 : undefined,
-			score2: gameInstance.notify ? gameInstance.score2 : undefined,
+interface RunTimeDetails {
+	GAME_LOOP_DELAY: number;
+	MAX_GAME_TIME: number;
+	DISCONNECT_CHECK_INTERVAL: number;
+	gameStartTime: number;
+	lastDisconnectCheckTime: number;
+}
+
+export class PongGameInstance {
+	private pongGameData: PongGameData;
+	private sendToUser: (subcription: string, userId: number, message: any) => void;
+	private runTimeInfo: RunTimeDetails;
+
+	constructor(
+		player1Id: number,
+		player2Id: number,
+		gameId: number,
+		sendToUser: (subcription: string, userId: number, message: any) => void,
+		pausedUntil: number = Date.now() + 3000,
+		player1Pos: number = 0,
+		player2Pos: number = 0,
+		ballPos: BallPosition = {x: 0, y: 0},
+		ballMovement: Vector = {x: 0.5, y: 0.5},
+		score1: number = 0,
+		score2: number = 0,
+		run: boolean = true,
+		notify: boolean = false
+	) {
+		this.pongGameData = {
+			player1Id: player1Id,
+			player2Id: player2Id,
+			pausedUnitl: pausedUntil,
+			player1Pos: player1Pos,
+			player2Pos: player2Pos,
+			ballPos: ballPos,
+			ball_movement: ballMovement,
+			score1: score1,
+			score2: score2,
+			run: run,
+			notify: notify,
+			gameId: gameId,
+		
 		};
-		gameInstance.notify = false;
-		return gameDataForPlayer;
+		this.sendToUser = sendToUser;
+		this.runTimeInfo = {
+			GAME_LOOP_DELAY: 20,
+			MAX_GAME_TIME: 360000, // max game duration
+			DISCONNECT_CHECK_INTERVAL: 3000, // every 3 seconds
+			gameStartTime: Date.now(),
+			lastDisconnectCheckTime: Date.now(),
+		};
 	}
 
-	private GameInstanceLogicHandler(gameInstance: PongGameData) {
+	public Start() {
+		this.gameInstanceLoop();
+	}
+
+	public Stop() {
+		this.pongGameData.run = false;
+	}
+
+	private async gameInstanceLoop()
+	{
+		const GameCommenceInitiateMessage: GameCommenceData = {begin: true};
+		this.sendToUser('GameCommence', this.pongGameData.player1Id, GameCommenceInitiateMessage);
+		this.sendToUser('GameCommence', this.pongGameData.player2Id, GameCommenceInitiateMessage);
+		while (this.pongGameData.run && Date.now() - this.runTimeInfo.gameStartTime < this.runTimeInfo.MAX_GAME_TIME) {
+			this.GameInstanceLogicHandler();
+			// const invertedInstance = this.invertedGameInstance(this.pongGameData);
+			const gameDataForPlaye1: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player1Id);
+			const gameDataForPlaye2: PongGameDataUserUpdate = this.invertBallPosition(gameDataForPlaye1);
+			this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player1Id, gameDataForPlaye1);
+			this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, gameDataForPlaye2);
+			this.pongGameData.notify = false;
+			await this.sleep(this.runTimeInfo.GAME_LOOP_DELAY);
+		}
+		const gameDataForPlaye1: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player1Id, true, true);
+		const gameDataForPlaye2: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player2Id, true, true);
+		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player1Id, gameDataForPlaye1);
+		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, gameDataForPlaye2);
+	}
+
+	private GameInstanceLogicHandler() {
 		// Update the ball's position
-		if (gameInstance.pausedUnitl > Date.now()) {
+		if (this.pongGameData.pausedUnitl > Date.now()) {
 			// The ball is paused
 			
-		} else if (this.updateBallPosition(gameInstance)) {
+		} else if (this.updateBallPosition(this.pongGameData)) {
 			// A player scored, reset the ball
-			gameInstance.ballPos.x = 0;
-			gameInstance.ballPos.y = 0;
-			gameInstance.ball_movement.x = 0.5;
-			gameInstance.ball_movement.y = 0.5;
-			// gameInstance.ball_movement = this.randMovementVector(30);
-			gameInstance.pausedUnitl = Date.now() + 940;
-			gameInstance.notify = true;
+			this.pongGameData.ballPos.x = 0;
+			this.pongGameData.ballPos.y = 0;
+			this.pongGameData.ball_movement.x = 0.5;
+			this.pongGameData.ball_movement.y = 0.5;
+			// this.pongGameData.ball_movement = this.randMovementVector(30);
+			this.pongGameData.pausedUnitl = Date.now() + 940;
+			this.pongGameData.notify = true;
 		}
 	}
 
-	// private randMovementVector(angleLimit: number): Vector {
-	// 	// Generate a random movement vector for the ball
-	// 	// The angle of the vector will be between -angleLimit and angleLimit
-	// 	// The magnitude of the vector will be 1
-	// 	const angle = Math.random() * angleLimit * 2 - angleLimit;
-	// 	const x = Math.cos(angle);
-	// 	const y = Math.sin(angle);
-	// 	return { x, y };
-	// }
+	private prepareUpdateDataForPlayer(playerId: number, invert: boolean = false, end: boolean = false): PongGameDataUserUpdate {
+
+		const gameDataForPlayer: PongGameDataUserUpdate = {
+			oponent_pong_position: this.pongGameData.player1Id === playerId ? this.pongGameData.player2Pos : this.pongGameData.player1Pos,
+			ball_position: {
+				x: invert ? this.pongGameData.ballPos.x * -1 : this.pongGameData.ballPos.x,
+				y: this.pongGameData.ballPos.y,
+			},
+			end_game: end,
+			score1: this.pongGameData.notify ? this.pongGameData.score1 : undefined,
+			score2: this.pongGameData.notify ? this.pongGameData.score2 : undefined,
+		};
+		return gameDataForPlayer;
+	}
+
+	private invertBallPosition(data: PongGameDataUserUpdate)
+	{
+		const inverted = {
+			oponent_pong_position: this.pongGameData.player2Id,
+			ball_position: {
+				x: data.ball_position.x * -1,
+				y: data.ball_position.y,
+			},
+			end_game: data.end_game,
+			score1: data.score1,
+			score2: data.score2,
+		};
+		return inverted;
+	}
+
+	private sleep(ms: number) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	private easeInOutQuad(t: number): number {
+		return t < .5 ? 2 * t * t : -1 +(4 - 2 * t) * t;
+	}
+
+	private invertedGameInstance(gameInstance: PongGameData): PongGameData {
+		const invertedGameInstance: PongGameData = {
+			pausedUnitl: gameInstance.pausedUnitl,
+			player1Id: gameInstance.player2Id,
+			player2Id: gameInstance.player1Id,
+			player1Pos: gameInstance.player2Pos,
+			player2Pos: gameInstance.player1Pos,
+			ballPos: {
+				x: gameInstance.ballPos.x * -1,
+				y: gameInstance.ballPos.y,
+			},
+			ball_movement: {
+				x: -gameInstance.ball_movement.x * -1,
+				y: -gameInstance.ball_movement.y,
+			},
+			score1: gameInstance.score2,
+			score2: gameInstance.score1,
+			run: gameInstance.run,
+			gameId: gameInstance.gameId,
+			notify: gameInstance.notify,
+		};
+		return invertedGameInstance;
+	}
+
+	public updateGameInstance(x: number, currentPlayerId: number) {
+		if (this.pongGameData.player1Id === currentPlayerId) {
+			this.pongGameData.player1Pos = x;
+		} else if (this.pongGameData.player2Id === currentPlayerId) {
+			this.pongGameData.player2Pos = x;
+		}
+	}
 
 	private updateBallPosition(gameInstance: PongGameData): boolean {
 		// Update the ball's position based on its current movement vector
@@ -309,93 +373,4 @@ export class GameService {
 	
 		return false;
 	}
-
-	private updateBallPositionWithAngle(gameInstance: PongGameData): BallPosition {
-		// Update the ball's position based on its current movement vector
-		let newBallPos: BallPosition = {
-			x: gameInstance.ballPos.x + gameInstance.ball_movement.x,
-			y: gameInstance.ballPos.y + gameInstance.ball_movement.y
-		};
-	
-		// Check for collisions with the game boundaries
-		// Assuming the game field is 100 units in both dimensions
-		const FIELD_SIZE_Y = 50;
-		const FIELD_SIZE_X = 40; // css 80% width
-		if (newBallPos.y < -FIELD_SIZE_Y || newBallPos.y > FIELD_SIZE_Y) {
-			// The ball hit the top or bottom wall, reverse its vertical direction
-			gameInstance.ball_movement.y *= -1;
-		}
-	
-		// Check for collisions with the players
-		// Assuming the players' pong is at a fixed x-position
-		const PLAYER1_PONG_X = -36.5; // css 80% width
-		const PLAYER2_PONG_X = 36.5; // css 80% width
-		const PONG_HEIGHT = 12;  // Assuming the height of the pong
-	
-		if (newBallPos.x <= PLAYER1_PONG_X &&
-			newBallPos.y >= gameInstance.player1Pos - PONG_HEIGHT && 
-			newBallPos.y <= gameInstance.player1Pos + PONG_HEIGHT) {
-			// The ball hit player 1's pong, reverse its horizontal direction and adjust the vertical direction based on the hit position
-			gameInstance.ball_movement.x *= -1;
-			const t = (gameInstance.ballPos.y - gameInstance.player1Pos + PONG_HEIGHT / 2) / PONG_HEIGHT;
-			gameInstance.ball_movement.y += this.easeInOutQuad(t);
-			newBallPos.x = gameInstance.ballPos.x + gameInstance.ball_movement.x;
-		}
-	
-		if (newBallPos.x >= PLAYER2_PONG_X && 
-			newBallPos.y >= gameInstance.player2Pos - PONG_HEIGHT && 
-			newBallPos.y <= gameInstance.player2Pos + PONG_HEIGHT) {
-			// The ball hit player 2's pong, reverse its horizontal direction and adjust the vertical direction based on the hit position
-			gameInstance.ball_movement.x *= -1;
-			const t = (gameInstance.ballPos.y - gameInstance.player2Pos + PONG_HEIGHT / 2) / PONG_HEIGHT;
-			gameInstance.ball_movement.y += this.easeInOutQuad(t);
-		}
-	
-		if (newBallPos.x < -FIELD_SIZE_X || newBallPos.x > FIELD_SIZE_X) {
-			gameInstance.ball_movement.x *= -1;
-			if (newBallPos.x < -FIELD_SIZE_X) {
-				gameInstance.score2 += 1;
-			} else {
-				gameInstance.score1 += 1;
-			}
-		}
-	
-		// Now calculate the new position with the possibly updated movement vector
-		newBallPos.x = gameInstance.ballPos.x + gameInstance.ball_movement.x;
-		newBallPos.y = gameInstance.ballPos.y + gameInstance.ball_movement.y;
-	
-		// Update the ball's position in the game instance
-		gameInstance.ballPos = newBallPos;
-	
-		return newBallPos;
-	}
-
-	private easeInOutQuad(t: number): number {
-		return t < .5 ? 2 * t * t : -1 +(4 - 2 * t) * t;
-	}
-
-	private invertedGameInstance(gameInstance: PongGameData): PongGameData {
-		const invertedGameInstance: PongGameData = {
-			pausedUnitl: gameInstance.pausedUnitl,
-			player1Id: gameInstance.player2Id,
-			player2Id: gameInstance.player1Id,
-			player1Pos: gameInstance.player2Pos,
-			player2Pos: gameInstance.player1Pos,
-			ballPos: {
-				x: gameInstance.ballPos.x * -1,
-				y: gameInstance.ballPos.y,
-			},
-			ball_movement: {
-				x: -gameInstance.ball_movement.x * -1,
-				y: -gameInstance.ball_movement.y,
-			},
-			score1: gameInstance.score2,
-			score2: gameInstance.score1,
-			run: gameInstance.run,
-			gameId: gameInstance.gameId,
-			notify: gameInstance.notify,
-		};
-		return invertedGameInstance;
-	}
-
 }

@@ -62,6 +62,7 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 	useEffect(() => {
 		if (gameKey) {
 			Socket.on('pongGamePlayerUpdate', (data: PongGamePlayerUpdate) => {
+				console.log(data);
 				if (data?.score1)
 				{
 					setDisplayScore(`${data.score1}-${data.score2}`);

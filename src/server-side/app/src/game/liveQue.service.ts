@@ -75,11 +75,6 @@ export class LiveGameQue {
 
 	}
 
-	public getLivePlayerQue()
-	{
-
-	}
-
     private AttemptToMatchGame(gameId: number): void {
         const gameQueue = this.liveGameQueMap.get(gameId);
         if (gameQueue.size >= 2) {

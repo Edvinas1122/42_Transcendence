@@ -8,8 +8,9 @@ interface MatchHistory extends HasId {
 	opponent: string;
 	userScore: number;
 	opponentScore: number;
-	created?: Date;
 	completed: boolean;
+	created?: Date;
+	gameType?: string;
 }
 
 interface Achievement extends HasId {
