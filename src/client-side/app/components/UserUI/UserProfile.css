@@ -43,3 +43,59 @@
 .userButtonIcon {
   padding-right: 5px;
 }
+
+.UserPage  {
+  flex-direction: column !important;
+}
+
+.UserPage h1 {
+  font-size: 3em;
+  padding: 1em;
+  color: #333;
+  font-weight: 600;
+}
+
+.UserPage .Segment {
+  height: 67vh;
+}
+
+.Component.UserInfo {
+  display: flex;
+  flex-direction: row;
+	padding: 15px;
+	background-color: #f0f0f0;
+	border-radius: 5px;
+	/* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); */
+}
+
+.UserInfo .ImageFrame {
+  justify-content: center;
+}
+
+.Component.UserInteract {
+	padding: 15px;
+	background-color: #f0f0f0;
+	border-radius: 5px;
+	/* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); */
+}
+
+.Component.UserStats {
+	padding: 15px;
+	background-color: #f0f0f0;
+	border-radius: 5px;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.Component.MatchHistory {
+	padding: 15px;
+	background-color: #f0f0f0;
+	border-radius: 5px;
+	/* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); */
+}
+
+.Title {
+	font-size: 1.5em;
+	margin-bottom: 10px;
+	color: #333;
+	font-weight: 600;
+}
