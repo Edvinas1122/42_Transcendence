@@ -2,6 +2,12 @@ import { Controller, Get, Req, Post, Param, Body, UseGuards, ParseIntPipe, Valid
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { AchievementService, AchievementRecord } from './achievement.service';
 import { MatchService, MatchHistory } from './match.service';
+import { GameService } from './pongGame.service';
+import { UserId } from '../utils/user-id.decorator';
+
+interface inviteLink {
+	inviteLink: string;
+}
 
 @UseGuards(JwtAuthGuard)
 @Controller('game')
@@ -11,6 +17,8 @@ export class GameController {
 		private readonly achievementService: AchievementService,
 		@Inject(MatchService)
 		private readonly matchService: MatchService,
+		@Inject(GameService)
+		private readonly gameService: GameService
 	) {}
 
 	@Get('achievements/:userId')
@@ -29,6 +37,14 @@ export class GameController {
 		return await this.matchService.getPlayersMatches(userId);
 	}
 
-	// @Get('invite/:userId')
-	
+	@Post('invite/')
+	async invitePlayer(
+		@UserId() currentUserId: number,
+		@Body() data: { userName: string }
+
+	): Promise<inviteLink>
+	{
+		console.log("User found", data);
+		return await this.gameService.inviteToGame(currentUserId, data.userName, 1);
+	}
 }

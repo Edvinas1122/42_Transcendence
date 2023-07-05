@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn,
 	CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
-enum Outcome {
+export enum Outcome {
 	DISCONNECTED = 'DISCONNECTED',
 	WON_BY_SCORE = 'WON_BY_SCORE',
 	WON_BY_TIME = 'WON_BY_TIME',

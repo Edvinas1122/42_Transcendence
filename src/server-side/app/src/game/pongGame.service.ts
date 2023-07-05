@@ -1,6 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { SocketGateway } from '../socket/socket.gateway';
 import { UsersService } from '../users/users.service';
+import { NotFoundError } from 'rxjs';
+import { MatchService } from './match.service';
+import { Match, Outcome } from './entities/match.entity';
 
 interface Vector {
 	x: number,
@@ -20,7 +23,6 @@ interface PongGameData {
 	ballPos: BallPosition;
 	gameId: number;
 	run: boolean;
-	notify: boolean;
 };
 
 interface GameCommenceData {
@@ -43,6 +45,34 @@ interface PongGameDataUserUpdate {
 	score1?: number
 	score2?: number
 	end_game?: boolean
+	end_game_reason?: string
+}
+
+interface inviteLink {
+	inviteLink: string;
+}
+
+class MachResult implements Partial<Match> {
+	constructor(
+		data: PongGameData,
+		outcome: Outcome = Outcome.WON_BY_SCORE,
+	)
+	{
+		this.gameType = data.gameId.toString();
+		this.outcome = outcome;
+		this.player1Score = data.score1;
+		this.player1ID = data.player1Id;
+		this.player2Score = data.score2;
+		this.player2ID = data.player2Id;
+		this.gameEndDate = new Date();
+	}
+	gameType: string;
+	outcome: Outcome;
+	player1Score: number;
+	player1ID: number;
+	player2Score: number;
+	player2ID: number;
+	gameEndDate: Date;
 }
 
 @Injectable()
@@ -53,13 +83,28 @@ export class GameService {
 		private socketGateway: SocketGateway,
 		@Inject(UsersService)
 		private usersService: UsersService,
+		@Inject(MatchService)
+		private matchService: MatchService,
 	) {
 		this.socketGateway.registerDicconnector(this.handleDisconnect.bind(this));
 		this.socketGateway.registerHandler('pongGamePlayerUpdate', this.handleGameUpdate.bind(this), 'pongGamePlayerUpdateResponse');
+		this.socketGateway.registerHandler('pongGameBegin', this.handleGameBegin.bind(this), 'pongGameBeginResponse');
 	}
 
 	private liveGameInstancesMap = new Map<string, PongGameInstance>();
 	
+	async inviteToGame(userId1: number, inviteeName: string, gameType: number): Promise<inviteLink>
+	{
+		const user = await this.usersService.findOne(inviteeName);
+		if (user === null) {
+			throw new NotFoundException("User not found")
+		}
+		console.log("User found", user);
+		const userId2 = user.id;
+		const gameKey = this.handleJoinGameQue(userId1, userId2, gameType);
+		return {inviteLink: "http://localhost:3030/game/pong/?key=" + gameKey} as inviteLink;
+	}
+
 	public handleJoinGameQue(userId1: number, userId2:number, gameId:number): string {
 		const GAME_BEGIN_DELAY = 2950;
 		const gameKey = this.generateGameKey(userId1, userId2);
@@ -72,18 +117,32 @@ export class GameService {
 				userId2,
 				gameId,
 				this.sendtoUser.bind(this),
+				this.validator.bind(this),
 			);
 			this.liveGameInstancesMap.set(gameKey, gameInstance);
-			setTimeout(() => {
-				try {
-					gameInstance.Start();
-				} catch (e) {
-					console.error(`Error sending game commence message to user: ${userId1} or ${userId2}`);
-					console.error(e);
-				}
-			}, GAME_BEGIN_DELAY);
 		}
 		return gameKey;
+	}
+
+	handleGameBegin(data: {gameKey: string}): void {
+		console.log('handleGameBegin', data);
+		const { player1ID, player2ID } = this.parseGameKey(data.gameKey);
+		const defaultKey = this.defaultGameKey(player1ID, player2ID);
+		this.liveGameInstancesMap.get(defaultKey)?.Start().then((result) => {
+			if (result) {
+				this.matchService.createRecord(
+					result
+				);
+			}
+		});
+	}
+
+	validator(userId1: number, userId2: number)
+	{
+		if (this.socketGateway.CheckUserConnection(userId1) && this.socketGateway.CheckUserConnection(userId2)) {
+			return true;
+		}
+		return false;
 	}
 
 	sendtoUser(subcription: string, userId: number, message: any) {
@@ -100,20 +159,20 @@ export class GameService {
 		return `${player1ID}-${player2ID}`;
 	}
 
-	// private sendToUserProtected(subcription: string, userId: number, message: any) {
-	// 	if (this.userInMap(userId)) {
-	// 		this.socketGateway.sendToUser(subcription, userId, message);
-	// 	} else {
-	// 		throw new Error(`User ${userId} not found in map`); // can not be uncought
-	// 	}
-	// }
-
 	private parseGameKey(gameKey: string): { player1ID: number, player2ID: number, currentPlayer: number } {
 		const [player1ID, player2ID, currentPlayer] = gameKey.split('-').map(Number);
 		return { player1ID, player2ID, currentPlayer };
 	}
 
-	handleDisconnect(userId: number) {
+	handleDisconnect(userId: number)
+	{
+		const gameInstance = this.getInstanceByUserId(userId);
+		if (gameInstance) {
+			gameInstance.Stop();
+		}
+	}
+
+	private getInstanceByUserId(userId: number): PongGameInstance | undefined {
 		const allKeys = Array.from(this.liveGameInstancesMap.keys());
 		const gameKey = allKeys.find((key) => {
 			const { player1ID, player2ID } = this.parseGameKey(key);
@@ -121,26 +180,8 @@ export class GameService {
 		});
 		if (gameKey) {
 			const { player1ID, player2ID } = this.parseGameKey(gameKey);
-			const gameInstance = this.liveGameInstancesMap.get(this.defaultGameKey(player1ID, player2ID));
-			if (gameInstance) {
-				gameInstance.Stop();
-			}
-			this.liveGameInstancesMap.delete(this.defaultGameKey(player1ID, player2ID));
-			const otherPlayerId = player1ID === userId ? player2ID : player1ID;
-			this.socketGateway.sendToUser('GameCommence', otherPlayerId, `Player ${userId} has disconnected.`);
+			return this.liveGameInstancesMap.get(this.defaultGameKey(player1ID, player2ID));
 		}
-		console.log(`User ${userId} disconnected. Live game instances: ${this.liveGameInstancesMap.size}`);
-	}
-
-	private userInMap(userId: number): boolean {
-		const allKeys = Array.from(this.liveGameInstancesMap.keys());
-		for (let key of allKeys) {
-			const { player1ID, player2ID } = this.parseGameKey(key);
-			if (player1ID === userId || player2ID === userId) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private defaultGameKey(playerId1: number, playerId2: number): string {
@@ -154,11 +195,14 @@ interface RunTimeDetails {
 	DISCONNECT_CHECK_INTERVAL: number;
 	gameStartTime: number;
 	lastDisconnectCheckTime: number;
+	beginGame: number;
 }
 
-export class PongGameInstance {
+export class PongGameInstance
+{
 	private pongGameData: PongGameData;
 	private sendToUser: (subcription: string, userId: number, message: any) => void;
+	private validator: (userId1: number, userId2: number) => boolean;
 	private runTimeInfo: RunTimeDetails;
 
 	constructor(
@@ -166,6 +210,7 @@ export class PongGameInstance {
 		player2Id: number,
 		gameId: number,
 		sendToUser: (subcription: string, userId: number, message: any) => void,
+		validator: (userId1: number, userId2: number) => boolean,
 		pausedUntil: number = Date.now() + 3000,
 		player1Pos: number = 0,
 		player2Pos: number = 0,
@@ -174,7 +219,6 @@ export class PongGameInstance {
 		score1: number = 0,
 		score2: number = 0,
 		run: boolean = true,
-		notify: boolean = false
 	) {
 		this.pongGameData = {
 			player1Id: player1Id,
@@ -187,67 +231,149 @@ export class PongGameInstance {
 			score1: score1,
 			score2: score2,
 			run: run,
-			notify: notify,
 			gameId: gameId,
 		
 		};
 		this.sendToUser = sendToUser;
+		this.validator = validator;
 		this.runTimeInfo = {
 			GAME_LOOP_DELAY: 20,
 			MAX_GAME_TIME: 360000, // max game duration
-			DISCONNECT_CHECK_INTERVAL: 3000, // every 3 seconds
+			DISCONNECT_CHECK_INTERVAL: 4000, // every 3 seconds
 			gameStartTime: Date.now(),
 			lastDisconnectCheckTime: Date.now(),
+			beginGame: 0,
 		};
 	}
 
-	public Start() {
-		this.gameInstanceLoop();
+	async Start(): Promise<MachResult | null> {
+		if (this.runTimeInfo.beginGame < 1) {
+			this.runTimeInfo.beginGame++;
+			return null;
+		}
+		this.runTimeInfo.gameStartTime = Date.now();
+		this.runTimeInfo.lastDisconnectCheckTime = Date.now();
+		this.pongGameData.pausedUnitl = Date.now() + 1000;
+		// const GameCommenceInitiateMessage: GameCommenceData = {begin: true};
+		// this.sendToUser('GameCommence', this.pongGameData.player1Id, GameCommenceInitiateMessage);
+		// this.sendToUser('GameCommence', this.pongGameData.player2Id, GameCommenceInitiateMessage);
+		return this.gameInstanceLoop();
 	}
 
 	public Stop() {
 		this.pongGameData.run = false;
+		this.sendToUser('GameCommence', this.pongGameData.player1Id, `Player ${this.pongGameData.player2Id} has disconnected.`);
+		this.sendToUser('GameCommence', this.pongGameData.player2Id, `Player ${this.pongGameData.player1Id} has disconnected.`);
 	}
 
-	private async gameInstanceLoop()
+	private async gameInstanceLoop(): Promise<MachResult>
 	{
-		const GameCommenceInitiateMessage: GameCommenceData = {begin: true};
-		this.sendToUser('GameCommence', this.pongGameData.player1Id, GameCommenceInitiateMessage);
-		this.sendToUser('GameCommence', this.pongGameData.player2Id, GameCommenceInitiateMessage);
 		while (this.pongGameData.run && Date.now() - this.runTimeInfo.gameStartTime < this.runTimeInfo.MAX_GAME_TIME) {
-			this.GameInstanceLogicHandler();
-			// const invertedInstance = this.invertedGameInstance(this.pongGameData);
+			if (this.GameInstanceLogicHandler()) {
+				return new MachResult(this.pongGameData)
+			}
 			const gameDataForPlaye1: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player1Id);
 			const gameDataForPlaye2: PongGameDataUserUpdate = this.invertBallPosition(gameDataForPlaye1);
 			this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player1Id, gameDataForPlaye1);
 			this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, gameDataForPlaye2);
-			this.pongGameData.notify = false;
+			this.validateConnections();
 			await this.sleep(this.runTimeInfo.GAME_LOOP_DELAY);
 		}
-		const gameDataForPlaye1: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player1Id, true, true);
-		const gameDataForPlaye2: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player2Id, true, true);
-		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player1Id, gameDataForPlaye1);
-		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, gameDataForPlaye2);
+		this.tellUserstoDisconnect();
+		return new MachResult(this.pongGameData, Outcome.DISCONNECTED);
 	}
 
-	private GameInstanceLogicHandler() {
-		// Update the ball's position
-		if (this.pongGameData.pausedUnitl > Date.now()) {
-			// The ball is paused
-			
-		} else if (this.updateBallPosition(this.pongGameData)) {
-			// A player scored, reset the ball
-			this.pongGameData.ballPos.x = 0;
-			this.pongGameData.ballPos.y = 0;
-			this.pongGameData.ball_movement.x = 0.5;
-			this.pongGameData.ball_movement.y = 0.5;
-			// this.pongGameData.ball_movement = this.randMovementVector(30);
-			this.pongGameData.pausedUnitl = Date.now() + 940;
-			this.pongGameData.notify = true;
+	private validateConnections() {
+		if (Date.now() - this.runTimeInfo.lastDisconnectCheckTime > this.runTimeInfo.DISCONNECT_CHECK_INTERVAL) {
+			this.runTimeInfo.lastDisconnectCheckTime = Date.now();
+			if (!this.validator(this.pongGameData.player1Id, this.pongGameData.player2Id)) {
+				this.Stop();
+			}
 		}
 	}
 
-	private prepareUpdateDataForPlayer(playerId: number, invert: boolean = false, end: boolean = false): PongGameDataUserUpdate {
+	private GameInstanceLogicHandler(): boolean {
+		if (this.pongGameData.pausedUnitl > Date.now()) {
+			// game is paused
+		} else if (this.updateBallPosition(this.pongGameData)) {
+			if (this.winCondition()) {
+				this.sendWinMessage();
+				return true;
+			}
+			this.restartBall();
+			this.updatePlayerOfMachReload();
+		}
+		return false;
+	}
+
+	private sendWinMessage() {
+
+		const winMessage: PongGameDataUserUpdate = {
+			score1: this.pongGameData.score1,
+			score2: this.pongGameData.score2,
+			end_game: true,
+			end_game_reason: 'win',
+			oponent_pong_position: this.pongGameData.player1Pos,
+			ball_position: this.pongGameData.ballPos,
+		};
+
+		const loseMessageForPlayer1: PongGameDataUserUpdate = {
+			score1: this.pongGameData.score1,
+			score2: this.pongGameData.score2,
+			end_game: true,
+			end_game_reason: 'lose',
+			oponent_pong_position: this.pongGameData.player2Pos,
+			ball_position: this.pongGameData.ballPos,
+		};
+
+		if (this.pongGameData.score1 > this.pongGameData.score2) {
+			this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player1Id, winMessage);
+			this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, loseMessageForPlayer1);
+		} else {
+			this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, winMessage);
+			this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player1Id, loseMessageForPlayer1);
+		}
+	}
+
+	private winCondition(): boolean {
+		if (this.pongGameData.gameId !== 0) {
+			if (this.pongGameData.score1 >= 5 || this.pongGameData.score2 >= 5) {
+				return true;
+			}
+		}
+		else {
+			if (this.pongGameData.score1 >= 10 || this.pongGameData.score2 >= 10) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	private restartBall() {
+		this.pongGameData.ballPos.x = 0;
+		this.pongGameData.ballPos.y = 0;
+		this.pongGameData.ball_movement.x = 0.5;
+		this.pongGameData.ball_movement.y = 0.5;
+		this.pongGameData.pausedUnitl = Date.now() + 940;
+	}
+
+	private updatePlayerOfMachReload()
+	{
+		const gameDataForPlayer: PongGameDataUserUpdate = {
+			oponent_pong_position: 0,
+			ball_position: {
+				x: 0,
+				y: 0,
+			},
+			score1: this.pongGameData.score1,
+			score2: this.pongGameData.score2,
+		};
+		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player1Id, gameDataForPlayer);
+		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, gameDataForPlayer);
+	}
+
+	private prepareUpdateDataForPlayer(playerId: number, invert: boolean = false): PongGameDataUserUpdate {
 
 		const gameDataForPlayer: PongGameDataUserUpdate = {
 			oponent_pong_position: this.pongGameData.player1Id === playerId ? this.pongGameData.player2Pos : this.pongGameData.player1Pos,
@@ -255,9 +381,7 @@ export class PongGameInstance {
 				x: invert ? this.pongGameData.ballPos.x * -1 : this.pongGameData.ballPos.x,
 				y: this.pongGameData.ballPos.y,
 			},
-			end_game: end,
-			score1: this.pongGameData.notify ? this.pongGameData.score1 : undefined,
-			score2: this.pongGameData.notify ? this.pongGameData.score2 : undefined,
+			end_game: !this.pongGameData.run,
 		};
 		return gameDataForPlayer;
 	}
@@ -285,6 +409,13 @@ export class PongGameInstance {
 		return t < .5 ? 2 * t * t : -1 +(4 - 2 * t) * t;
 	}
 
+	private tellUserstoDisconnect() {
+		const gameDataForPlaye1: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player1Id);
+		const gameDataForPlaye2: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player2Id);
+		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player1Id, gameDataForPlaye1);
+		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, gameDataForPlaye2);
+	}
+
 	private invertedGameInstance(gameInstance: PongGameData): PongGameData {
 		const invertedGameInstance: PongGameData = {
 			pausedUnitl: gameInstance.pausedUnitl,
@@ -304,7 +435,6 @@ export class PongGameInstance {
 			score2: gameInstance.score1,
 			run: gameInstance.run,
 			gameId: gameInstance.gameId,
-			notify: gameInstance.notify,
 		};
 		return invertedGameInstance;
 	}

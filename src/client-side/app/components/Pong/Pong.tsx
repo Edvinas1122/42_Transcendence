@@ -11,6 +11,7 @@ interface PongGamePlayerUpdate {
 	oponent_pong_position: number,
 	ball_position: BallPosition,
 	end_game?: boolean,
+	end_game_reason?: string,
 	score1?: number,
 	score2?: number,
 }
@@ -32,7 +33,7 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 	const [opponent_pong_position, setOpponentPongPosition] = useState<number>(0);
 	const [ball_position, setBallPosition] = useState<BallPosition>({x: 0, y: 0});
     const [displayScore, setDisplayScore] = useState<string>("0 - 0");
-    const [showScore, setShowScore] = useState<boolean>(true);
+    const [showScore, setShowScore] = useState<boolean>(false);
 	const router = useRouter();
 	const { gameKey } = useContext(GameKeyContext);
 	const Socket = useContext(WebSocketContex);
@@ -56,11 +57,18 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 	}, [gameKey, Socket]);
 
 	const endGameHadler	= (data: PongGamePlayerUpdate) => {
-		router.push('/game');
+
+		setTimeout(() => {
+			router.push('/game');
+		}, 2000);
+			
 	}
 
 	useEffect(() => {
 		if (gameKey) {
+			Socket.emit('events', { event: "pongGameBegin", data: {
+				gameKey: gameKey
+			}});
 			Socket.on('pongGamePlayerUpdate', (data: PongGamePlayerUpdate) => {
 				console.log(data);
 				if (data?.score1)
@@ -72,6 +80,7 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
                     setTimeout(() => setShowScore(false), 1000);
 				}
 				if (data.end_game) {
+					setDisplayScore(data?.end_game_reason ? data.end_game_reason : "Game Over");
 					endGameHadler(data);
 				}
 				setOpponentPongPosition(data.oponent_pong_position);
@@ -100,7 +109,7 @@ const PongGame: React.FC = () => {
 
 	return (
 		<>
-		<div className={"Display"}>
+		<div className={"Display PongMain"}>
 			<PongGameDisplay/>
 		</div>
 		</>

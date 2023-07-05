@@ -3,7 +3,7 @@
     justify-content: space-between;
     align-items: center;
     height: 100%;
-    background-color: #000;
+    background-color: #1a1a1a;
     overflow: hidden;
 	width: 80%;
 }
@@ -33,4 +33,13 @@
     width: 5vh;
     height: 5vh;
     align-self: center;
+}
+
+.PongMain {
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    /* height: 100%; */
+    background-color: #1a1a1a;
+    /* overflow: hidden; */
 }

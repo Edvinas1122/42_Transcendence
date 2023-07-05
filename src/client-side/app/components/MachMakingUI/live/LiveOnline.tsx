@@ -4,6 +4,7 @@ import WebSocketContext from '../GameDataProvider';
 import { Socket } from "socket.io-client";
 import { useRouter } from 'next/navigation';
 import { GameKeyContext } from '@/components/Pong/GameKeyProvider';
+import { serverFetch } from '@/lib/fetch.util';
 
 interface SocketEvent {
 	event: string,
@@ -12,6 +13,59 @@ interface SocketEvent {
 
 interface QueInterfaceProps {
     socket: Socket;
+}
+
+interface inviteLink {
+	inviteLink: string;
+}
+
+export const InviteUserInterface: React.FC = () => {
+	const [username, setUsername] = useState<string>("");
+	const [gameId, setGameId] = useState<number>(0);
+	const [inviteLink, setInviteLink] = useState<string>("");
+	const [error, setError] = useState<string>("");
+
+	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setUsername(event.target.value);
+	}
+
+	const onClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+
+		if (!username) {
+			setError('Username is required.');
+			return;
+		}
+
+		try {
+			const response = await serverFetch(`/game/invite/`, "POST", {
+				headers: {
+					'Content-Type': 'application/json'
+				},
+			},{
+				username: username,
+			});
+
+			console.log(response);
+			// if (response.status !== 200 || ) {
+			// 	throw new Error(`Error: ${response.statusText}`);
+			// }
+
+			setInviteLink(response.inviteLink);
+			setError('');
+		} catch (err: any) {
+			setError(err.message);
+		}
+	}
+
+	return (
+		<>
+			<input type="text" onChange={onChange} value={username} />
+			<button onClick={onClick}>Invite</button>
+			{inviteLink && <div>{inviteLink}</div>}
+			{error && <div style={{ color: 'red' }}>{error}</div>}
+		</>
+	)
 }
 
 const QueInterface: React.FC<QueInterfaceProps> = ({
@@ -41,10 +95,10 @@ const QueInterface: React.FC<QueInterfaceProps> = ({
 	}
 
 	return (
-		<>
+		<div className="Form">
 			<button onClick={onClick}>JoinQue</button>
 			<button onClick={onClickLeave}>LeaveQue</button>
-		</>
+		</div>
 	)
 }
 
@@ -91,10 +145,10 @@ const Countdown: React.FC<{
 			}, 1500);
 			return;
 		}
-		setServerResponded(true);
-		console.log("redirecting, game key here", gameKey);
+		// setServerResponded(true);
+		// console.log("redirecting, game key here", gameKey);
 		setGameKey(gameKey);
-        router.push(`/game/pong/`);
+		router.push(`/game/pong/`);
     };
 
     useEffect(() => {
@@ -108,10 +162,12 @@ const Countdown: React.FC<{
 				// if (!serverResponded){
 				// 	setFailure(true);
 				// }
-				setTimeout(() => {
-					setVisibility(false);
-				}, 1000);
-			}, 1500);
+				setGameKey(gameKey);
+				router.push(`/game/pong/`);
+				// setTimeout(() => {
+				// 	setVisibility(false);
+				// }, 1000);
+			}, 900);
 			return;
         }
 		return () => {

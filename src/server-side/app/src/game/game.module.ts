@@ -8,10 +8,11 @@ import { Match } from "./entities/match.entity";
 import { Achievement } from "./entities/achievement.entity";
 import { AchievementService } from "./achievement.service";
 import { MatchService } from "./match.service";
+import { GameController } from "./game.controller";
 
 @Module({
 	imports: [SocketModule, UsersModule, TypeOrmModule.forFeature([Match, Achievement])],
-	controllers: [],
+	controllers: [GameController],
 	providers: [LiveGameQue, GameService, AchievementService, MatchService],
 	exports: [LiveGameQue],
 })
