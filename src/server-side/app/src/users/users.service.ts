@@ -106,6 +106,43 @@ export class UsersService {
 		return await this.userRepository.save(user);
 	}
 
+	async set2FASecret(secret: string, id: number): Promise<User | null> {
+		let user = await this.getUser(id);
+		if (!user) {
+			return null;
+		}
+		user.twoFactorAuthSecret = secret;
+		return await this.userRepository.save(user);
+	}
+
+	async activate2FA(id: number): Promise<User | null> {
+		let user = await this.getUser(id);
+		if (!user) {
+			return null;
+		}
+		user.twoFactorAuth = true;
+		user.twoFactorAuthenticated = true;
+		return await this.userRepository.save(user);
+	}
+
+	async deactivate2FA(id: number): Promise<User | null> {
+		let user = await this.getUser(id);
+		if (!user) {
+			return null;
+		}
+		user.twoFactorAuth = false;
+		return await this.userRepository.save(user);
+	}
+
+	async validate2FA(id: number): Promise<User | null> {
+		let user = await this.getUser(id);
+		if (!user) {
+			return null;
+		}
+		user.twoFactorAuthenticated = true;
+		return await this.userRepository.save(user);
+	}
+
 	async isBlocked(userId: number, anotherUserId: number): Promise<boolean> {
 		const userWithRelationships = await this.userRepository.findOne({
 			where: { id: userId },

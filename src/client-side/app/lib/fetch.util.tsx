@@ -76,6 +76,7 @@ async function ft_fetch<T>(uri: string, revalidate_interval: number | null = nul
 
 	const response = await fetch(fullUrl, options);
 	if (!response.ok) {
+		console.log(response.statusText);
 		throw new Error('Failed to fetch data')
 	}
 	return response.json();

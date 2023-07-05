@@ -49,4 +49,14 @@ export class User {
 
 	@OneToMany(() => Sanction, sanction => sanction.user)
 	sanctions: Sanction[];
+
+	@Column({default: false})
+	twoFactorAuth?: boolean;
+
+	@Column({nullable: true})
+	twoFactorAuthenticated?: boolean;
+
+	@Column({nullable: true})
+	twoFactorAuthSecret?: string;
+
 }

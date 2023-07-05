@@ -5,7 +5,7 @@ import { User } from '../users/entities/user.entity';
 import { ChatService } from './chat.service';
 import { UsersService } from '../users/users.service'
 import { UserInfo } from '../users/dtos/user.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { JwtTwoFactorGuard } from '../auth/guards/jwt-2fa.guard';
 import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto, EditRoleDto } from './dtos/chat.dtos'; // import DTOs
 import { PrivilegedGuard } from './guards/privileged.guard';
 import { UserId } from '../utils/user-id.decorator';
@@ -13,7 +13,7 @@ import { NoSanctionGuard } from './guards/noSanction.guard';
 import { SanctionService } from './sanction.service';
 
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtTwoFactorGuard)
 @Controller('chat/roles')
 export class RolesController {
 	constructor(

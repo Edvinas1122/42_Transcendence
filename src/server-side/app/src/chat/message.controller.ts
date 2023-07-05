@@ -1,14 +1,14 @@
 import { Controller, Get, Req, Post, Param, Body, UseGuards, ParseIntPipe, ValidationPipe } from '@nestjs/common';
 import { MessageService, MessageDto } from './message.service';
 import { Message } from './entities/message.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { JwtTwoFactorGuard } from '../auth/guards/jwt-2fa.guard';
 import { SendMessageDto } from './dtos/chat.dtos';
 import { PermitedChatGuard } from './guards/permited.guard';
 import { UserId } from '../utils/user-id.decorator';
 import { ParticipantGuard } from './guards/participant.guard';
 import { MutedSanctionGuard } from './guards/mutedSanction.guard';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtTwoFactorGuard)
 @Controller('chat/messages')
 export class MessagesController {
 	constructor(private readonly messageService: MessageService) {}

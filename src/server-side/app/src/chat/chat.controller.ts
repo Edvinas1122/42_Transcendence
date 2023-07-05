@@ -2,7 +2,7 @@ import { Controller, Get, Req, Post, Body, Param, Delete, NotFoundException, Inj
 import { ChatService } from './chat.service';
 import { Chat } from './entities/chat.entity';
 import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { JwtTwoFactorGuard } from '../auth/guards/jwt-2fa.guard';
 import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto } from './dtos/chat.dtos'; // import DTOs
 import { EventService } from '../events/events.service';
 import { OwnerGuard } from './guards/owner.guard';
@@ -13,7 +13,7 @@ interface EntityUpdateResponse {
 	message: string;
 }
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtTwoFactorGuard)
 @Controller('chat')
 export class ChatController {
 	constructor(
