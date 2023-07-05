@@ -16,19 +16,27 @@ export class TwoFAService {
     ) {}
 
     public async generate2FASecret(id: number
-        ): Promise<string> {
+) {
+        const user = await this.usersService.getUser(id);
+        if (!user) {
+            console.log("no")
+        }
         const secret = authenticator.generateSecret();
-        const otpauth = authenticator.keyuri(
-            encodeURIComponent(id),
-            encodeURIComponent(process.env.TWO_FA_NAME),
+        const otpAuthURL = authenticator.keyuri(
+            user.name,
+            process.env.TWO_FA_NAME,
             secret
         );
         await this.usersService.set2FASecret(secret, id);
-        return otpauth;
+        console.log("OtpAuthURL: ", otpAuthURL);
+        return {
+            secret, 
+            otpAuthURL
+        }
     }
 
-    public async qrCodeStream(stream: Response, otpauth: string) {
-        return toFileStream(stream, otpauth);
+    public async qrCodeStream(stream: Response, otpAuthURL: string) {
+        return await toFileStream(stream, otpAuthURL);
     }
 
     public async validate2FASecret(id: number, twoFAcode: string): Promise<boolean> {

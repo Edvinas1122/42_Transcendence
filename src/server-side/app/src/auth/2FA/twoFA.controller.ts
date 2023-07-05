@@ -24,12 +24,13 @@ export class twoFAController {
     @UseGuards(JwtAuthGuard)
     @Post('qr')
     async qrCode(@Res() response: Response, @UserId() userId: number) {
-        console.log("arrived backend");
-
-        const otpauth = await this.twoFAService.generate2FASecret(userId);
+        const { otpAuthURL } = await this.twoFAService.generate2FASecret(userId);
+        console.log("OtpAuthURL1: ", otpAuthURL);
         response.setHeader('content-type', 'image/png');
-        const qrCode = await this.twoFAService.qrCodeStream(response, otpauth);
-        return { qrCode };
+        const qrCode = await this.twoFAService.qrCodeStream(response, otpAuthURL);
+        console.log("here2");
+        console.log("QRCode: ", qrCode);
+        return  qrCode ;
     }
 
     @UseGuards(JwtAuthGuard)

@@ -2,7 +2,7 @@
 import { AuthCodeDTO } from '@/lib/DTO/AuthData';
 
 interface FetchProps {
-    token: string;
+    token: AuthCodeDTO;
     url: string;
     method: "GET" | "POST";
     body?: any;
@@ -12,7 +12,7 @@ interface FetchProps {
 export async function fetchWith2FAToken<T = any>(fetchProps: FetchProps): Promise<T> {
     "use server";
     const options: RequestInit = {
-        headers: {'Authorization': `Bearer ${fetchProps.token}`},
+        headers: {'Authorization': "Bearer " +  fetchProps.token.accessToken},
         method: fetchProps.method,
         body: fetchProps.body,
         cache: 'no-store',
@@ -27,5 +27,6 @@ export async function fetchWith2FAToken<T = any>(fetchProps: FetchProps): Promis
     }
     return response.json();
 }
+
 
 

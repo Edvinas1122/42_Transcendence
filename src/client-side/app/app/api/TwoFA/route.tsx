@@ -1,19 +1,18 @@
-import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers';
-import { ft_fetch } from '@/lib/fetch.util';
-import { redirect } from 'next/navigation'
+import { NextResponse } from 'next/server';
 
-interface AccessToken {
-	accessToken: string | undefined;
-	id: string;
-}
-
-export async function GET() {
-
-	let token: AccessToken;
-	token = await ft_fetch<AccessToken>("/auth/DevUser2FA/");
-	if (token.accessToken !== undefined) {
-		localStorage.setItem("currentUser", token.accessToken);
-	}
-	redirect('/@auth/twofa');
+export async function POST(request: Request) {
+		"use server";
+	
+		const token = request.headers.get("Authorization");
+		const options: RequestInit = 
+		{
+			method: "POST",
+			headers: {'Authorization': token as string,
+			'Content-Type' : "application/json"},
+		}
+		const response = await fetch(
+			"http://nest-app:3000/2fa/qr",
+			options
+		)
+		return response;
 }

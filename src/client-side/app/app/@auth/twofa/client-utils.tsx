@@ -1,31 +1,44 @@
 "use client";
-import React, { useState, Image} from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthCodeDTO } from '@/lib/DTO/AuthData';
-import { fetchWith2FAToken } from './server-utils';
-import { ft_fetch } from '@/lib/fetch.util';
 
 export const QRCode = ({token}: {token: AuthCodeDTO}) => {
 
-    const [qrCode, setQrCode] = useState<string | null>(null);
-    const [isClicked, setIsClicked] = useState<boolean>(false);
+    const [qrCodeURL, setQrCodeURL] = useState("");
+    const [isLoading, setLoading] = useState(false);
 
-    const fetchQRCode = async () => {
-        const result = await fetchWith2FAToken<string>({token: JSON.stringify(token.accessToken), url: "/2fa/qr", method: "POST"});
-        if (result) {
-            setQrCode(result);
+    useEffect(() => {
+        if (qrCodeURL === "") {
+            setLoading(true);
+
+            const options: RequestInit = {
+                method: "POST",
+                headers: {'Authorization': "Bearer " +  token.accessToken,
+                'Content-Type' : "application/json"},
+            }
+            fetch(
+                "api/TwoFA",
+                options
+            )
+            .then(response => {
+                if (!response.ok) {
+                    console.log("Error:", response.status);
+                }
+                return response.blob();
+            })
+            .then((qrCode) => {
+                const imageURL = URL.createObjectURL(qrCode);
+                setQrCodeURL(imageURL);
+                setLoading(false);
+            })
         }
-        console.log(result);
-    }
+    }, [])
 
-    const handleClick = async () => {
-        await fetchQRCode();
-        setIsClicked(true);
-    }
-
+    if (isLoading) return <p>loading...</p>
+    if (qrCodeURL.length < 1) return <p>No QR</p>
     return (
         <div>
-            {!isClicked && <button onClick={handleClick}>Generate OTP</button>}
-            {/* {isClicked && qrCode? <Image src={qrCode} /> : <h1>QR code not found</h1> } */}
+            <img src={qrCodeURL} />
         </div>
     )
 }
