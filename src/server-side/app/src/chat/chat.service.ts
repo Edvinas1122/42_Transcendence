@@ -38,6 +38,9 @@ export class ChatService {
 	}
 
 	async createGroupChat(createChatDto: CreateChatDto): Promise<Chat> {
+		if (createChatDto.isPrivate == true && createChatDto.password){
+			throw new BadRequestException('Private Chat can not have password');
+		}
 		const chat = new Chat();
 		chat.name = createChatDto.name;
 		chat.private = createChatDto.isPrivate;
