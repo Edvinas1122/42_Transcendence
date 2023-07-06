@@ -1,9 +1,10 @@
-import React, { useState, useEffect, MouseEvent } from 'react';
+import React, { useState, useEffect, MouseEvent, useContext } from 'react';
 import DisplayPopUp from "@/components/EventsInfoUI/EventsInfo";
 import { serverFetch } from '@/lib/fetch.util';
 import { useServerFetch } from '@/lib/fetch.client';
 import { SpinnerLoaderSmall } from '../Loader';
 import { usePathname, useRouter } from 'next/navigation';
+import { ConfirmationContext } from '@/components/confirmationDialog/Confirmation';
 import {
 	ButtonConfig,
 	ToggleUnit,
@@ -72,6 +73,7 @@ const InterfaceUnit = ({
 	confirmation?: Confirmation,
 }) => {
 	const pathname = usePathname();
+	const {setConfirmation} = useContext(ConfirmationContext);
 	// const pageId = pathname.split("/").pop() || ''; // fallback to empty string if no value
 	const endpoint = endpointTemplate.replace("[id]", item._id)
 	// .replace("[@]", pageId);
@@ -116,13 +118,16 @@ const InterfaceUnit = ({
 
 
 	const onClickFunction = () => {
-	if (confirmation) {
+		console.log("trigered on clieck ", confirmation, setConfirmation);
+	if (confirmation && confirmation.condition(item)) {
 		// Show confirmation dialog
-		confirmation.show({
-		title: 'Confirmation Required',
-		message: 'Are you sure you want to proceed?',
-		onConfirm: proceedWithAction,  // the function that performs the actual action
-		onCancel: () => {}  // You could perform some action on cancel, or leave this empty
+		setConfirmation({
+			title: confirmation.title,
+			message: confirmation.question,
+			yes: confirmation.yes,
+			no: confirmation.no,
+			onConfirm: proceedWithAction,  // the function that performs the actual action
+			onCancel: () => {}  // You could perform some action on cancel, or leave this empty
 		});
 	} else {
 		proceedWithAction();
@@ -360,6 +365,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 				callBackBehaviour={callBackBehaviourMap[button.type].sucessBehaviour}
 				renderDependency={button.displayDependency}
 				setEntityState={setEntityState}
+				confirmation={button.confirmation}
 			  />
 			);
 

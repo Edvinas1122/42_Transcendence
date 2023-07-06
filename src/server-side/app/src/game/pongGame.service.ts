@@ -139,7 +139,11 @@ export class GameService {
 				this.matchService.createRecord(
 					result
 				).then((match) => {
-					this.rankService.updateRanks(match);
+					this.rankService.updateRanks(match).then(() => {
+						console.log ("Achievement check")
+						this.achievementService.checkAchievements(match.player1ID);
+						this.achievementService.checkAchievements(match.player2ID);
+					});
 				});
 			}
 		});
@@ -206,12 +210,19 @@ interface RunTimeDetails {
 	beginGame: number;
 }
 
+interface PongMatchCustomisation {
+	gameType: string,
+	scoreToWin?: number,
+	timeLimit?: number,
+}
+
 export class PongGameInstance
 {
 	private pongGameData: PongGameData;
 	private sendToUser: (subcription: string, userId: number, message: any) => void;
 	private validator: (userId1: number, userId2: number) => boolean;
 	private runTimeInfo: RunTimeDetails;
+	private gameCustomisation: PongMatchCustomisation;
 
 	constructor(
 		player1Id: number,
@@ -227,7 +238,13 @@ export class PongGameInstance
 		score1: number = 0,
 		score2: number = 0,
 		run: boolean = true,
+		gameCustomisation: PongMatchCustomisation = {
+			gameType: "classic",
+			scoreToWin: 5,
+			timeLimit: 36000
+		},
 	) {
+		this.gameCustomisation = gameCustomisation;
 		this.pongGameData = {
 			player1Id: player1Id,
 			player2Id: player2Id,
@@ -252,6 +269,18 @@ export class PongGameInstance
 			lastDisconnectCheckTime: Date.now(),
 			beginGame: 0,
 		};
+	}
+
+	public CustomiseGame(customisation: PongMatchCustomisation): void {
+		if (customisation.gameType) {
+			this.gameCustomisation.gameType = customisation.gameType;
+		}
+		if (customisation.scoreToWin) {
+			this.gameCustomisation.scoreToWin = customisation.scoreToWin;
+		}
+		if (customisation.timeLimit) {
+			this.gameCustomisation.timeLimit = customisation.timeLimit;
+		}
 	}
 
 	async Start(): Promise<MatchResult | null> {
@@ -345,12 +374,16 @@ export class PongGameInstance
 
 	private winCondition(): boolean {
 		if (this.pongGameData.gameId !== 0) {
-			if (this.pongGameData.score1 >= 5 || this.pongGameData.score2 >= 5) {
+			if (this.pongGameData.score1 >= this.gameCustomisation.scoreToWin
+				|| this.pongGameData.score2 >= this.gameCustomisation.scoreToWin) {
 				return true;
 			}
 		}
 		else {
-			if (this.pongGameData.score1 >= 10 || this.pongGameData.score2 >= 10) {
+			if (this.pongGameData.score1 >= 
+				this.gameCustomisation.scoreToWin ||
+				this.pongGameData.score2 >= this.gameCustomisation.scoreToWin) 
+			{
 				return true;
 			}
 		}

@@ -86,6 +86,16 @@ export class MatchService {
 			],
 		});
 	}
+
+	async getUsersMatches(userId: number): Promise<Match[]> {
+		return this.matchRepository.find({
+			where: [
+				{ player1ID: userId },
+				{ player2ID: userId },
+			],
+			relations: ['player1', 'player2'],
+		});
+	}
 }
 
 export {Outcome};

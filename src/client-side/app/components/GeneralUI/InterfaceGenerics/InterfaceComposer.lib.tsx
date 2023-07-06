@@ -17,9 +17,11 @@ interface FormField {
 */
 
 interface Confirmation {
+	condition: (item: any) => boolean,
+	title: string,
 	question: string,
-	confirmText: string,
-	cancelText: string,
+	yes: string,
+	no: string,
 }
 
 interface ButtonConfig<T extends HasId> {
@@ -38,6 +40,7 @@ interface UnitRouter {
 }
 
 interface ToggleUnit {
+	confirmation?: Confirmation,
 	name: string,
 	endpointTemplate: string,
 	fields?: FormField[],

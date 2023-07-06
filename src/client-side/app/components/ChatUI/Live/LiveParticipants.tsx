@@ -67,11 +67,6 @@ const LiveParticipants: Function = ({
 			name: "Kick",
 			endpointTemplate: `/chat/roles/${chatID}/[id]`,
 			type: "delete",
-			confirmation: {
-				question: "Are you sure you want to promote this user?",
-				confirmText: "Promote",
-				cancelText: "Cancel"
-			},
 			displayDependency: (item: User) => item.Role === "Owner" ? false : true,
 			fields: [
 				{

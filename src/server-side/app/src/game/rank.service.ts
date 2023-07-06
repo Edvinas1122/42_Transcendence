@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { MatchService, Outcome } from './match.service';
 import { Match } from './entities/match.entity';
+import { AchievementService } from './achievement.service';
 
 @Injectable()
 export class RankService {
@@ -10,6 +11,8 @@ export class RankService {
 		private userService: UsersService,
 		@Inject(MatchService)
 		private matchService: MatchService,
+		@Inject(AchievementService)
+		private achievementService: AchievementService,
 	) {}
 
 	async updateRanks(match: Match) {

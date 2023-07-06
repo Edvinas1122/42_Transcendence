@@ -171,6 +171,13 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: string }) => {
 				// dependency: (item: Chat) => item?.amParticipant? true : false,
 				type: "linkToggle",
 				unitOne: {
+					confirmation: {
+						condition: (item: Chat) => item?.mine? true : false,
+						title: "Are you sure you want to delete this chat?",
+						question: "This action cannot be undone",
+						yes: "Delete",
+						no: "Cancel",
+					},
 					name: "Leave",
 					endpointTemplate: "/chat/roles/[id]/leave",
 					link: {link: "/chat", currentActiveOnly: "/chat/[@]"},

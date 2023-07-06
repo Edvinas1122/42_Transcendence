@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Achievement } from './entities/achievement.entity';
 import { MatchService } from './match.service';
-import { Match } from './entities/match.entity';
+import { Match, Outcome } from './entities/match.entity';
 
 export interface AchievementRecord {
 	_id: number;
@@ -26,16 +26,15 @@ class UserAchievement implements AchievementRecord {
 	achievedOn: Date;
 }
 
-
-
 @Injectable()
 export class AchievementService {
 	constructor(
 		@InjectRepository(Achievement)
 		private achievementRepository: Repository<Achievement>,
+		@Inject('ACHIEVEMENT_DEFINITIONS')
+		private achievementDefinitions: AchievementDefinition[],
 		@Inject(MatchService)
 		private matchService: MatchService,
-		private achievementDefinitions: AchievementDefinition[],
 	) {}
 
 	public async getUserAchievements(userId: number): Promise<AchievementRecord[]> {
@@ -46,9 +45,9 @@ export class AchievementService {
 		return achievements.map(achievement => new UserAchievement(achievement));
 	}
 
-	public async checkForAchievements(userId: number): Promise<void> {
-		const matches = await this.matchService.getPlayersMatches(userId);
-		const newAchievement = 
+	async checkAchievements(userId: number): Promise<void> {
+		const matches = await this.matchService.getUsersMatches(userId);
+		await this.iterateAchievementDefinitions(matches, userId);
 	}
 
 	private createRecord({
@@ -69,12 +68,13 @@ export class AchievementService {
 		return newAchievement;
 	}
 
-	async private iterateAchievementDefinitions(
+	private async iterateAchievementDefinitions(
 		matches: Match[],
 		userId: number,
 	): Promise<void> {
 		for (const achievementDefinition of this.achievementDefinitions) {
-			if (achievementDefinition.check(matches, userId) && await !this.hasAchievement(userId, achievementDefinition.name)) {
+			const hasAchievement = await this.hasAchievement(userId, achievementDefinition.name);
+			if (achievementDefinition.check(matches, userId) && !hasAchievement) {
 				this.createRecord({
 					name: achievementDefinition.name,
 					description: achievementDefinition.description,
@@ -103,7 +103,7 @@ class AchievementDefinition {
 	) {}
 }
 
-const achievementDefinitions = [
+export const ACHIEVEMENT_DEFINITIONS = [
 	// Other achievement definitions...
   
 	new AchievementDefinition(
@@ -133,7 +133,12 @@ const achievementDefinitions = [
 	new AchievementDefinition(
 		'First Time Winner',
 		'Win your first game',
-		(matches: Match[], playerID: number) => matches.some(match => (match.player1ID === playerID && match.outcome === Outcome.WON_BY_SCORE) || (match.player2ID === playerID && match.outcome === Outcome.WON_BY_TIME)),
+		(matches: Match[], playerID: number) => matches.some(match => {
+			console.log("testting", (match.player1ID === playerID && match.outcome === Outcome.WON_BY_SCORE) ||
+			(match.player2ID === playerID && match.outcome === Outcome.WON_BY_TIME));
+			return (match.player1ID === playerID && match.outcome === Outcome.WON_BY_SCORE) ||
+			(match.player2ID === playerID && match.outcome === Outcome.WON_BY_TIME)
+		}),
 	),
-  ];
+];
  

@@ -3,16 +3,6 @@ import { SocketGateway } from '../socket/socket.gateway';
 import { UsersService } from '../users/users.service';
 import { GameService } from './pongGame.service';
 
-// export class SocketsDisconnetor {
-// 	constructor(
-// 		@Inject(SocketGateway)
-// 		private socketGateway: SocketGateway,
-// 		(userId: number) => void
-// 	){
-// 		this.socketGateway.registerDicconnector(this.handleDisconnect.bind(this));
-// 	}
-// }
-
 interface MachedData {
 	info: string,
 	gameKey?: string,
@@ -23,8 +13,6 @@ export class LiveGameQue {
 	constructor(
 		@Inject(SocketGateway)
 		private socketGateway: SocketGateway,
-		@Inject(UsersService)
-		private usersService: UsersService,
 		private gameService: GameService,
 	) {
 		this.socketGateway.registerHandler('joinGame', this.handleJoinGameQue.bind(this), 'liveGameQueResponse');
