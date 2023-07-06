@@ -89,10 +89,10 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 			</section>
 			<div className="Component">
 				<h1>Achievements</h1>
-				{/* <UIListBox 
+				<UIListBox 
 					Items={user.achievements}
 					BoxComponent={GenericAchievement}
-				/> */}
+				/>
 				{/* <GenericAchievement id={0} />
 				<GenericAchievement id={1} />
 				<GenericAchievement id={2} /> */}
