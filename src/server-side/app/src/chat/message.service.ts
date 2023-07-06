@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './entities/message.entity';
@@ -81,7 +81,9 @@ export class MessageService {
 		if (!sender) {
 			throw new NotFoundException('Sender not found');
 		}
-		
+		if (senderId === recipientId){
+			throw new BadRequestException('Can not create MSG Priv with yourself');
+		}
 		let chat = await this.chatService.findPersonalChat(sender, recipientId);
 		if (!chat) {
 			chat = await this.chatService.createPersonalChat(sender, recipientId);

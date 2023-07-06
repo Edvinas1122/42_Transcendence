@@ -96,9 +96,6 @@ export class ChatService {
 		if (!user2) {
 			throw new NotFoundException('User not found');
 		}
-		if (user2.id === sender.id){
-			throw new BadRequestException('Can not create MSG Priv with yourself');
-		}
 		const chat = new Chat();
 		chat.name = `${sender.name} & ${user2.name}`;
 		chat.private = true;
