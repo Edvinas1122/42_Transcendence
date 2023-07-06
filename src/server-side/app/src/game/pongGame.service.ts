@@ -5,6 +5,7 @@ import { NotFoundError } from 'rxjs';
 import { MatchService } from './match.service';
 import { Match, Outcome } from './entities/match.entity';
 import { RankService } from './rank.service';
+import { AchievementService } from './achievement.service';
 
 interface Vector {
 	x: number,
@@ -88,6 +89,8 @@ export class GameService {
 		private matchService: MatchService,
 		@Inject(RankService)
 		private rankService: RankService,
+		@Inject(AchievementService)
+		private achievementService: AchievementService,
 	) {
 		this.socketGateway.registerDicconnector(this.handleDisconnect.bind(this));
 		this.socketGateway.registerHandler('pongGamePlayerUpdate', this.handleGameUpdate.bind(this), 'pongGamePlayerUpdateResponse');
