@@ -272,13 +272,13 @@ export class ChatService {
 	async banUser(
 		userId: number,
 		chatId: number,
-		bannedName: string,
+		banneeName: string,
 	): Promise<boolean> {
 		const chat = await this.getChat(chatId);
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
-		const banned = await this.usersService.findOne(bannedName);
+		const banned = await this.usersService.findOne(banneeName);
 		if (!banned) {
 			throw new NotFoundException('User not found');
 		}
@@ -288,6 +288,9 @@ export class ChatService {
 		}
 		if (role.type === RoleType.Blocked) {
 			throw new BadRequestException('User already banned');
+		}
+		if (role.type === RoleType.Owner) {
+			throw new BadRequestException('User is an Owner');
 		}
 		await this.roleService.editRole(role, RoleType.Blocked);
 		this.updateEvent(chat, RoomEventType.Banned, await this.makeChatDto(chat, userId, banned.id), true); // ashame to all Online users
