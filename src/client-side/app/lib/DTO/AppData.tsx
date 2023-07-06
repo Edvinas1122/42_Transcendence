@@ -35,6 +35,8 @@ interface UserProfile extends User {
 	MatchHistory: MatchHistory[];
 	achievements: Achievement[];
 	rank: number;
+	wins: number;
+	losses: number;
 }
 
 interface Chat extends HasId {

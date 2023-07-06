@@ -38,13 +38,6 @@ const UserInfoBox = ({ user }: { user: UserProfile }) => {
 	);
 }
 
-// interface Achievement extends HasId {
-// 	name: string;
-// 	description: string;
-// 	achievedOn?: Date;
-// 	icon?: any;
-// }
-
 const GenericAchievement = ({item}: {item: Achievement}) => {
 
     return (
@@ -61,13 +54,12 @@ const GenericAchievement = ({item}: {item: Achievement}) => {
 const MatchHistoryBox = ({ item }: { item: MatchHistory}) => {
 	return (
 		<div className={"Entity"}>
-			<strong>{item.opponent}</strong>
+			<strong>VS: {item.opponent} </strong>
 			<span>{item.userScore} | {item.opponentScore} </span>
 		</div>
 	);
 }
 
-// THIS IS OBVIOUSLY A SHITSHOW OF A FUNCTION, I WILL FIGURE OUT A BETTER WAY LMAO 
 const UserStats = ({ user }: { user: UserProfile }) => {
 
 	console.log("user adafgqewfewqf", user.achievements);
@@ -80,11 +72,11 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 			<section>
 				<div className="Component">
 					<h2>Wins</h2>
-					<p>7</p>
+					<p>{user.wins}</p>
 				</div>
 				<div className="Component">
 					<h2>Losses</h2>
-					<p>8</p>
+					<p>{user.losses}</p>
 				</div>
 			</section>
 			<div className="Component">
@@ -93,9 +85,6 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 					Items={user.achievements}
 					BoxComponent={GenericAchievement}
 				/>
-				{/* <GenericAchievement id={0} />
-				<GenericAchievement id={1} />
-				<GenericAchievement id={2} /> */}
 			</div>
 		</div>
 	);
@@ -104,7 +93,6 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 const UserProfileUI: Function = async ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
 	
 	const userStatus = isUser ? "user" : UserInfo.friend? UserInfo.friend : "none";
-	// const MachHistory: MatchHistory[] = await fetchWithToken(`/game/match-history/${UserInfo._id}`); // could have default user with mach history instread of double fetch
 
 	return (
 		<section className="Display UserPage">
@@ -120,7 +108,7 @@ const UserProfileUI: Function = async ({UserInfo, isUser}: {UserInfo: UserProfil
 				</div>
 				<div className="Component MatchHistory">
 					<h1 className="Title">Match History</h1>
-					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} />
+					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} />	
 				</div>
 			</div>
 		</section>

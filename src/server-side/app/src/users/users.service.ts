@@ -50,19 +50,20 @@ export class UsersService {
 	}
 	
 	async getUserProfile(id: number): Promise<UserProfileInfo> {
-		const resultUser = await this.userRepository.findOne({
-			where: { id },
-			relations: ['achievements', "matchesAsPlayer1", "matchesAsPlayer2"],
-		});
+		const resultUser = await this.userRepository.createQueryBuilder("user")
+			.where("user.id = :id", { id: id })
+			.leftJoinAndSelect("user.matchesAsPlayer1", "matchesAsPlayer1")
+			.leftJoinAndSelect("matchesAsPlayer1.player2", "player2")
+			.leftJoinAndSelect("user.matchesAsPlayer2", "matchesAsPlayer2")
+			.leftJoinAndSelect("matchesAsPlayer2.player1", "player1")
+			.leftJoinAndSelect("user.achievements", "achievements")
+			.getOne();
 		if (!resultUser) {
 			throw new NotFoundException('User not found');
 		}
 		const relationship = await this.getRelationshipStatus(id);
 		console.log("REATIONSHIP", relationship);
 		const user: UserProfileInfo = new UserProfileInfo(resultUser, relationship);
-		// user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
-		// user.avatar = `/avatar/avatar-${id}.png`;
-		// user.avatar = `/avatar-default.png`;
 		return user;
 	}
 
@@ -179,7 +180,7 @@ export class UsersService {
 	  
 		console.log('User:', user);
 	  
-		if (!user) {
+		if (user === undefined) {
 		  return 'none';
 		}
 	  
@@ -210,7 +211,7 @@ export class UsersService {
 		}
 	  
 		return 'none';
-	  }
+	}
 
 	async updateUser(user: User): Promise<User | null> {
 		let resultUser = await this.getUser(user.id);
