@@ -81,7 +81,7 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 const UserProfileUI: Function = async ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
 	
 	const userStatus = isUser ? "user" : UserInfo.friend? UserInfo.friend : "none";
-	const MachHistory = await fetchWithToken(`/game/match-history/${UserInfo._id}`);
+	const MachHistory = await fetchWithToken(`/game/match-history/${UserInfo._id}`); // could have default user with mach history instread of double fetch
 
 	return (
 		<section className="Display UserPage">
