@@ -13,6 +13,10 @@ export class UsersService {
 	private userRepository: Repository<User>,
 	) {}
 
+	async getAllUsers(): Promise<User[]> {
+		return this.userRepository.find();
+	}
+
 	async findAll(): Promise<UserInfo[]> {
 		const users = await this.userRepository.find();
 		return users.map(user => new UserInfo(user));
@@ -40,16 +44,25 @@ export class UsersService {
 		return this.userRepository.findOne({ where: { id } });
 	}
 
+	private setDefaultAvatar(user: User): User {
+		user.avatar = '/avatar-default.png';
+		return user;
+	}
 	
 	async getUserProfile(id: number): Promise<UserProfileInfo> {
-		const resultUser = await this.userRepository.findOne({ where: { id } });
+		const resultUser = await this.userRepository.findOne({
+			where: { id },
+			relations: ['achievements'],
+		});
 		if (!resultUser) {
 			throw new NotFoundException('User not found');
 		}
 		const relationship = await this.getRelationshipStatus(id);
 		console.log("REATIONSHIP", relationship);
 		const user: UserProfileInfo = new UserProfileInfo(resultUser, relationship);
-		user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
+		// user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
+		// user.avatar = `/avatar/avatar-${id}.png`;
+		// user.avatar = `/avatar-default.png`;
 		return user;
 	}
 
@@ -62,6 +75,7 @@ export class UsersService {
 		if (resultUser) {
 			return null;
 		}
+		user.avatar = `/avatar-default.png`;
 		return await this.userRepository.save(user);
 	}
 
@@ -73,13 +87,13 @@ export class UsersService {
 			user = new User();
 			user.name = info['login'];
 			user.FullName = info['displayname'];
-			user.avatar = info['image']['versions']['small'];
+			// user.avatar = info['image']['versions']['small'];
+			user.avatar = `/avatar-default.png`;
 			user.ImageLinks = info['image']['versions'];
 			// user.OriginJson = info;
 			
 			user = await this.userRepository.save(user);
 		}
-	
 		return user;
 	}
 
@@ -89,7 +103,7 @@ export class UsersService {
 			throw new NotFoundException('User not found');
 		}
 		const user: UserInfo = new UserInfo(resultUser);
-		user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
+		// user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
 		return user;
 	}
 
@@ -197,6 +211,15 @@ export class UsersService {
 	  
 		return 'none';
 	  }
+
+	async updateUser(user: User): Promise<User | null> {
+		let resultUser = await this.getUser(user.id);
+		if (!resultUser) {
+			return null;
+		}
+		// save to database updated user
+		return await this.userRepository.save(user);
+	}
 }
 
 export { User };

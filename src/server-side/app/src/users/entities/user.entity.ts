@@ -60,4 +60,7 @@ export class User {
 
 	@OneToMany(() => Achievement, achievement => achievement.laureate)
 	achievements: Achievement[];
+
+	@Column({ nullable: true })
+	rank: number;
 }
