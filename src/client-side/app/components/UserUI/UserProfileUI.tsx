@@ -1,7 +1,6 @@
 import React from 'react';
-import { UserProfile, MatchHistory } from '@/lib/DTO/AppData';
+import { UserProfile, MatchHistory, Achievement } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
-import GenericAchievement from './Placeholders/DummyAchievements';
 import UserInteract from './UserInteract';
 import Image from 'next/image';
 import fetchWithToken from '@/lib/fetch.util';
@@ -39,6 +38,26 @@ const UserInfoBox = ({ user }: { user: UserProfile }) => {
 	);
 }
 
+// interface Achievement extends HasId {
+// 	name: string;
+// 	description: string;
+// 	achievedOn?: Date;
+// 	icon?: any;
+// }
+
+const GenericAchievement = ({item}: {item: Achievement}) => {
+
+    return (
+        <div className="Entity Achievement">
+            <p>
+                {/* <span> <FontAwesomeIcon icon={item?.icon} size="sm"/> </span> */}
+                <strong>{item?.name}</strong>
+                <span>{item?.description}</span>
+            </p>
+        </div>
+    );
+}
+
 const MatchHistoryBox = ({ item }: { item: MatchHistory}) => {
 	return (
 		<div className={"Entity"}>
@@ -51,7 +70,7 @@ const MatchHistoryBox = ({ item }: { item: MatchHistory}) => {
 // THIS IS OBVIOUSLY A SHITSHOW OF A FUNCTION, I WILL FIGURE OUT A BETTER WAY LMAO 
 const UserStats = ({ user }: { user: UserProfile }) => {
 
-	console.log("user", user);
+	console.log("user", user.achievements);
 
 	return (
 		<div className="Segment">
@@ -70,9 +89,13 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 			</section>
 			<div className="Component">
 				<h1>Achievements</h1>
-				<GenericAchievement id={0} />
+				{/* <UIListBox 
+					Items={user.achievements}
+					BoxComponent={GenericAchievement}
+				/> */}
+				{/* <GenericAchievement id={0} />
 				<GenericAchievement id={1} />
-				<GenericAchievement id={2} />
+				<GenericAchievement id={2} /> */}
 			</div>
 		</div>
 	);
@@ -81,7 +104,7 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 const UserProfileUI: Function = async ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
 	
 	const userStatus = isUser ? "user" : UserInfo.friend? UserInfo.friend : "none";
-	const MachHistory = await fetchWithToken(`/game/match-history/${UserInfo._id}`); // could have default user with mach history instread of double fetch
+	const MachHistory: MatchHistory[] = await fetchWithToken(`/game/match-history/${UserInfo._id}`); // could have default user with mach history instread of double fetch
 
 	return (
 		<section className="Display UserPage">
