@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import { NotFoundError } from 'rxjs';
 import { MatchService } from './match.service';
 import { Match, Outcome } from './entities/match.entity';
+import { RankService } from './rank.service';
 
 interface Vector {
 	x: number,
@@ -52,7 +53,7 @@ interface inviteLink {
 	inviteLink: string;
 }
 
-class MachResult implements Partial<Match> {
+class MatchResult implements Partial<Match> {
 	constructor(
 		data: PongGameData,
 		outcome: Outcome = Outcome.WON_BY_SCORE,
@@ -85,6 +86,8 @@ export class GameService {
 		private usersService: UsersService,
 		@Inject(MatchService)
 		private matchService: MatchService,
+		@Inject(RankService)
+		private rankService: RankService,
 	) {
 		this.socketGateway.registerDicconnector(this.handleDisconnect.bind(this));
 		this.socketGateway.registerHandler('pongGamePlayerUpdate', this.handleGameUpdate.bind(this), 'pongGamePlayerUpdateResponse');
@@ -132,7 +135,9 @@ export class GameService {
 			if (result) {
 				this.matchService.createRecord(
 					result
-				);
+				).then((match) => {
+					this.rankService.updateRanks(match);
+				});
 			}
 		});
 	}
@@ -246,7 +251,7 @@ export class PongGameInstance
 		};
 	}
 
-	async Start(): Promise<MachResult | null> {
+	async Start(): Promise<MatchResult | null> {
 		if (this.runTimeInfo.beginGame < 1) {
 			this.runTimeInfo.beginGame++;
 			return null;
@@ -266,11 +271,11 @@ export class PongGameInstance
 		this.sendToUser('GameCommence', this.pongGameData.player2Id, `Player ${this.pongGameData.player1Id} has disconnected.`);
 	}
 
-	private async gameInstanceLoop(): Promise<MachResult>
+	private async gameInstanceLoop(): Promise<MatchResult>
 	{
 		while (this.pongGameData.run && Date.now() - this.runTimeInfo.gameStartTime < this.runTimeInfo.MAX_GAME_TIME) {
 			if (this.GameInstanceLogicHandler()) {
-				return new MachResult(this.pongGameData)
+				return new MatchResult(this.pongGameData);
 			}
 			const gameDataForPlaye1: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player1Id);
 			const gameDataForPlaye2: PongGameDataUserUpdate = this.invertBallPosition(gameDataForPlaye1);
@@ -280,7 +285,7 @@ export class PongGameInstance
 			await this.sleep(this.runTimeInfo.GAME_LOOP_DELAY);
 		}
 		this.tellUserstoDisconnect();
-		return new MachResult(this.pongGameData, Outcome.DISCONNECTED);
+		return new MatchResult(this.pongGameData, Outcome.DISCONNECTED);
 	}
 
 	private validateConnections() {

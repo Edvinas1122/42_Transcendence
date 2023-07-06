@@ -35,11 +35,13 @@ export class UserProfileInfo extends UserInfo {
 		this.MachHistory = [];
 		this.Achievements = [];
 		this.friend = friend;
+		this.rank = user.rank;
 		// you can also assign user properties here if needed
 	}
 	MachHistory?: MachHistory[];
 	Achievements?: Achievement[];
 	friend?: string;
+	rank?: number;
 }
 
 export class Achievement {

@@ -70,6 +70,13 @@
 
 .UserInfo .ImageFrame {
   justify-content: center;
+  /* border-radius: 50%; */
+}
+
+.UserInfo .ImageFrame img {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
 }
 
 .Component.UserInteract {

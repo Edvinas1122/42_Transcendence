@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Match } from './entities/match.entity';
+import { Match, Outcome } from './entities/match.entity';
+import { RankService } from './rank.service';
 
 export interface MatchHistory {
 	_id: number;
@@ -51,7 +52,7 @@ export class MatchService {
 		return matches.map(match => new MatchRecord(match, userID));
 	}
 
-	createRecord({
+	async createRecord({
 		gameType,
 		outcome,
 		player1Score,
@@ -59,8 +60,8 @@ export class MatchService {
 		player2Score,
 		player2ID,
 		gameEndDate,
-	}: Partial<Match>): void {
-		this.create({
+	}: Partial<Match>): Promise<Match> {
+		return this.create({
 			gameType,
 			outcome,
 			player1Score,
@@ -77,4 +78,14 @@ export class MatchService {
 		return newMatch;
 	}
 
+	async getMachesByUserId(userId: number): Promise<Match[]> {
+		return this.matchRepository.find({
+			where: [
+				{ player1ID: userId },
+				{ player2ID: userId },
+			],
+		});
+	}
 }
+
+export {Outcome};

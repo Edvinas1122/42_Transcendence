@@ -9,11 +9,12 @@ import { Achievement } from "./entities/achievement.entity";
 import { AchievementService } from "./achievement.service";
 import { MatchService } from "./match.service";
 import { GameController } from "./game.controller";
+import { RankService } from "./rank.service";
 
 @Module({
 	imports: [SocketModule, UsersModule, TypeOrmModule.forFeature([Match, Achievement])],
 	controllers: [GameController],
-	providers: [LiveGameQue, GameService, AchievementService, MatchService],
+	providers: [LiveGameQue, GameService, AchievementService, MatchService, RankService],
 	exports: [LiveGameQue],
 })
 export class GameModule {}

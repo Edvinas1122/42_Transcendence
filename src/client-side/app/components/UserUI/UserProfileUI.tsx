@@ -32,7 +32,8 @@ const UserInfoBox = ({ user }: { user: UserProfile }) => {
 			<p>{user.Online ? user.Ingame ? "In game" : "Idle" : "Offline"}</p>
 			</div>
 			<div className="ImageFrame">
-			{user.avatar && <Image src={"/public/" + user.avatar} alt={`Profile Image for ${user.name}`} width={60} height={60}/>}
+			{/* <img src="http://localhost:3030/avatar-default.png"></img> */}
+			{user.avatar && <Image src={user.avatar} alt={`Profile Image for ${user.name}`} width={130} height={130}/>}
 			</div>
 		</div>
 	);
@@ -50,12 +51,12 @@ const MatchHistoryBox = ({ item }: { item: MatchHistory}) => {
 // THIS IS OBVIOUSLY A SHITSHOW OF A FUNCTION, I WILL FIGURE OUT A BETTER WAY LMAO 
 const UserStats = ({ user }: { user: UserProfile }) => {
 
-
+	console.log("user", user);
 
 	return (
 		<div className="Segment">
 			<div className="Component">
-				<h1>Rank #2</h1>
+				<h1>Rank #{user?.rank}</h1>
 			</div>
 			<section>
 				<div className="Component">
