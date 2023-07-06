@@ -52,7 +52,7 @@ export class UsersService {
 	async getUserProfile(id: number): Promise<UserProfileInfo> {
 		const resultUser = await this.userRepository.findOne({
 			where: { id },
-			relations: ['achievements'],
+			relations: ['achievements', "matchesAsPlayer1", "matchesAsPlayer2"],
 		});
 		if (!resultUser) {
 			throw new NotFoundException('User not found');

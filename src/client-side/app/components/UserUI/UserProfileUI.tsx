@@ -104,7 +104,7 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 const UserProfileUI: Function = async ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
 	
 	const userStatus = isUser ? "user" : UserInfo.friend? UserInfo.friend : "none";
-	const MachHistory: MatchHistory[] = await fetchWithToken(`/game/match-history/${UserInfo._id}`); // could have default user with mach history instread of double fetch
+	// const MachHistory: MatchHistory[] = await fetchWithToken(`/game/match-history/${UserInfo._id}`); // could have default user with mach history instread of double fetch
 
 	return (
 		<section className="Display UserPage">
@@ -120,7 +120,7 @@ const UserProfileUI: Function = async ({UserInfo, isUser}: {UserInfo: UserProfil
 				</div>
 				<div className="Component MatchHistory">
 					<h1 className="Title">Match History</h1>
-					<UIListBox Items={MachHistory} BoxComponent={MatchHistoryBox} />
+					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} />
 				</div>
 			</div>
 		</section>
