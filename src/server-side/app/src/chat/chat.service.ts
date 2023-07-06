@@ -38,6 +38,9 @@ export class ChatService {
 	}
 
 	async createGroupChat(createChatDto: CreateChatDto): Promise<Chat> {
+		if (createChatDto.isPrivate == true && createChatDto.password){
+			throw new BadRequestException('Private Chat can not have password');
+		}
 		const chat = new Chat();
 		chat.name = createChatDto.name;
 		chat.private = createChatDto.isPrivate;
@@ -95,9 +98,6 @@ export class ChatService {
 		const user2 = await this.usersService.findUser(receiverId);
 		if (!user2) {
 			throw new NotFoundException('User not found');
-		}
-		if (user2.id === sender.id){
-			throw new BadRequestException('Can not create MSG Priv with yourself');
 		}
 		const chat = new Chat();
 		chat.name = `${sender.name} & ${user2.name}`;
