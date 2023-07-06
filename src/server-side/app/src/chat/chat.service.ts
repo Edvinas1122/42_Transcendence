@@ -93,11 +93,12 @@ export class ChatService {
 	async createPersonalChat(sender: User, receiverId: number): Promise<Chat> {
 
 		const user2 = await this.usersService.findUser(receiverId);
-
 		if (!user2) {
 			throw new NotFoundException('User not found');
 		}
-
+		if (user2.id === sender.id){
+			throw new BadRequestException('Can not create MSG Priv with yourself');
+		}
 		const chat = new Chat();
 		chat.name = `${sender.name} & ${user2.name}`;
 		chat.private = true;
@@ -236,6 +237,9 @@ export class ChatService {
 		if (!role) {
 			throw new BadRequestException('User not a participant');
 		}
+		if (promotee.id === userId){
+			throw new BadRequestException('Can not Promote yourself');
+		}
 		if (role.type === RoleType.Admin || role.type === RoleType.Owner) {
 			throw new BadRequestException('User already an admin');
 		}
@@ -281,6 +285,9 @@ export class ChatService {
 		const banned = await this.usersService.findOne(banneeName);
 		if (!banned) {
 			throw new NotFoundException('User not found');
+		}
+		if (banned.id === userId){
+			throw new BadRequestException('Can not ban yourself')
 		}
 		const role = await this.roleService.getRole(chatId, banned.id);
 		if (!role) {
@@ -338,6 +345,8 @@ export class ChatService {
 		if (!muted) {
 			throw new NotFoundException('User not found');
 		}
+		if (muted.id === userId)
+			throw new BadRequestException('Can not mute yourself')
 		await this.sanctionService.imposeSanction(muted.id, chatId, duration, SanctionType.MUTED);
 		this.updateEvent(chat, RoomEventType.Muted, await this.makeChatDto(chat, userId, muted.id));
 		return true;
