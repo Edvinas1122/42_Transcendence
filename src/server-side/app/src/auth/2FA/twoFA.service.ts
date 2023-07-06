@@ -28,7 +28,6 @@ export class TwoFAService {
             secret
         );
         await this.usersService.set2FASecret(secret, id);
-        console.log("OtpAuthURL: ", otpAuthURL);
         return {
             secret, 
             otpAuthURL
@@ -52,6 +51,7 @@ export class TwoFAService {
             })
             return valid;
         } catch (error) {
+            console.log("Validation Error : ", error);
             return false;
         }
     }

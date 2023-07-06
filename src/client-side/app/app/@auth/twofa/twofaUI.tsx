@@ -8,6 +8,6 @@ const TwoFAUI = ({token}: {token: AuthCodeDTO}) => {
             <QRCode token={token}/>
         </div>
     );
-}
+}                          
 
 export default TwoFAUI;

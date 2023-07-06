@@ -25,11 +25,8 @@ export class twoFAController {
     @Post('qr')
     async qrCode(@Res() response: Response, @UserId() userId: number) {
         const { otpAuthURL } = await this.twoFAService.generate2FASecret(userId);
-        console.log("OtpAuthURL1: ", otpAuthURL);
         response.setHeader('content-type', 'image/png');
         const qrCode = await this.twoFAService.qrCodeStream(response, otpAuthURL);
-        console.log("here2");
-        console.log("QRCode: ", qrCode);
         return  qrCode ;
     }
 
@@ -61,17 +58,19 @@ export class twoFAController {
     
     @UseGuards(JwtAuthGuard)
     @Post('authenticate')
-    async authenticate2FA(@Res() res: Response, @UserId() currentUserId: number, @Body() twoFACodeDto: TwoFACodeDto) {
+    async authenticate2FA(@UserId() currentUserId: number, @Body() twoFACodeDto: TwoFACodeDto) {
+        console.log("Hello");
         const valid = await this.twoFAService.validate2FASecret(
             currentUserId,
             twoFACodeDto.code
         );
         if (!valid) {
+            console.log("Boooo");
             throw new UnauthorizedException('Invalid authentication code');
         }
         const user = await this.usersService.getUser(currentUserId);
         await this.usersService.validate2FA(currentUserId);
-        const accessToken = await this.authService.generateToken(user);
+        const accessToken = await this.authService.generateToken({id: user.id, owner: user.name});
         return {accessToken};
     }
 }
