@@ -33,13 +33,20 @@ export class UserProfileInfo extends UserInfo {
 	constructor(user: User, friend?: string) {
 		super(user);
 		this.MachHistory = [];
-		this.Achievements = [];
+		this.achievements = user.achievements.map(achievement => {
+			return {
+				_id: achievement.id,
+				name: achievement.name,
+				description: achievement.description,
+				achievedOn: achievement.createdAt,
+			};
+		});
 		this.friend = friend;
 		this.rank = user.rank;
 		// you can also assign user properties here if needed
 	}
 	MachHistory?: MachHistory[];
-	Achievements?: Achievement[];
+	achievements?: Achievement[];
 	friend?: string;
 	rank?: number;
 }

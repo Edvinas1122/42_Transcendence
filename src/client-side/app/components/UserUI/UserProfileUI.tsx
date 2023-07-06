@@ -70,7 +70,7 @@ const MatchHistoryBox = ({ item }: { item: MatchHistory}) => {
 // THIS IS OBVIOUSLY A SHITSHOW OF A FUNCTION, I WILL FIGURE OUT A BETTER WAY LMAO 
 const UserStats = ({ user }: { user: UserProfile }) => {
 
-	console.log("user", user.achievements);
+	console.log("user adafgqewfewqf", user.achievements);
 
 	return (
 		<div className="Segment">
