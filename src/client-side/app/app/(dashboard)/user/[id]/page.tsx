@@ -1,13 +1,19 @@
-import { User } from '@/lib/DTO/AppData';
+import { User, UserProfile } from '@/lib/DTO/AppData';
 import fetchWithToken from '@/lib/fetch.util';
-import UserProfileInfo from '@/components/UserUI/UserProfileDisplay'
+import UserProfileUI from '@/components/UserUI/UserProfileUI';
+import { serverFetch } from '@/lib/fetch.util';
+import { notFound} from "next/navigation";
 
 const UserPage = async ({ params }: { params: { id: string } }) => {
 
-	const user: User = await fetchWithToken<User>(`/users/profile/${params.id}`, 30);
+	const user: any = await serverFetch<Promise<any>>(`/users/profile/${params.id}`);
+
+	if (user.error) {
+		notFound();
+	}
 
 	return (
-		<UserProfileInfo UserInfo={user} />
+		<UserProfileUI UserInfo={user as UserProfile} isUser={false}/>
 	);
 };
 

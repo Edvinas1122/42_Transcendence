@@ -6,7 +6,7 @@ import EventPopUp from '@/components/EventsInfoUI/EventsInfo'
 
 
 
-export default function RootLayout(
+export default function DashboardLayout(
 {
 	children
 }: {

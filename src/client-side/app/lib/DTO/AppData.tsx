@@ -4,18 +4,20 @@ interface HasId {
 	_id: number;
 }
 
-interface MachHistory extends HasId {
-	opeonent: string;
+interface MatchHistory extends HasId {
+	opponent: string;
 	userScore: number;
-	oponentScore: number;
-	created: Date;
+	opponentScore: number;
 	completed: boolean;
+	created?: Date;
+	gameType?: string;
 }
 
 interface Achievement extends HasId {
 	name: string;
 	description: string;
-	achievedOn: Date;
+	achievedOn?: Date;
+	icon?: any;
 }
 
 interface User extends HasId {
@@ -26,11 +28,11 @@ interface User extends HasId {
 	Role?: RoleType; // chat context
 	Muted?: boolean; // chat context
 	Banned?: boolean; // chat context
-	friend?: boolean;
+	friend?: string;
 }
 
 interface UserProfile extends User {
-	MachHistory: MachHistory[];
+	MatchHistory: MatchHistory[];
 	Achievements: Achievement[];
 }
 
@@ -86,5 +88,5 @@ interface AppData {
 }
 
 export default AppData;
-export type { User, UserProfile, MachHistory, Chat, Achievement, PersonalChat, GroupChat, Message };
+export type { User, UserProfile, MatchHistory, Chat, Achievement, PersonalChat, GroupChat, Message};
 export { isGroupChat };

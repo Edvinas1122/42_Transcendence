@@ -8,6 +8,7 @@ WORKDIR /app
 COPY app/package*.json ./
 
 # Install dependencies
+# RUN npm update
 RUN npm install
 
 # Copy tsconfig.json
@@ -20,16 +21,19 @@ RUN mkdir /uploads
 
 
 # Copy the rest of the application
-RUN npm install --save @nestjs/typeorm typeorm pg
-RUN npm install @nestjs/passport passport passport-42
-RUN npm install passport-jwt @nestjs/jwt
-
+# RUN npm install --save @nestjs/typeorm typeorm pg
+# RUN npm install @nestjs/common@10
+# RUN npm install @nestjs/passport passport passport-42
+# RUN npm install @nestjs/platform-express
 # RUN npm i --save @nestjs/websockets @nestjs/platform-socket.io
-RUN npm install class-validator class-transformer
+
+# RUN npm install passport-jwt @nestjs/jwt
+
+# RUN npm install class-validator class-transformer
 
 # file upload
-RUN npm install npm i -D @types/multer
-RUN npm install cookie-parser
+# RUN npm install npm i -D @types/multer
+# RUN npm install cookie-parser
 
 COPY app/ ./
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { User } from '@/lib/DTO/AppData';
+import UserProfileUI from './UserProfileUI';
 
 interface UserProfileDisplayProps {
 	UserInfo: User;
@@ -9,9 +10,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = (
 	{UserInfo}: UserProfileDisplayProps
 ) => {
 	return (
-		<div>
-			<h1>{UserInfo.name}</h1>
-		</div>
+		<UserProfileUI userInfo={UserInfo} isUser={true} />
 	);
 };
 

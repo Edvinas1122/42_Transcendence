@@ -12,6 +12,8 @@ import { ChatModule } from './chat/chat.module';
 import { DriveModule } from './drive/drive.module';
 import { NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { HttpsRedirectMiddleware } from './utils/http.middleware';
+import { SocketModule } from './socket/socket.module';
+import { GameModule } from './game/game.module';
 
 @Module({
 	imports: [
@@ -20,6 +22,10 @@ import { HttpsRedirectMiddleware } from './utils/http.middleware';
 		EventsModule,
 		ChatModule,
 		DriveModule,
+		UsersModule,
+		ProfileManagementModule,
+		SocketModule,
+		GameModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
