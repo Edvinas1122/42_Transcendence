@@ -18,7 +18,7 @@ export class Achievement {
 	laureateId: number;
 
 	@ManyToOne(() => User, (user) => user.achievements, { onDelete: 'CASCADE' })
-	@JoinColumn({ name: "LaureateId" })
+	@JoinColumn({ name: "laureateId" })
 	laureate: User;
 
 	@CreateDateColumn()
