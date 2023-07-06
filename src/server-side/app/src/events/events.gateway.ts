@@ -10,7 +10,7 @@ import * as jwt from 'jsonwebtoken';
 
 @Controller("events")
 export class EventsController {
-    constructor(private eventService: EventService) {}
+	constructor(private eventService: EventService) {}
 
 	@Sse('sse')
 	sse(

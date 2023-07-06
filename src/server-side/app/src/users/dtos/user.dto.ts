@@ -31,10 +31,12 @@ export class UserInfo {
 }
 
 export class UserProfileInfo extends UserInfo {
-	constructor(user: User, friend?: string) {
+	constructor(user: User, friend?: string, online?: boolean, ingame?: boolean) {
 		super(user);
 		let wincount = 0;
 		let losscount = 0;
+		this.Online = online;
+		this.Ingame = ingame;
 		this.MatchHistory = [...user.matchesAsPlayer1, ...user.matchesAsPlayer2].map(match => {
 			if (match.player1ID === user.id) {
 				if (match.player1Score > match.player2Score) {

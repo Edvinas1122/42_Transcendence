@@ -3,32 +3,17 @@ import { UserProfile, MatchHistory, Achievement } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
 import UserInteract from './UserInteract';
 import Image from 'next/image';
-import fetchWithToken from '@/lib/fetch.util';
+import { OnlineStatus } from './OnlineStatus';
 import "./UserProfile.css"
 
-const MatchHistoryDummy: MatchHistory[] = [
-	{
-		_id: 1,
-		opponent: "bob",
-		userScore: 7,
-		opponentScore: 8,
-		completed: true
-	},
-	{
-		_id: 2,
-		opponent: "barry",
-		userScore: 65,
-		opponentScore: 3,
-		completed: true
-	},
-]
-
 const UserInfoBox = ({ user }: { user: UserProfile }) => {
+
+
 	return (
 		<div className="Component UserInfo">
 			<div>
 			<h1>{user.name}</h1>
-			<p>{user.Online ? user.Ingame ? "In game" : "Idle" : "Offline"}</p>
+			<OnlineStatus id={user._id} />
 			</div>
 			<div className="ImageFrame">
 			{/* <img src="http://localhost:3030/avatar-default.png"></img> */}

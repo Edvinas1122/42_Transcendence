@@ -12,30 +12,18 @@ import { Observable } from 'rxjs';
 //   // passphrase: 'verynicedog'
 // };
 
-// export class MyWebSocketAdapter implements WebSocketAdapter {
-
-// 	bindClientConnect(server: any, callback: Function) {
-		
-// 	}
-// 	bindMessageHandlers(client: any, handlers: WsMessageHandler<string>[], transform: (data: any) => Observable<any>) {
-		
-// 	}
-// 	create(port: number, options?: any) {
-		
-// 	}
-// 	close(server: any) {}
-// }
-
 async function bootstrap() {
-  // const app = await NestFactory.create(AppModule, { httpsOptions });
-  const app = await NestFactory.create(AppModule);
+	// const app = await NestFactory.create(AppModule, { httpsOptions });
+	const app = await NestFactory.create(AppModule, {
+		forceCloseConnections: true
+	});
 
-  app.enableCors(corsConfig); // enable cors
+	app.enableCors(corsConfig); // enable cors
 
-//   app.useWebSocketAdapter(new MyWebSocketAdapter());
-  app.use(cookieParser());
-  await app.listen(3000);
-  // await app.listen(3001);
+	app.enableShutdownHooks();
+	app.use(cookieParser());
+	await app.listen(3000);
+	// await app.listen(3001);
 
 }
 bootstrap();

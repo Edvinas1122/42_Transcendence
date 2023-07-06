@@ -1,16 +1,19 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRuntimeError, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserProfileInfo, UserInfo, UpdateUsernameDto } from './dtos/user.dto';
 import { MachHistory } from './dtos/game-stats.dto';
 import { Relationship, RelationshipStatus } from './profile-management/entities/relationship.entity';
+// import { OnlineStatusService } from '../OnlineStatus/onlineStatus.service';
 
 @Injectable()
 export class UsersService {
 	constructor(
 	@InjectRepository(User)
 	private userRepository: Repository<User>,
+	// @Inject(OnlineStatusService)
+	// private onlineStatusService: OnlineStatusService,
 	) {}
 
 	async getAllUsers(): Promise<User[]> {
@@ -23,7 +26,6 @@ export class UsersService {
 	}
 
 	async findAllUsersNotBlocked(id: number): Promise<UserInfo[]> {
-		console.log('id', id);
 		const users = await this.userRepository
 		.createQueryBuilder('user')
 		.where('user.id NOT IN ' +
@@ -62,7 +64,7 @@ export class UsersService {
 			throw new NotFoundException('User not found');
 		}
 		const relationship = await this.getRelationshipStatus(id);
-		console.log("REATIONSHIP", relationship);
+		// const onlineStatus = await this.onlineStatusService.getOnlineStatus(id);
 		const user: UserProfileInfo = new UserProfileInfo(resultUser, relationship);
 		return user;
 	}
@@ -149,7 +151,6 @@ export class UsersService {
 		if(newName) {
 			let unique = await this.findOne(newName);
 			if (unique != null) {
-				console.log(unique.name);
 				throw new ConflictException("Username already exists");
 			}
 			user.name = newName;
@@ -178,7 +179,6 @@ export class UsersService {
 		  .where('user.id = :userId', { userId })
 		  .getOne();
 	  
-		console.log('User:', user);
 	  
 		if (user === undefined) {
 		  return 'none';
@@ -186,9 +186,6 @@ export class UsersService {
 	  
 		const initiatedRelationship = user.relationshipsInitiated?.find(relationship => relationship.user1ID === userId);
 		const receivedRelationship = user.relationshipsReceived?.find(relationship => relationship.user2ID === userId);
-	  
-		console.log('Initiated Relationship:', initiatedRelationship);
-		console.log('Received Relationship:', receivedRelationship);
 	  
 		if (initiatedRelationship && initiatedRelationship.status === RelationshipStatus.PENDING) {
 		  return 'received';
