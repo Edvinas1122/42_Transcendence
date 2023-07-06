@@ -21,7 +21,7 @@ export class MutedSanctionGuard implements CanActivate {
 		return this.sanctionService.hasActiveSanction(userId, chatId)
 			.then(sanction => {
 				if (sanction?.sanctionType === SanctionType.MUTED) {
-					const message = `You've been muted and cannot send messages`; 
+					const message = `You've been muted and can not send messages`; 
 					throw new ForbiddenException(message);
 				}
 			return true;

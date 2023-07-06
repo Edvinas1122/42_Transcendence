@@ -18,7 +18,7 @@ export class ProfileManagementService {
 
 	async sendFriendRequest(senderId: number, receiverId: number): Promise<Relationship>{
 		if (senderId == receiverId)
-			throw new HttpException('You cannot send friend request to yourself', HttpStatus.BAD_REQUEST);
+			throw new HttpException('You can not send friend request to yourself', HttpStatus.BAD_REQUEST);
 		const relationship = new Relationship();
 		relationship.user1ID = senderId;
 		relationship.user2ID = receiverId;

@@ -20,7 +20,7 @@ export class NoSanctionGuard implements CanActivate {
 		return this.sanctionService.hasActiveSanction(userId, chatId)
 			.then(sanction => {
 				if (sanction?.sanctionType === SanctionType.KICKED) {
-					const message = `You are currently sanctioned and cannot join this chat until ${sanction.sanctionUntil}`;
+					const message = `You are currently sanctioned and can not join this chat until ${sanction.sanctionUntil}`;
 					throw new ForbiddenException(message);
 				}
 			return true;
