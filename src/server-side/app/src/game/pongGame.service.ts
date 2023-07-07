@@ -99,6 +99,14 @@ export class GameService {
 
 	private liveGameInstancesMap = new Map<string, PongGameInstance>();
 	
+	public userIsInGame(userId: number): boolean {
+		const user = this.getInstanceByUserId(userId);
+		if (user === undefined) {
+			return false;
+		}
+		return true;
+	}
+
 	async inviteToGame(userId1: number, inviteeName: string, gameType: number): Promise<inviteLink>
 	{
 		const user = await this.usersService.findOne(inviteeName);
@@ -143,6 +151,9 @@ export class GameService {
 						console.log ("Achievement check")
 						this.achievementService.checkAchievements(match.player1ID);
 						this.achievementService.checkAchievements(match.player2ID);
+					}).then(() => {
+						this.handleDisconnect(player1ID);
+						this.handleDisconnect(player2ID);
 					});
 				});
 			}
@@ -180,7 +191,10 @@ export class GameService {
 	{
 		const gameInstance = this.getInstanceByUserId(userId);
 		if (gameInstance) {
-			gameInstance.Stop();
+			gameInstance.Stop().then((data) => {
+				this.liveGameInstancesMap.delete(
+					this.defaultGameKey(data.player1Id, data.player2Id));
+			});
 		}
 	}
 
@@ -297,10 +311,12 @@ export class PongGameInstance
 		return this.gameInstanceLoop();
 	}
 
-	public Stop() {
+	public async Stop(): Promise<PongGameData> {
 		this.pongGameData.run = false;
 		this.sendToUser('GameCommence', this.pongGameData.player1Id, `Player ${this.pongGameData.player2Id} has disconnected.`);
 		this.sendToUser('GameCommence', this.pongGameData.player2Id, `Player ${this.pongGameData.player1Id} has disconnected.`);
+		this.sleep(2000);
+		return (this.pongGameData);
 	}
 
 	private async gameInstanceLoop(): Promise<MatchResult>
@@ -324,7 +340,11 @@ export class PongGameInstance
 		if (Date.now() - this.runTimeInfo.lastDisconnectCheckTime > this.runTimeInfo.DISCONNECT_CHECK_INTERVAL) {
 			this.runTimeInfo.lastDisconnectCheckTime = Date.now();
 			if (!this.validator(this.pongGameData.player1Id, this.pongGameData.player2Id)) {
-				this.Stop();
+				this.Stop().then(
+					() => {
+						console.log("Game Stopped by validator------- not clean stop");
+					}
+				);
 			}
 		}
 	}

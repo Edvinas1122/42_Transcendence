@@ -22,6 +22,6 @@ import { RankService } from "./rank.service";
 		MatchService,
 		RankService
 	],
-	exports: [LiveGameQue],
+	exports: [LiveGameQue, GameService],
 })
 export class GameModule {}
