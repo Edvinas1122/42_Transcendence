@@ -3,7 +3,6 @@ import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UseGuards, } from '@nestjs/common';
 import { JwtTwoFactorGuard } from '../auth/guards/jwt-2fa.guard';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { UserProfileInfo, UserInfo, UpdateUsernameDto } from './dtos/user.dto';
 import { UserId } from '../utils/user-id.decorator';
 
@@ -12,13 +11,13 @@ interface UserUpdateResponse {
 	message: string;
 }
 
+@UseGuards(JwtTwoFactorGuard)
 @Controller('users')
 export class UsersController {
 	constructor(
 		private readonly usersService: UsersService,
 	) {}
 
-	@UseGuards(JwtTwoFactorGuard)
 	@Get('all')
 	async findAllUsers(@UserId() currentUserId: number): Promise<UserInfo[]>
 	{
@@ -28,7 +27,6 @@ export class UsersController {
 		return users;
 	}
 
-	@UseGuards(JwtAuthGuard)
 	@Get('me')
 	async findCurrentUser(@UserId() currentUser: number): Promise<UserProfileInfo>
 	{
@@ -36,7 +34,6 @@ export class UsersController {
 		return user;
 	}
 
-	@UseGuards(JwtTwoFactorGuard)
 	@Get('profile/:id')
 	async findUser(@UserId() userId: number, @Param('id', new ParseIntPipe()) requesteeId: number): Promise<UserProfileInfo>
 	{
@@ -44,7 +41,6 @@ export class UsersController {
 		return requestee;
 	}
 
-	@UseGuards(JwtTwoFactorGuard)
 	@Post('edit')
 	async editUsername(@Body() newName: UpdateUsernameDto, @UserId() userId: number
 	): Promise<UserUpdateResponse | null>
