@@ -188,6 +188,16 @@ export class ChatService {
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
+		if (kickedId === userId){
+			throw new BadRequestException('Can not Kick yourself from Chat');
+		}
+		const roleofExecutor = await this.roleService.getRole(chatId, userId);
+		const roleofMutee = await this.roleService.getRole(chatId, kickedId);
+		if (roleofExecutor?.type === RoleType.Admin){
+			if (roleofMutee?.type === RoleType.Admin || roleofMutee?.type === RoleType.Owner){
+				throw new BadRequestException('Can not kick other Admins or owners from Chat');
+			}
+		}
 		this.updateEvent(chat, RoomEventType.Kicked, await this.makeChatDto(chat, userId, kickedId), true); // ashame to all Online users
 		if (duration) {
 			this.sanctionService.imposeSanction(kickedId, chatId, duration);
