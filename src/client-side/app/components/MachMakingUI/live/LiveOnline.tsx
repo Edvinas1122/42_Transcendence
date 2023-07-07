@@ -5,6 +5,8 @@ import { Socket } from "socket.io-client";
 import { useRouter } from 'next/navigation';
 import { GameKeyContext } from '@/components/Pong/GameKeyProvider';
 import { serverFetch } from '@/lib/fetch.util';
+import { Oxanium } from 'next/font/google';
+import "../Que.css";
 
 interface SocketEvent {
 	event: string,
@@ -18,6 +20,11 @@ interface QueInterfaceProps {
 interface inviteLink {
 	inviteLink: string;
 }
+
+const oxanium = Oxanium({ 
+	subsets: ['latin'],
+})
+
 
 export const InviteUserInterface: React.FC = () => {
 	const [username, setUsername] = useState<string>("");
@@ -60,7 +67,7 @@ export const InviteUserInterface: React.FC = () => {
 
 	return (
 		<>
-			<input type="text" onChange={onChange} value={username} />
+			<input type="text" className={oxanium.className} onChange={onChange} value={username} />
 			<button onClick={onClick}>Invite</button>
 			{inviteLink && <div>{inviteLink}</div>}
 			{error && <div style={{ color: 'red' }}>{error}</div>}
