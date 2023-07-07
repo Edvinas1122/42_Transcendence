@@ -63,12 +63,13 @@ export class EventService {
 			}
 		}
 	}
+	
 
 	async getAllOnlineUsers(): Promise<number[]> {
 		return Array.from(this.eventSubjects.keys()).map(Number);
 	}
 
-	async seeIfUserIsOnline(userId: string): Promise<boolean> {
+	seeIfUserIsOnline(userId: string): boolean {
 		console.log("Total online count", this.eventSubjects.size)
 		return this.eventSubjects.has(userId);
 	}

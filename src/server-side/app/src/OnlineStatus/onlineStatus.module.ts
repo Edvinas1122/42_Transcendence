@@ -3,10 +3,11 @@ import { Module } from '@nestjs/common';
 import { OnlineStatusService } from './onlineStatus.service';
 import { OnlineStatusController } from './onlineStatus.controller';
 import { EventsModule } from '../events/events.module';
-import { SocketModule } from '../socket/socket.module';
+// import { GameService } from '../game/pongGame.service';
+import { GameModule } from '../game/game.module';
 
 @Module({
-	imports: [EventsModule, SocketModule],
+	imports: [EventsModule, GameModule],
 	providers: [OnlineStatusService],
 	controllers: [OnlineStatusController],
 	exports: [OnlineStatusService],

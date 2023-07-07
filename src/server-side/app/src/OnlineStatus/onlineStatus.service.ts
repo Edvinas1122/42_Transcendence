@@ -1,19 +1,30 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { EventService } from '../events/events.service';
-import { SocketGateway } from '../socket/socket.gateway';
+import { GameService } from '../game/pongGame.service';
+
+export interface OnlineStatusResponse {
+	status: 'online' | 'offline' | 'InGame';
+}
 
 @Injectable()
 export class OnlineStatusService {
 	constructor(
 		@Inject(EventService)
 		private eventService: EventService,
-		@Inject(SocketGateway)
-		private socketGateway: SocketGateway,
+		@Inject(GameService)
+		private readonly gameService: GameService,
 	) {}
 
-	public async getOnlineStatus(userId: number): Promise<boolean> {
+	async getOnlineStatus(userId: number): Promise<OnlineStatusResponse> {
 		const status = this.eventService.seeIfUserIsOnline(userId.toString());
-		return status;
+		if (status) {
+			const game = this.gameService.userIsInGame(userId);
+			if (game) {
+				return { status: 'InGame' };
+			}
+			return { status: 'online' };
+		}
+		return { status: 'offline' };
 	}
 }
 
