@@ -1,6 +1,7 @@
 "use client";	
 import React from "react";
 import { User } from "@/lib/DTO/AppData";
+import { UserInfoBox } from "@/components/UserUI/UserProfileUI";
 
 interface UserBoxProps {
 	item: User,
@@ -10,10 +11,10 @@ interface UserBoxProps {
 const UserBox: React.FC<UserBoxProps> = ({ item, childnode }: UserBoxProps) => {
 	return (
 	  <>
-		<p>
-		  <strong>{item.name}</strong>
-		  <span>{item.name}</span>
-		</p>
+		<UserInfoBox
+		  user={item}
+		  scale={70}
+		/>
 		  <div className="status"></div>
 		{childnode}
 	  </>

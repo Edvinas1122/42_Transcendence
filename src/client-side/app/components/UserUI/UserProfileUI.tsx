@@ -1,13 +1,18 @@
 import React from 'react';
-import { UserProfile, MatchHistory, Achievement } from '@/lib/DTO/AppData';
+import { UserProfile, MatchHistory, Achievement, User } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
 import UserInteract from './UserInteract';
 import Image from 'next/image';
 import { OnlineStatus } from './OnlineStatus';
 import "./UserProfile.css"
 
-const UserInfoBox = ({ user }: { user: UserProfile }) => {
-
+export const UserInfoBox = ({
+	user,
+	scale
+}: {
+	user: User
+	scale?: number
+}) => {
 
 	return (
 		<div className="Component UserInfo">
@@ -15,9 +20,10 @@ const UserInfoBox = ({ user }: { user: UserProfile }) => {
 			<h1>{user.name}</h1>
 			<OnlineStatus id={user._id} />
 			</div>
-			<div className="ImageFrame">
-			{/* <img src="http://localhost:3030/avatar-default.png"></img> */}
-			{user.avatar && <Image src={user.avatar} alt={`Profile Image for ${user.name}`} width={130} height={130}/>}
+			<div className="ImageDisplay">
+				<div className="ImageFrame" style={{ width: scale || 300, height: scale || 300 }}>
+				{user.avatar && <Image src={user.avatar} alt={`Profile Image for ${user.name}`} width={scale? scale :300} height={scale? scale :300}/>}
+				</div>
 			</div>
 		</div>
 	);
