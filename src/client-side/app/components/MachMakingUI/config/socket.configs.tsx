@@ -7,7 +7,7 @@ export interface SocketSettings {
 
 export const connectSettings = (token: string): SocketSettings => {
 	// const url = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL;
-	const url = "http://localhost:3000";
+	const url = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}`;
 	if (url == undefined) {
 		throw new Error("Socket URL is undefined");
 	}

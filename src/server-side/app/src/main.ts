@@ -15,7 +15,8 @@ import { Observable } from 'rxjs';
 async function bootstrap() {
 	// const app = await NestFactory.create(AppModule, { httpsOptions });
 	const app = await NestFactory.create(AppModule, {
-		forceCloseConnections: true
+		forceCloseConnections: true,
+		cors: true,	// enable cors
 	});
 
 	app.enableCors(corsConfig); // enable cors

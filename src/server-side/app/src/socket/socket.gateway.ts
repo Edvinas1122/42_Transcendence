@@ -14,7 +14,7 @@ import { Inject, UnauthorizedException } from '@nestjs/common';
 // import { Chat } from '../chat/entities/chat.entity';
 
 const corsWSConfig = { cors: {
-	origin: process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL,
+	origin: [process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL, "http://localhost:3030"],
 	// origin: "*",
 	// methods: ["GET", "POST", ],
 	credentials: true

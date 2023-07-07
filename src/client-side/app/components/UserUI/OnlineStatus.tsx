@@ -7,7 +7,11 @@ interface OnlineStatusResponse {
 	status: 'online' | 'offline' | 'InGame';
 }
 
-export const OnlineStatus: React.FC = ({id}: {id: number}) => {
+interface OnlineStatusProps {
+    id: number;
+}
+
+export const OnlineStatus: React.FC<OnlineStatusProps> = ({id}) => {
     const [online, setOnline] = useState<string>("loading...");
 
 	console.log("user id: ", id);
