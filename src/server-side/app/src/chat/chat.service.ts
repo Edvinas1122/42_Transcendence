@@ -347,6 +347,13 @@ export class ChatService {
 		}
 		if (muted.id === userId)
 			throw new BadRequestException('Can not mute yourself')
+		const roleofExecutor = await this.roleService.getRole(chatId, userId);
+		const roleofMutee = await this.roleService.getRole(chatId, muted.id);
+		if (roleofExecutor?.type === RoleType.Admin){
+			if (roleofMutee?.type === RoleType.Admin || roleofMutee?.type === RoleType.Owner){
+				throw new BadRequestException('Can not mute other Admins or owners');
+			}
+		}
 		await this.sanctionService.imposeSanction(muted.id, chatId, duration, SanctionType.MUTED);
 		this.updateEvent(chat, RoomEventType.Muted, await this.makeChatDto(chat, userId, muted.id));
 		return true;
