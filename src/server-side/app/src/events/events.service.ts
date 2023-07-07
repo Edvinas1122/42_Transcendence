@@ -14,6 +14,7 @@ export class EventService {
 		private eventRepository: Repository<Event>,
 	) {}
 	private eventSubjects = new Map<string, Subject<any>>();
+	
 
 	connectUser(userId: string) {
 		this.eventSubjects.set(userId, new Subject<any>());
@@ -43,9 +44,7 @@ export class EventService {
 		event.data = data.payload;
 		event.user = new User();
 		event.user.id = Number(userId);
-		await this.eventRepository.save(event);
 		
-		// Save the event
 		await this.eventRepository.save(event);
 		
 		if (subject) {
@@ -64,11 +63,16 @@ export class EventService {
 			}
 		}
 	}
+	
 
 	async getAllOnlineUsers(): Promise<number[]> {
 		return Array.from(this.eventSubjects.keys()).map(Number);
 	}
 
+	seeIfUserIsOnline(userId: string): boolean {
+		console.log("Total online count", this.eventSubjects.size)
+		return this.eventSubjects.has(userId);
+	}
 
 	getUserEventStream(userId: string) {
 		return this.eventSubjects.get(userId)?.asObservable();

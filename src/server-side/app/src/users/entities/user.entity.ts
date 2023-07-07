@@ -5,6 +5,8 @@ import { Message } from '../../chat/entities/message.entity';
 import { Role } from '../../chat/entities/role.entity';
 import { Event } from '../../events/entities/event.entity';
 import { Sanction } from '../../chat/entities/sanction.entity';
+import { Match } from '../../game/entities/match.entity';
+import { Achievement } from '../../game/entities/achievement.entity';
 
 @Entity()
 export class User {
@@ -54,9 +56,20 @@ export class User {
 	twoFactorAuth?: boolean;
 
 	@Column({nullable: true})
-	twoFactorAuthenticated?: boolean;
+	twoFactorAuthenticated?: boolean; // WHY ??
 
 	@Column({nullable: true})
 	twoFactorAuthSecret?: string;
 
+	@OneToMany(() => Match, match => match.player1)
+	matchesAsPlayer1: Match[];
+
+	@OneToMany(() => Match, match => match.player2)
+	matchesAsPlayer2: Match[];
+
+	@OneToMany(() => Achievement, achievement => achievement.laureate)
+	achievements: Achievement[];
+
+	@Column({ nullable: true })
+	rank: number;
 }

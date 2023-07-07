@@ -1,87 +1,105 @@
 import React from 'react';
-import { UserProfile, MatchHistory } from '@/lib/DTO/AppData';
+import { UserProfile, MatchHistory, Achievement, User } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
-import GenericAchievement from './Placeholders/DummyAchievements';
 import UserInteract from './UserInteract';
+import Image from 'next/image';
+import { OnlineStatus } from './OnlineStatus';
+import "./UserProfile.css"
 
-const MatchHistoryDummy: MatchHistory[] = [
-	{
-		_id: 1,
-		opponent: "bob",
-		userScore: 7,
-		opponentScore: 8,
-		completed: true
-	},
-	{
-		_id: 2,
-		opponent: "barry",
-		userScore: 65,
-		opponentScore: 3,
-		completed: true
-	},
-]
+export const UserInfoBox = ({
+	user,
+	scale
+}: {
+	user: User
+	scale?: number
+}) => {
 
-const UserInfoBox = ({ user }: { user: UserProfile }) => {
 	return (
-		<div className="Component">
-			{user.avatar && <img src={user.avatar} alt={`Profile Image for ${user.name}`}/>}
+		<div className="Component UserInfo">
+			<div>
 			<h1>{user.name}</h1>
-			<p>{user.Online ? user.Ingame ? "In game" : "Idle" : "Offline"}</p>
+			<OnlineStatus id={user._id} />
+			</div>
+			<div className="ImageDisplay">
+				<div className="ImageFrame" style={{ width: scale || 300, height: scale || 300 }}>
+				{user.avatar && <Image src={user.avatar} alt={`Profile Image for ${user.name}`} width={scale? scale :300} height={scale? scale :300}/>}
+				</div>
+			</div>
 		</div>
 	);
 }
 
-const MatchHistoryBox = ({ item, style }: { item: MatchHistory, style?: string }) => {
+const GenericAchievement = ({item}: {item: Achievement}) => {
+
+    return (
+        <div className="Entity Achievement">
+            <p>
+                {/* <span> <FontAwesomeIcon icon={item?.icon} size="sm"/> </span> */}
+                <strong>{item?.name}</strong>
+                <span>{item?.description}</span>
+            </p>
+        </div>
+    );
+}
+
+const MatchHistoryBox = ({ item }: { item: MatchHistory}) => {
 	return (
-		<div className={"Entity " + style}>
-			<strong>{item.opponent}</strong>
+		<div className={"Entity"}>
+			<strong>VS: {item.opponent} </strong>
 			<span>{item.userScore} | {item.opponentScore} </span>
 		</div>
 	);
 }
 
-// THIS IS OBVIOUSLY A SHITSHOW OF A FUNCTION, I WILL FIGURE OUT A BETTER WAY LMAO 
 const UserStats = ({ user }: { user: UserProfile }) => {
+
+	console.log("user adafgqewfewqf", user.achievements);
+
 	return (
 		<div className="Segment">
 			<div className="Component">
-				<h1>Rank #2</h1>
+				<h1>Rank #{user?.rank}</h1>
 			</div>
 			<section>
 				<div className="Component">
 					<h2>Wins</h2>
-					<p>7</p>
+					<p>{user.wins}</p>
 				</div>
 				<div className="Component">
 					<h2>Losses</h2>
-					<p>8</p>
+					<p>{user.losses}</p>
 				</div>
 			</section>
 			<div className="Component">
 				<h1>Achievements</h1>
-				<GenericAchievement id={0} />
-				<GenericAchievement id={1} />
-				<GenericAchievement id={2} />
+				<UIListBox 
+					Items={user.achievements}
+					BoxComponent={GenericAchievement}
+				/>
 			</div>
 		</div>
 	);
 }
 
-const UserProfileUI: Function = ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
+const UserProfileUI: Function = async ({UserInfo, isUser}: {UserInfo: UserProfile, isUser: boolean}) => {
 	
 	const userStatus = isUser ? "user" : UserInfo.friend? UserInfo.friend : "none";
-	
+
 	return (
-		<section className="Display">
+		<section className="Display UserPage">
 			<div className="Segment">
-				<UserInfoBox user={UserInfo} />
-				<UserInteract userStatus={userStatus} userID={UserInfo._id}/>
+					<UserInfoBox user={UserInfo} />
+				<div className="Component UserInteract">
+					<UserInteract userStatus={userStatus} userID={UserInfo._id}/>
+				</div>
 			</div>
 			<div className="Segment">
-                <UserStats user={UserInfo} />
-                <div className="Component">
-                    <h1>Match History</h1>
-					<UIListBox Items={MatchHistoryDummy} BoxComponent={MatchHistoryBox} />
+				<div className="Component UserStats">
+					<UserStats user={UserInfo} />
+				</div>
+				<div className="Component MatchHistory">
+					<h1 className="Title">Match History</h1>
+					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} />	
 				</div>
 			</div>
 		</section>

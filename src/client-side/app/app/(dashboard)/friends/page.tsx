@@ -1,6 +1,6 @@
 import FriendsUI from "@/components/FriendsUI/FriendsUI";
 
-const FriendsAndUsersPage: Function = async () => {
+const FriendsAndUsersPage: Function = () => {
 
 	return (
 		<FriendsUI />

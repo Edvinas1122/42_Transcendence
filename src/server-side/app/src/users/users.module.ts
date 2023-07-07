@@ -11,7 +11,7 @@
 	import { ProfileManagementModule } from './profile-management/profile-management.module';
 
 	@Module({
-		imports: [TypeOrmModule.forFeature([User, UserRepository]), ProfileManagementModule],
+		imports: [TypeOrmModule.forFeature([User, UserRepository]), ProfileManagementModule, EventsModule],
 		controllers: [UsersController],
 		providers: [UsersService],
 		exports: [UsersService],

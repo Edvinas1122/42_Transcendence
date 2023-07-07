@@ -5,6 +5,7 @@ import UIClientListBox, {UIClientListBoxClassBuilder} from "@/components/General
 import { ParticipantSourceContext } from "../ChatEventProvider";
 import { EntityInterfaceBuilder } from "@/components/GeneralUI/InterfaceGenerics/InterfaceComposer";
 import { RoleType, User } from "@/lib/DTO/AppData";
+import { UserInfoBox } from "@/components/UserUI/UserProfileUI";
 import "../Chat.css"
 
 interface ParticipantBoxProps {
@@ -18,8 +19,11 @@ const ParticipantBox: React.FC<ParticipantBoxProps> = ({
 }) => {
 	return (
 		<div>
+			<UserInfoBox 
+				user={item}
+				scale={70}
+			/>
 			<p>
-				<strong>{item.name}</strong>
 				<span>{item.Role}</span>
 			</p>
 			<div className="status"></div>

@@ -1,0 +1,45 @@
+.pong-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    background-color: #1a1a1a;
+    overflow: hidden;
+	width: 80%;
+}
+
+.pong-score {
+    position: absolute; /* Make the score display absolute */
+    top: 0; /* Position it at the top */
+    left: 50%; /* Center it horizontally */
+    transform: translateX(-50%); /* Fine-tune the centering */
+    width: auto; /* Let it auto size based on content */
+    height: 10%;
+    font-size: 10vh;
+    color: #fff;
+    z-index: 10; /* Make it appear on top */
+}
+
+.pong-player, .pong-ball {
+	position: relative;
+	margin: 1vw;
+    width: 2.2vw;
+    height: 23vh;
+    background-color: #fff;
+}
+
+.pong-ball {
+	position: relative;
+    width: 5vh;
+    height: 5vh;
+    align-self: center;
+}
+
+.PongMain {
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    /* height: 100%; */
+    background-color: #1a1a1a;
+    /* overflow: hidden; */
+}

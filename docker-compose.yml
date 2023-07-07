@@ -37,8 +37,8 @@ services:
       - ./src/client-side/app/app:/app/app
       - ./src/client-side/app/lib:/app/lib
       - ./src/client-side/app/components:/app/components
-      - file_storage:/app/public/avatar
-      - ./src/client-side/app/public:/app/public
+      # - file_storage:/app/public/avatar
+      - ./src/client-side/app/public/:/app/public/
     depends_on:
       - nest-app
 
@@ -50,18 +50,19 @@ services:
       - .env
     ports:
       - 3000:3000
+      - 3001:3001
     volumes:
       - ./src/server-side/app/src:/app/src
-      - file_storage:/uploads
+      - ./src/client-side/app/public/avatar/:/uploads
     depends_on:
       - db
 
 volumes:
   pgadmin_data:
-  file_storage:
-    # driver: local
-    # name: file_storage
-    # driver_opts:
-    #   o: bind
-    #   type: none
-    #   device: ./src/client-side/app/public/avatar
+  # file_storage:
+  #   driver: local
+  #   name: file_storage
+  #   driver_opts:
+  #     o: bind
+  #     type: none
+  #     device: ./src/client-side/app/public/avatar

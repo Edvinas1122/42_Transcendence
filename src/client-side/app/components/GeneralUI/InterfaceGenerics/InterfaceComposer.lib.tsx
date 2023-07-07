@@ -14,7 +14,16 @@ interface FormField {
 	delete - use callback to remove item from list
 	toggle - not sure yet
 	action - updates notifcation if successful, designed for put or post entity updates
-*/ 
+*/
+
+interface Confirmation {
+	condition: (item: any) => boolean,
+	title: string,
+	question: string,
+	yes: string,
+	no: string,
+}
+
 interface ButtonConfig<T extends HasId> {
     name: string,
 	endpointTemplate: string,
@@ -22,6 +31,7 @@ interface ButtonConfig<T extends HasId> {
 	displayDependency?: (item: T) => boolean,
 	fields?: FormField[],
 	editEntity?: (item: T) => any,
+	confirmation?: Confirmation,
 }
 
 interface UnitRouter {
@@ -30,6 +40,7 @@ interface UnitRouter {
 }
 
 interface ToggleUnit {
+	confirmation?: Confirmation,
 	name: string,
 	endpointTemplate: string,
 	fields?: FormField[],
@@ -73,6 +84,7 @@ export type {
 	FormField,
 	UnitRouter,
 	EntityUpdateResponse,
+	Confirmation,
 };
 
 interface EntityUpdateResponse extends Response {

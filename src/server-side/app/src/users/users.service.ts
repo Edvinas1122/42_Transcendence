@@ -1,10 +1,11 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRuntimeError, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserProfileInfo, UserInfo, UpdateUsernameDto } from './dtos/user.dto';
 import { MachHistory } from './dtos/game-stats.dto';
 import { Relationship, RelationshipStatus } from './profile-management/entities/relationship.entity';
+// import { OnlineStatusService } from '../OnlineStatus/onlineStatus.service';
 
 @Injectable()
 export class UsersService {
@@ -13,13 +14,16 @@ export class UsersService {
 	private userRepository: Repository<User>,
 	) {}
 
+	async getAllUsers(): Promise<User[]> {
+		return this.userRepository.find();
+	}
+
 	async findAll(): Promise<UserInfo[]> {
 		const users = await this.userRepository.find();
 		return users.map(user => new UserInfo(user));
 	}
 
 	async findAllUsersNotBlocked(id: number): Promise<UserInfo[]> {
-		console.log('id', id);
 		const users = await this.userRepository
 		.createQueryBuilder('user')
 		.where('user.id NOT IN ' +
@@ -40,16 +44,26 @@ export class UsersService {
 		return this.userRepository.findOne({ where: { id } });
 	}
 
+	private setDefaultAvatar(user: User): User {
+		user.avatar = '/avatar-default.png';
+		return user;
+	}
 	
 	async getUserProfile(id: number): Promise<UserProfileInfo> {
-		const resultUser = await this.userRepository.findOne({ where: { id } });
+		const resultUser = await this.userRepository.createQueryBuilder("user")
+			.where("user.id = :id", { id: id })
+			.leftJoinAndSelect("user.matchesAsPlayer1", "matchesAsPlayer1")
+			.leftJoinAndSelect("matchesAsPlayer1.player2", "player2")
+			.leftJoinAndSelect("user.matchesAsPlayer2", "matchesAsPlayer2")
+			.leftJoinAndSelect("matchesAsPlayer2.player1", "player1")
+			.leftJoinAndSelect("user.achievements", "achievements")
+			.getOne();
 		if (!resultUser) {
 			throw new NotFoundException('User not found');
 		}
 		const relationship = await this.getRelationshipStatus(id);
-		console.log("REATIONSHIP", relationship);
+		// const onlineStatus = await this.onlineStatusService.getOnlineStatus(id);
 		const user: UserProfileInfo = new UserProfileInfo(resultUser, relationship);
-		user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
 		return user;
 	}
 
@@ -62,6 +76,7 @@ export class UsersService {
 		if (resultUser) {
 			return null;
 		}
+		user.avatar = `/avatar-default.png`;
 		return await this.userRepository.save(user);
 	}
 
@@ -73,13 +88,13 @@ export class UsersService {
 			user = new User();
 			user.name = info['login'];
 			user.FullName = info['displayname'];
-			user.avatar = info['image']['versions']['small'];
+			// user.avatar = info['image']['versions']['small'];
+			user.avatar = `/avatar-default.png`;
 			user.ImageLinks = info['image']['versions'];
 			// user.OriginJson = info;
 			
 			user = await this.userRepository.save(user);
 		}
-	
 		return user;
 	}
 
@@ -89,7 +104,7 @@ export class UsersService {
 			throw new NotFoundException('User not found');
 		}
 		const user: UserInfo = new UserInfo(resultUser);
-		user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
+		// user.avatar = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + `/avatar/avatar-${id}.png`;
 		return user;
 	}
 
@@ -171,7 +186,6 @@ export class UsersService {
 		if(newName) {
 			let unique = await this.findOne(newName);
 			if (unique != null) {
-				console.log(unique.name);
 				throw new ConflictException("Username already exists");
 			}
 			user.name = newName;
@@ -200,17 +214,13 @@ export class UsersService {
 		  .where('user.id = :userId', { userId })
 		  .getOne();
 	  
-		console.log('User:', user);
 	  
-		if (!user) {
+		if (user === undefined) {
 		  return 'none';
 		}
 	  
 		const initiatedRelationship = user.relationshipsInitiated?.find(relationship => relationship.user1ID === userId);
 		const receivedRelationship = user.relationshipsReceived?.find(relationship => relationship.user2ID === userId);
-	  
-		console.log('Initiated Relationship:', initiatedRelationship);
-		console.log('Received Relationship:', receivedRelationship);
 	  
 		if (initiatedRelationship && initiatedRelationship.status === RelationshipStatus.PENDING) {
 		  return 'received';
@@ -233,7 +243,16 @@ export class UsersService {
 		}
 	  
 		return 'none';
-	  }
+	}
+
+	async updateUser(user: User): Promise<User | null> {
+		let resultUser = await this.getUser(user.id);
+		if (!resultUser) {
+			return null;
+		}
+		// save to database updated user
+		return await this.userRepository.save(user);
+	}
 }
 
 export { User };

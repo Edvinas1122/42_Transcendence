@@ -1,9 +1,10 @@
-import React, { useState, useEffect, MouseEvent } from 'react';
+import React, { useState, useEffect, MouseEvent, useContext } from 'react';
 import DisplayPopUp from "@/components/EventsInfoUI/EventsInfo";
 import { serverFetch } from '@/lib/fetch.util';
 import { useServerFetch } from '@/lib/fetch.client';
 import { SpinnerLoaderSmall } from '../Loader';
 import { usePathname, useRouter } from 'next/navigation';
+import { ConfirmationContext } from '@/components/confirmationDialog/Confirmation';
 import {
 	ButtonConfig,
 	ToggleUnit,
@@ -13,6 +14,7 @@ import {
 	HasId,
 	FormField,
 	UnitRouter,
+	Confirmation
 	} from './InterfaceComposer.lib';
 import "@/public/layout.css";
 
@@ -55,6 +57,7 @@ const InterfaceUnit = ({
 	link,
 	setEntityState,
 	editEntity,
+	confirmation,
 }: {
 	name: string,
 	endpointTemplate: string,
@@ -67,8 +70,10 @@ const InterfaceUnit = ({
 	link?: UnitRouter,
 	setEntityState?: (item: any) => void,
 	editEntity?: (item: any) => any,
+	confirmation?: Confirmation,
 }) => {
 	const pathname = usePathname();
+	const {setConfirmation} = useContext(ConfirmationContext);
 	// const pageId = pathname.split("/").pop() || ''; // fallback to empty string if no value
 	const endpoint = endpointTemplate.replace("[id]", item._id)
 	// .replace("[@]", pageId);
@@ -113,6 +118,27 @@ const InterfaceUnit = ({
 
 
 	const onClickFunction = () => {
+		console.log("trigered on clieck ", confirmation, setConfirmation);
+	if (confirmation && confirmation.condition(item)) {
+		// Show confirmation dialog
+		setConfirmation({
+			title: confirmation.title,
+			message: confirmation.question,
+			yes: confirmation.yes,
+			no: confirmation.no,
+			onConfirm: proceedWithAction,  // the function that performs the actual action
+			onCancel: () => {}  // You could perform some action on cancel, or leave this empty
+		});
+	} else {
+		proceedWithAction();
+	}
+	};
+
+	// const proceedWithAction = async () => {
+	// // Place your original onClickFunction logic here
+	// };
+
+	const proceedWithAction = () => {
 		(async () => {
 			setLoading(true);
 			if (fields) {
@@ -265,6 +291,7 @@ export const ToggleInterfaceUnit = ({
 				link={visibleUnit.link}
 				setEntityState={setEntityState}
 				editEntity={visibleUnit.editEntity}
+				confirmation={visibleUnit.confirmation}
 			/>
 		</>
 	);
@@ -287,6 +314,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 				renderDependency={button.displayDependency}
 				setEntityState={setEntityState}
 				editEntity={button.editEntity}
+				confirmation={button.confirmation}
 			/>
 		);
 
@@ -337,6 +365,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 				callBackBehaviour={callBackBehaviourMap[button.type].sucessBehaviour}
 				renderDependency={button.displayDependency}
 				setEntityState={setEntityState}
+				confirmation={button.confirmation}
 			  />
 			);
 

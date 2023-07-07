@@ -15,9 +15,14 @@ COPY app/tsconfig.json ./
 
 
 # RUN npm install js-cookie
-RUN npm install --save @types/js-cookie
-# RUN npm install socket.io-client bufferutil utf-8-validate
+# RUN npm install --save @types/js-cookie
+# RUN npm install bufferutil
+# utf-8-validate 
+# bufferutil
+RUN npm install bufferutil utf-8-validate --save-optional
+RUN npm install socket.io-client 
 RUN npm install @types/react @types/react-dom @types/node
+# RUN npm i sharp
 
 #GRAPHICS RELATED modules
 	#functional

@@ -12,6 +12,9 @@ import { ChatModule } from './chat/chat.module';
 import { DriveModule } from './drive/drive.module';
 import { NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { HttpsRedirectMiddleware } from './utils/http.middleware';
+import { SocketModule } from './socket/socket.module';
+import { GameModule } from './game/game.module';
+import { OnlineStatusModule } from './OnlineStatus/onlineStatus.module';
 
 @Module({
 	imports: [
@@ -22,6 +25,9 @@ import { HttpsRedirectMiddleware } from './utils/http.middleware';
 		DriveModule,
 		UsersModule,
 		ProfileManagementModule,
+		SocketModule,
+		GameModule,
+		OnlineStatusModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

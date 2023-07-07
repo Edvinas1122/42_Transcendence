@@ -3,6 +3,7 @@ import { EventsController } from './events.gateway';
 import { EventService } from './events.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
+// import { OnlineStatusService } from '../OnlineStatus/onlineStatus.service';
 // import { UsersModule } from '../users/users.module';
 
 @Module({
