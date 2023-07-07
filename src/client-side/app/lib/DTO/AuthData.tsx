@@ -6,5 +6,5 @@ export interface TwoFACodeDTO {
 
 export interface AuthCodeDTO{
 	accessToken: string | undefined;
-	id: string;
+	id?: string;
 }

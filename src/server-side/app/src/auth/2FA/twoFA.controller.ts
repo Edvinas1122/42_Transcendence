@@ -1,24 +1,20 @@
-import { Controller, Res, ClassSerializerInterceptor, UseInterceptors, UseGuards, Post, HttpCode, Body, ParseUUIDPipe, UnauthorizedException, Get } from '@nestjs/common';
+import { Controller, Res, ClassSerializerInterceptor, UseInterceptors, UseGuards, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { TwoFAService } from './twoFA.service';
 import { Response } from 'express';
 import { JwtAuthGuard }from '../guards/jwt.guard';
 import { UserId } from '../../utils/user-id.decorator';
-import { User, UsersService } from '../../users/users.service';
+import { UsersService } from '../../users/users.service';
 import { TwoFACodeDto } from './twoFA.dto';
-import { TmpTokenStore } from '../tmpTokenStore.service';
-import { Inject } from '@nestjs/common';
 
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('2fa')
 export class twoFAController {
     constructor(
-        // @Inject(TmpTokenStore)
         private readonly twoFAService: TwoFAService,
         private readonly usersService: UsersService,
         private readonly authService: AuthService,
-        // private tokenStore: TmpTokenStore,
     ){}
 
     @UseGuards(JwtAuthGuard)
@@ -45,7 +41,7 @@ export class twoFAController {
 
     @UseGuards(JwtAuthGuard)
     @Post('deactivate')
-    async deactivate2FA(@UserId() currentUserId: number, @Body() twoFACodeDto: TwoFACodeDto) {
+    async deactivate2FA(@Body() twoFACodeDto: TwoFACodeDto, @UserId() currentUserId: number) {
         const valid = await this.twoFAService.validate2FASecret(
             currentUserId,
             twoFACodeDto.code
@@ -59,13 +55,11 @@ export class twoFAController {
     @UseGuards(JwtAuthGuard)
     @Post('authenticate')
     async authenticate2FA(@UserId() currentUserId: number, @Body() twoFACodeDto: TwoFACodeDto) {
-        console.log("Hello");
         const valid = await this.twoFAService.validate2FASecret(
             currentUserId,
             twoFACodeDto.code
         );
         if (!valid) {
-            console.log("Boooo");
             throw new UnauthorizedException('Invalid authentication code');
         }
         const user = await this.usersService.getUser(currentUserId);

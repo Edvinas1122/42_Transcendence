@@ -6,6 +6,114 @@ import GenericButton from '../GeneralUI/GenericButton';
 import GenericMultiStateButton from '../GeneralUI/GenericMultiStateButton';
 import { faUserPlus, faUserXmark, faUserSlash } from '@fortawesome/free-solid-svg-icons'
 import EditAvatar from "../PreferencesUI/EditAvatar";
+import React, { useEffect, useState } from 'react';
+import { serverFetch, setToken } from "@/lib/fetch.util";
+
+const TwoFaUI = ({user2FA}: {user2FA: boolean}) => {
+    const [qrCodeURL, setQrCodeURL] = useState("");
+    const [isLoading, setLoading] = useState(false);
+	const [qrError, setQrError] = useState("");
+    const [error, setError] = useState<string | null>(null);
+    const [used, setUsed] = useState(false);
+	const [formState, setFormState] = useState({["code"]: ""});
+
+	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setFormState({["code"]: value});
+    }
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		let url;
+		if (!user2FA) {
+			url = "/2fa/activate";
+		} else {
+			url = "/2fa/deactivate"
+		}
+		try {
+			serverFetch(
+				url,
+				"POST",
+				{ 'Content-Type': 'application/json' },
+				JSON.stringify(formState),
+			)
+			setQrCodeURL("");
+			URL.revokeObjectURL(qrCodeURL);
+		} catch (error) {
+			setError("Authentication error");
+			console.log(error);
+		}
+	}
+
+    useEffect(() => {
+		const fetchToken = async () => {
+			return await setToken();
+		}
+
+        if (qrCodeURL === "" && !used) {
+            setLoading(true);
+			setUsed(true);
+			const token = fetchToken();
+			const options: RequestInit = 
+			{
+				method: "POST",
+				headers: {'Authorization': `Bearer ${token}`,
+				'Content-Type' : "application/json"},
+			}
+            fetch(
+				"/api/2fa/qr",
+				options
+            )
+            .then(response => {
+                if (!response.ok) {
+                    setQrError("Could not generate QR Code");
+                }
+                return response.blob();
+            })
+            .then((qrCode) => {
+                const imageURL = URL.createObjectURL(qrCode);
+                setQrCodeURL(imageURL);
+                setLoading(false);
+            })
+        }
+    }, [])
+
+    return (
+        <div className="Component">
+            <h1>{user2FA ? "Enter Code to Activate Two-Factor Authentication" :
+						"Enter Code to Deactivate Two-Factor Authentication"}</h1>
+            <p>Please download Google Authenticator, then generate a QR Code to scan and enter the code</p>
+            {isLoading ? <h1>Loading...</h1> : !qrError && <img src={qrCodeURL} />}
+			{qrError !== "" && <p>{qrError}</p>}
+            <form onSubmit={handleSubmit} > 
+				<input 
+				onChange={handleChange}
+				type="text"
+				name="code"
+				placeholder="Type 6 Digit Code here..."
+				/>
+				<button type="submit">Submit</button>
+			</form>
+            {error && <h1>{error}</h1>}
+        </div>
+    )
+}
+
+const Set2Fa = ({user2FA}: {user2FA: boolean}) => {
+	const [clicked, setClicked] = useState(false);
+
+	const handleClick = (event: any) => {
+		event.preventDefault();
+		setClicked(true);
+	}
+
+	return (
+		<div>
+			<button onClick={handleClick}>{user2FA? "Deactivate 2-Factor Authentication" : "Activate 2-Factor Authentication"}</button>
+			{clicked && <TwoFaUI user2FA={user2FA} />}
+		</div>
+	)
+}
 
 const GenericFriendButton = ({userID, userStatus}: {userID: number, userStatus: string}) => {
 	switch (userStatus) {
@@ -81,7 +189,7 @@ const FriendInteractions = ({userID, userStatus}: {userID: number, userStatus: s
 	);
 }
 
-const UserEdit = () => {
+const UserEdit = ({user2FA}: {user2FA: boolean}) => {
 	return (
 		<div className="Component">
 			<GenericForm
@@ -96,13 +204,14 @@ const UserEdit = () => {
             resetAfterSubmit={true}
             />
 			<EditAvatar />
+			<Set2Fa user2FA={user2FA} />
 		</div>
 	);
 }
 
-const UserInteract = ({userStatus, userID}: {userStatus: string, userID: number}) => {
+const UserInteract = ({userStatus, userID, user2FA}: {userStatus: string, userID: number, user2FA?: boolean}) => {
 	if (userStatus === "user") {
-		return <UserEdit />
+		return <UserEdit user2FA={user2FA? true : false}/>
 	} else {
 		return <FriendInteractions userID={userID} userStatus={userStatus}/>
 	};

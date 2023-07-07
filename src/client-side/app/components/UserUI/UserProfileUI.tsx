@@ -75,7 +75,7 @@ const UserProfileUI: Function = ({UserInfo, isUser}: {UserInfo: UserProfile, isU
 		<section className="Display">
 			<div className="Segment">
 				<UserInfoBox user={UserInfo} />
-				<UserInteract userStatus={userStatus} userID={UserInfo._id}/>
+				<UserInteract userStatus={userStatus} userID={UserInfo._id} user2FA={UserInfo.twoFA}/>
 			</div>
 			<div className="Segment">
                 <UserStats user={UserInfo} />

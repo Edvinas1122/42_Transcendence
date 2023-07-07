@@ -15,8 +15,6 @@ const Page: Function = async () => {
 
 	// const user: User = await fetchWithToken<User>(`/users/profile/${}`);
 	const user: User = await fetchWithToken<User>(`/users/me`);
-
-
 	return (
 		<UserProfileUI UserInfo={user} isUser={true}/>
 	);

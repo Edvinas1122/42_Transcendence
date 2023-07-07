@@ -19,6 +19,7 @@ export class UserInfo {
         // this.Online = false;
         // this.Ingame = false;
         this.Role = role;
+		this.twoFA = user.twoFactorAuth;
     }
     _id: number;
     name: string;
@@ -26,7 +27,7 @@ export class UserInfo {
     Online?: boolean;
     Ingame?: boolean;
     Role?: RoleType;
-	
+	twoFA?: boolean;
 }
 
 export class UserProfileInfo extends UserInfo {
