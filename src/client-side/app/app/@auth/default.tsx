@@ -175,7 +175,6 @@ const AuthPage = () => {
 	const authorizedRedirect = () => {
 		setTimer(0);
 		setLoading("redirecting");
-		// router.push("/user");
 		window.location.href = "/user";
 	}
 
@@ -215,6 +214,7 @@ const AuthPage = () => {
 						method: "GET"
 					});
 					const data = await response.json();
+					console.log("data", data);
 					if (data.sucess) {
 						setAuthorised(data);
 						console.log("2FA", data);
@@ -224,7 +224,7 @@ const AuthPage = () => {
 								id: data.id
 							});
 						} else {
-							authorizedRedirect(); // Redirect to user page does not re-rener server component
+							authorizedRedirect();
 						}
 					}
 				} catch (error) {
