@@ -5,9 +5,10 @@ import { AuthCodeDTO } from "@/lib/DTO/AuthData";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ft_fetch } from "@/lib/fetch.util";
 import React, { useState, useEffect } from 'react';
-import {SpinnerLoader2} from "@/components/GeneralUI/Loader";
-import { CodeFormComponent } from "@/components/QRAuth/codeSubmit"
-import "./Auth.css"
+import { SpinnerLoader2 } from "@/components/GeneralUI/Loader";
+import { CodeFormComponent } from "@/components/QRAuth/codeSubmit";
+import Image from 'next/image';
+import "./Auth.css";
 
 
 const ButtonWithLink = ({
@@ -81,7 +82,12 @@ const ErrorComponent = () => (
 	</div>
 );
 
-const Loading = () => (
+const Loading = ({
+	reason
+}:{
+	reason?: string
+}
+) => (
 	<div className="Loading">
 	<div
 		className="Buttons"
@@ -93,14 +99,14 @@ const Loading = () => (
 		alignItems: 'center',
 		}}
 	>
-		<h2>Authorizing ...</h2>
+		<h2>{reason? reason : "Authorizing" + "..."}</h2>
 		<SpinnerLoader2 />
 	</div>
 	</div>
 );
 
-const Buttons = ({ intraLink, devLink, dev2faLink }:
-	{ intraLink: string, devLink: string, dev2faLink: string }
+const Buttons = ({ intraLink, devLink  }:
+	{ intraLink: string, devLink: string }
 ) => (
 	<div className="Buttons">
 	<h2>Sign In with Intra</h2>
@@ -109,8 +115,6 @@ const Buttons = ({ intraLink, devLink, dev2faLink }:
 		<>
 		<h2>Developer Temp User Login</h2>
 		<ButtonWithLink link={devLink} text="Dev Insta" />
-		<h2>Developer 2FA Login</h2>
-		<ButtonWithLink link={dev2faLink} text="Test 2FA" />
 		</>
 	)}
 	</div>
@@ -121,7 +125,14 @@ const UserProfile = ({ user }: { user: AuthorizedIntraUser }) => (
 	  <h2>Welcome, {user.name}</h2>
 	  <div className="ImageDisplay">
 		<div className="ImageFrame">
-		<img src={user.image} alt={`${user.user} avatar`} loading="lazy" />
+		<Image 
+			src={user.image}
+			alt={`${user.user} avatar`}
+			width={300}
+			height={300}
+			placeholder={"blur"}
+			blurDataURL={user.micro_image}
+		/>
 		</div>
 	  </div>
 	</div>
@@ -133,6 +144,7 @@ interface AuthorizedIntraUser {
 	user: string;
 	name: string;
 	image: string;
+	micro_image: string;
 	secret: string;
 	error?: string;
 }
@@ -144,19 +156,55 @@ interface RetrieveCall {
 
 const AuthPage = () => {
 
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean | string>(false);
 	const [authorised, setAuthorised] = useState<AuthorizedIntraUser | null>(null);
+	const [timer, setTimer] = useState<number>(0);
 	const [codeDisplay, setCodeDisplay] = useState<RetrieveCall>(
-		{retrieve: "", id: ""}
+		{
+			retrieve: "",
+			id: 0,
+		}
 	);
 	const intraLink: string = process.env.NEXT_PUBLIC_INTRA_LINL ? process.env.NEXT_PUBLIC_INTRA_LINL : "";
 	const devLink: string = "/api/auth/";
 
-	const dev2faLink: string = "/twofa/";
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const search = searchParams.get('code');
 
+	const authorizedRedirect = () => {
+		setTimer(0);
+		setLoading("redirecting");
+		// router.push("/user");
+		window.location.href = "/user";
+	}
+
+	useEffect(() => {
+		let countdown: NodeJS.Timeout; // Declare a variable for countdown interval
+		// Check if 2FA is required and start the countdown
+		if (codeDisplay.retrieve !== "") {
+		setTimer(120); // Set timer to 120 seconds (2 minutes)
+		countdown = setInterval(() => {
+			setTimer(prev => prev > 0 ? prev - 1 : 0);
+		}, 1000); // Update the timer every second
+		}
+		// Clear the countdown interval when timer runs out or component unmounts
+		return () => {
+		if (countdown) {
+			clearInterval(countdown);
+		}
+		};
+	}, [codeDisplay.retrieve]);
+
+	useEffect(() => {
+		if (timer === 0 && codeDisplay.retrieve !== "") {
+		setCodeDisplay({
+			retrieve: "",
+			id: 0,
+		});
+		setAuthorised(null);  
+		}
+	}, [timer]);
 
 	useEffect(() => {
 		if (search) {
@@ -176,7 +224,7 @@ const AuthPage = () => {
 								id: data.id
 							});
 						} else {
-							router.push("/user"); // Redirect to user page does not re-rener server component
+							authorizedRedirect(); // Redirect to user page does not re-rener server component
 						}
 					}
 				} catch (error) {
@@ -197,27 +245,35 @@ const AuthPage = () => {
 				</p>
 				{search !== "" ? (
 					loading ? (
-						<Loading />
+						<Loading 
+							reason={typeof loading === "string" ? loading : undefined}
+						/>
 					) : (
 						authorised ? (
 							<>
 								<UserProfile user={authorised} />
-								{codeDisplay.retireve !== "" && <CodeFormComponent
-									retrieve={codeDisplay.retrieve}
-									id={codeDisplay.id}
-								/>}
+								<div className="Buttons">
+								{codeDisplay.retrieve !== "" && (
+									<>
+									<p>You have {timer} seconds to authorize.</p>
+									<CodeFormComponent
+										retrieve={codeDisplay.retrieve}
+										id={codeDisplay.id}
+										authorizedRedirect={authorizedRedirect}
+										/> 
+									</>
+								)}
+								</div>
 							</>
 						) : (
-							<Buttons intraLink={intraLink} devLink={devLink} dev2faLink={dev2faLink} />
+							<Buttons intraLink={intraLink} devLink={devLink} />
 						)
-					)
-				) : (
-					<ErrorComponent />
+					)) : (
+						<ErrorComponent />
 				)}
 			</div>
 		</div>
-	  );
-	
+	);
 }
   
 export default AuthPage;

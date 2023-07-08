@@ -9,7 +9,13 @@ interface IntraInfo { // partial user info just what we need
 	login: string;
 	first_name: string;
 	last_name: string;
-	image: { link: string };
+	image: { 
+		link: string,
+		versions: {
+			medium: string,
+			micro: string,
+		}
+	};
 }
 
 export async function GET(request: Request) {
@@ -58,6 +64,7 @@ export async function GET(request: Request) {
 
 	const userInfo: IntraInfo = await userInfoResponse.json();
 
+	console.log("userInfo: ", userInfo.image);
 	const random_secret = crypto.randomBytes(32).toString('hex');
 
 	const registerLogin = await fetch("http://nest-app:3000/auth/register", {
@@ -86,6 +93,7 @@ export async function GET(request: Request) {
 		user: userInfo.login,
 		name: userInfo.first_name + " " + userInfo.last_name,
 		image: userInfo.image.link,
+		micro_image: userInfo.image.versions.micro,
 		retrieve: registerLoginResponse.retrieve + "-" + random_secret,
 		two_fa: registerLoginResponse.HAS_2_FA,
 		id: registerLoginResponse.id,

@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 		code: req.code,
 		retrieve: req.retrieve,
 		id: req.id,
-		serverSecret: serverSecret,
+		server_secret: serverSecret,
 	}
 
 	console.log(
@@ -45,7 +45,8 @@ export async function POST(request: Request) {
 	if (serverResponseJson?.error !== undefined) {
 		return NextResponse.json({
 			sucess: false,
-			error: serverResponseJson.error
+			error: serverResponseJson.error,
+			message: serverResponseJson.message,
 		});
 	}
 

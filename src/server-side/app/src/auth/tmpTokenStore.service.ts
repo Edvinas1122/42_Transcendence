@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 interface TokenData {
@@ -51,9 +51,11 @@ export class TmpTokenStore {
 		if (tokenData && Date.now() < tokenData.expiresAt) {
 			return tokenData.link;
 		} else {
-			console.log("expired token: ", tokenId);
-			this.tokenStore.delete(tokenId);
-		return null;
+			if (tokenData) {
+				this.tokenStore.delete(tokenId);
+				throw new UnauthorizedException('Token expired');
+			}
+			return null;
 		}
 	}
 }

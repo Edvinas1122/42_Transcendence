@@ -29,12 +29,48 @@
 
 }
 
+.Buttons form {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: 0.5em 1em;
+}
+
 .Buttons h2 {
 	font-size: 1em;
 	padding: 1em;
 	color: #333;
 	font-weight: 600;
 	margin: auto;
+}
+
+.status {
+	display: flex;
+    justify-content: center;
+}
+
+.Buttons p {
+	margin: auto;
+}
+
+.Buttons input {
+	display: inline-block;
+	justify-content: center;
+	padding: 0.5em 1em;
+	margin: auto;
+	border: 1px solid rgb(0, 0, 0);
+	border-radius: 3px;
+	background-color: transparent;
+	color: rgb(0, 0, 0);
+	font-family: 'Roboto', sans-serif;
+	font-size: 1em;
+	font-weight: 300;
+	text-decoration: none;
+	text-align: center;
+	transition: all 0.2s ease-in-out;
+	box-sizing: border-box;
+	width: 14em;
+	margin-bottom: 1em;
 }
 
 .Buttons button {

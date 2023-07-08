@@ -1,4 +1,4 @@
-import { Controller, Res, ClassSerializerInterceptor, UseInterceptors, UseGuards, Post, Body, UnauthorizedException, Inject } from '@nestjs/common';
+import { Controller, Res, ClassSerializerInterceptor, UseInterceptors, UseGuards, Post, Body, UnauthorizedException, Inject, BadRequestException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { TwoFAService } from './twoFA.service';
 import { Response } from 'express';
@@ -81,21 +81,20 @@ export class twoFAController {
 	async authenticate2FAServer(
 		@Body() retrieveReq: TokenRetrieveReq,
 	) {
+		const server_sercet = process.env.SERVER_SECRET;
+		if (retrieveReq.server_secret !== server_sercet) {
+			throw new UnauthorizedException('Unknown accessor');
+		}
 		const valid = await this.twoFAService.validate2FASecret(
 			retrieveReq.id,
 			retrieveReq.code
 		);
 		if (!valid) {
-			throw new UnauthorizedException('Invalid authentication code');
-		}
-		const user = await this.usersService.validate2FA(retrieveReq.id);
-		if (!user) {
-			throw new UnauthorizedException('Invalid request');
+			throw new UnauthorizedException('Invalid 2FA code');
 		}
 		const accessToken = this.tmpTokenStore.retrieveTokenLink(retrieveReq.retrieve)
-		console.log("passed token: ", accessToken);
 		if (!accessToken) {
-			throw new UnauthorizedException('Invalid request');
+			throw new UnauthorizedException('Invalid retrieve request token');
 		}
 		return {accessToken: accessToken};
 	}

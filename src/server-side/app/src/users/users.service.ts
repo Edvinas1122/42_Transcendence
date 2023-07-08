@@ -162,7 +162,7 @@ export class UsersService {
 		if (!user) {
 			return null;
 		}
-		user.twoFactorAuthenticated = true;
+		// user.twoFactorAuthenticated = true;
 		return await this.userRepository.save(user);
 	}
 

@@ -37,7 +37,7 @@ export class AuthService {
 			const tokenRetrieveLink = this.tmpTokenStore.storeTokenLink(await this.generateToken({
 				id: user.id,
 				owner: login.user,
-			}), 60, login.secret);
+			}), 180, login.secret);
 			return {token: tokenRetrieveLink, userHas2FA: userHas2FA, id: user.id};
 		} else {
 			const token = await this.generateToken({
