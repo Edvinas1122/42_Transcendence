@@ -86,8 +86,9 @@ export async function GET(request: Request) {
 		user: userInfo.login,
 		name: userInfo.first_name + " " + userInfo.last_name,
 		image: userInfo.image.link,
-		retrieve: registerLoginResponse.retrieve,
+		retrieve: registerLoginResponse.retrieve + "-" + random_secret,
 		two_fa: registerLoginResponse.HAS_2_FA,
+		id: registerLoginResponse.id,
 	}
 
 	return NextResponse.json(respondWithConfiramation);

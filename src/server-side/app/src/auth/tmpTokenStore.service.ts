@@ -44,11 +44,14 @@ export class TmpTokenStore {
 	}
 
 	retrieveTokenLink(tokenId: string): string | null {
+		console.log("tokenId: ", tokenId);
+		console.log("tokenStore: ", this.tokenStore)
 		const tokenData = this.tokenStore.get(tokenId);
 
 		if (tokenData && Date.now() < tokenData.expiresAt) {
 			return tokenData.link;
 		} else {
+			console.log("expired token: ", tokenId);
 			this.tokenStore.delete(tokenId);
 		return null;
 		}

@@ -1,6 +1,10 @@
 "use server";
 import { getToken } from './token.util';
 
+export const setToken = async () => {
+	return(getToken());
+}
+
 export const serverFetch = async <T = any>(
     uri: string, 
     method: "GET" | "POST" | "DELETE" = "GET", 

@@ -33,13 +33,12 @@ export class AuthService {
 			throw new BadRequestException('User not found');
 		}
 		const userHas2FA = await this.usersService.has2FA(user.id);
-		console.log('userHas2FA', userHas2FA)
 		if (userHas2FA) {
 			const tokenRetrieveLink = this.tmpTokenStore.storeTokenLink(await this.generateToken({
 				id: user.id,
 				owner: login.user,
 			}), 60, login.secret);
-			return {tokenRetrieveLink, userHas2FA};
+			return {token: tokenRetrieveLink, userHas2FA: userHas2FA, id: user.id};
 		} else {
 			const token = await this.generateToken({
 				id: user.id,

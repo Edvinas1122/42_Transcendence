@@ -88,9 +88,9 @@ const UserProfileUI: Function = async ({UserInfo, isUser}: {UserInfo: UserProfil
 	return (
 		<section className="Display UserPage">
 			<div className="Segment">
-					<UserInfoBox user={UserInfo} />
+				<UserInfoBox user={UserInfo} />
 				<div className="Component UserInteract">
-					<UserInteract userStatus={userStatus} userID={UserInfo._id}/>
+				<UserInteract userStatus={userStatus} userID={UserInfo._id} user2FA={UserInfo.twoFA}/>
 				</div>
 			</div>
 			<div className="Segment">

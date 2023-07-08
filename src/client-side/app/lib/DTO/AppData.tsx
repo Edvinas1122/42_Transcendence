@@ -29,6 +29,7 @@ interface User extends HasId {
 	Muted?: boolean; // chat context
 	Banned?: boolean; // chat context
 	friend?: string;
+	twoFA?: boolean;
 }
 
 interface UserProfile extends User {

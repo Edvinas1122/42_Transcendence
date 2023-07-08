@@ -4,7 +4,7 @@ import	{ AuthController } from './auth.controller';
 import	{ UsersModule } from '../users/users.module';
 import	{ FourtyTwoStrategy } from './strategies/42.strategy';
 import	{ JwtStrategy, JwtParams } from './strategies/jwt.strategy';
-import	{ JwtTwoFaStrategy } from './strategies/jwt-2fa.strategy';
+import	{ JwtTwoFaStrategy} from './strategies/jwt-2fa.strategy';
 import	{ JwtModule } from '@nestjs/jwt';
 import	{ TmpTokenStore } from './tmpTokenStore.service';
 import { TwoFAService } from './2FA/twoFA.service';

@@ -120,23 +120,15 @@ export class AuthController
 		if (server_secret === undefined || server_secret !== process.env.SERVER_SECRET) {
 			throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
 		}
-		const {token, userHas2FA} = await this.authService.registerAuthorizedLogin({
+		const {token, userHas2FA, id} = await this.authService.registerAuthorizedLogin({
 			user: user,
 			fullName : fullName,
 			secret: secret,
 		});
-		return {retrieve: token, HAS_2_FA: userHas2FA};
-	}
 
-	// @Get('login')
-	// async requestToken(
-	// 	@Query('retrieve') retrieve: string,
-	// 	@Req() req: Request,
-	// 	@Res() res: Response
-	// ): Promise<any>
-	// {
-	// 	const token = await this.authService.seeToken(retrieve);
-	// }
+		console.log("token", token, "userHas2FA", userHas2FA, "id", id);
+		return {retrieve: token, HAS_2_FA: userHas2FA, id: id};
+	}
 
 	@Get('validate')
 	@UseGuards(JwtAuthGuard)

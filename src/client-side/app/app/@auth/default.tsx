@@ -1,12 +1,14 @@
 "use client";
 import "@/public/layout.css"
+
 import { AuthCodeDTO } from "@/lib/DTO/AuthData";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ft_fetch } from "@/lib/fetch.util";
-import Link from 'next/link'
 import React, { useState, useEffect } from 'react';
 import {SpinnerLoader2} from "@/components/GeneralUI/Loader";
+import { CodeFormComponent } from "@/components/QRAuth/codeSubmit"
 import "./Auth.css"
+
 
 const ButtonWithLink = ({
 	link,
@@ -39,6 +41,7 @@ const FetchButton = ({
 		</button>
 	);
 }
+
 
 function ActiveLink({href}: {href: string}) {
 	const router = useRouter();
@@ -134,17 +137,26 @@ interface AuthorizedIntraUser {
 	error?: string;
 }
 
+interface RetrieveCall {
+	retrieve: string;
+	id: number;
+}
 
 const AuthPage = () => {
 
 	const [loading, setLoading] = useState<boolean>(false);
 	const [authorised, setAuthorised] = useState<AuthorizedIntraUser | null>(null);
+	const [codeDisplay, setCodeDisplay] = useState<RetrieveCall>(
+		{retrieve: "", id: ""}
+	);
 	const intraLink: string = process.env.NEXT_PUBLIC_INTRA_LINL ? process.env.NEXT_PUBLIC_INTRA_LINL : "";
 	const devLink: string = "/api/auth/";
+
 	const dev2faLink: string = "/twofa/";
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const search = searchParams.get('code');
+
 
 	useEffect(() => {
 		if (search) {
@@ -157,13 +169,14 @@ const AuthPage = () => {
 					const data = await response.json();
 					if (data.sucess) {
 						setAuthorised(data);
-						if (data.HAS_2_FA) {
-							// const second_request = await fetch(`/api/auth/`, {
-							// 	method: "POST",
-							// 	body: JSON.stringify(data.retrieve)
-							// });
+						console.log("2FA", data);
+						if (data?.two_fa === true) {
+							setCodeDisplay({
+								retrieve: data.retrieve,
+								id: data.id
+							});
 						} else {
-							router.push("/user");
+							router.push("/user"); // Redirect to user page does not re-rener server component
 						}
 					}
 				} catch (error) {
@@ -177,23 +190,31 @@ const AuthPage = () => {
 
 	return (
 		<div className="AuthPage Display">
-		  <div className="Component">
-			<h1>Ping Gop</h1>
-			<p>
-			  <em>by Deep thought architects...</em>
-			</p>
-			{search !== "" ? (
-			  loading ? (
-				<Loading />
-			  ) : authorised ? (
-				<UserProfile user={authorised} />
-			  ) : (
-				  <Buttons intraLink={intraLink} devLink={devLink} dev2faLink={dev2faLink} />
-				  )
-			) : (
-				<ErrorComponent />
-			)}
-		  </div>
+			<div className="Component">
+				<h1>Ping Gop</h1>
+				<p>
+					<em>by Deep thought architects...</em>
+				</p>
+				{search !== "" ? (
+					loading ? (
+						<Loading />
+					) : (
+						authorised ? (
+							<>
+								<UserProfile user={authorised} />
+								{codeDisplay.retireve !== "" && <CodeFormComponent
+									retrieve={codeDisplay.retrieve}
+									id={codeDisplay.id}
+								/>}
+							</>
+						) : (
+							<Buttons intraLink={intraLink} devLink={devLink} dev2faLink={dev2faLink} />
+						)
+					)
+				) : (
+					<ErrorComponent />
+				)}
+			</div>
 		</div>
 	  );
 	
