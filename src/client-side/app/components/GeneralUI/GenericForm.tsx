@@ -21,9 +21,10 @@ interface GenericFormProps {
     fields: GenericField[];
     className?: string; // Optional
 	resetAfterSubmit?: boolean; // Optional
+	notify?: boolean; // Optional
 }
 
-const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = false }: GenericFormProps) => {
+const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = false, notify }: GenericFormProps) => {
 
 	const initialFormState = fields.reduce((acc, { name, value }) => ({ ...acc, [name]: value }), {});
 	const [formState, setFormState] = useState<{ [key: string]: string | number | boolean | undefined }>(
@@ -51,9 +52,12 @@ const GenericForm = ({ endpoint, method, fields, className, resetAfterSubmit = f
 			if (response?.error) {
 				throw new Error(JSON.stringify(response.message));
 			}
+			if (notify !== undefined && notify) {
+				DisplayPopUp("Success", response?.message, 1500, "success");
+			}
 			if (resetAfterSubmit) resetForm();
 		} catch (error: any) {
-			DisplayPopUp("Error", error.message, 1500, "danger");
+			DisplayPopUp("Error", error?.message, 1500, "danger");
 		}
 	};
 

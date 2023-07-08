@@ -38,12 +38,12 @@ class NotificationDisplay {
 const DisplayPopUp = (() => {
     let lastNotificationId: string | undefined;
 
-    return (title: string, message: string, duration?: number, type?: "success" | "danger" | "info" | "default" | "warning"): void => {
+    return (title: string, message?: string, duration?: number, type?: "success" | "danger" | "info" | "default" | "warning"): void => {
         if (lastNotificationId) {
             Store.removeNotification(lastNotificationId);
         }
 
-        const info = new NotificationDisplay(title, message, duration, type);
+        const info = new NotificationDisplay(title, message ? message : "", duration, type);
         lastNotificationId = Store.addNotification(info);
     };
 })();

@@ -59,6 +59,13 @@ const UIClientListBox: Function = ({
 	const endOfListRef = useRef<HTMLDivElement | null>(null);
 	const [Items, setItems] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
+	const [fetchError, setFetchError] = useState(false);
+
+	useEffect(() => {
+		if (fetchError) {
+			notFound();
+		}
+	}, [fetchError]);
 
 	useEffect(() => {
 		if (typeof initialItems === "string") {
@@ -70,8 +77,8 @@ const UIClientListBox: Function = ({
 					}
 					setItems(data)	
 				}).catch((error) => {
-					// notFound();
-					throw new Error(error);
+					setFetchError(true);
+					// throw new Error(error);
 			});
 			setIsLoading(false);
 		} else if (Array.isArray(initialItems)) {

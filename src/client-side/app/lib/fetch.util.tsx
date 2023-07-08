@@ -15,6 +15,34 @@ export const serverFetch = async <T = any>(
     return await fetchWithToken<T>(uri, null, params, method, body);
 }
 
+export const serverFetchSerialized = async <T = any>({
+	uri,
+	revalidate_interval = null,
+	headers,
+	method,
+	body,
+}: {
+	uri: string;
+	revalidate_interval?: number | null;
+	headers?: any;
+	method?: "GET" | "POST" | "DELETE";
+	body?: any;
+}): Promise<Response> => {
+	"use server";
+	const cookie = getToken();
+	const options: RequestInit = {
+		headers: {...headers,
+			'Authorization': `Bearer ${cookie}`,
+		},
+		method: method,
+		body: body,
+		cache: 'no-store',
+	};
+	const fullUrl = "http://nest-app:3000" + uri;
+	const response = await fetch(fullUrl, options);
+	return await response.json();
+}
+
 async function fetchWithToken<T = any>(
 	uri: string,
 	revalidate_interval: number | null = null,
@@ -32,7 +60,6 @@ async function fetchWithToken<T = any>(
 	}
 
 	if (!cookie) {
-		console.log("No cookie found");
 		throw new Error('Unauthorized');
 	}
 	const headers = {
@@ -55,14 +82,7 @@ async function fetchWithToken<T = any>(
 	console.log("fetching with token", options);
 
 	const response: Response = await fetch(fullUrl, options);
-	// if (!response.ok) {
-	// 	const responseBody = await response.json();
-	// 	if (response.status === 401) { // consider returning without throwing
-	// 		throw new Error(JSON.stringify(responseBody));
-	// 	}
-	// 	throw new Error(JSON.stringify(responseBody));
 
-	// }
 	return response.json();
 }
 

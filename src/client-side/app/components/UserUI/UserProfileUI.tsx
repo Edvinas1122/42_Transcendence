@@ -53,8 +53,6 @@ const MatchHistoryBox = ({ item }: { item: MatchHistory}) => {
 
 const UserStats = ({ user }: { user: UserProfile }) => {
 
-	console.log("user adafgqewfewqf", user.achievements);
-
 	return (
 		<div className="Segment">
 			<div className="Component">
@@ -95,11 +93,11 @@ const UserProfileUI: Function = async ({UserInfo, isUser}: {UserInfo: UserProfil
 			</div>
 			<div className="Segment">
 				<div className="Component UserStats">
-					{/* <UserStats user={UserInfo} /> */}
+					<UserStats user={UserInfo} />
 				</div>
 				<div className="Component MatchHistory">
 					<h1 className="Title">Match History</h1>
-					{/* <UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} /> */}
+					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} />
 				</div>
 			</div>
 		</section>

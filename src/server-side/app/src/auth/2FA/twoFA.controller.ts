@@ -28,7 +28,10 @@ export class twoFAController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post('qr')
-	async qrCode(@Res() response: Response, @UserId() userId: number) {
+	async qrCode(
+		@Res() response: Response,
+		@UserId() userId: number
+	) {
 		const { otpAuthURL } = await this.twoFAService.generate2FASecret(userId);
 		response.setHeader('content-type', 'image/png');
 		const qrCode = await this.twoFAService.qrCodeStream(response, otpAuthURL);
@@ -37,7 +40,11 @@ export class twoFAController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post('activate')
-	async activate2FA(@UserId() currentUserId: number, @Body() twoFACodeDto: TwoFACodeDto) {
+	async activate2FA(
+		@UserId() currentUserId: number,
+		@Body() twoFACodeDto: TwoFACodeDto
+	): Promise<any>
+	{
 		const valid = await this.twoFAService.validate2FASecret(
 			currentUserId,
 			twoFACodeDto.code
@@ -46,11 +53,20 @@ export class twoFAController {
 			throw new UnauthorizedException('Invalid authentication code');
 		}
 		await this.usersService.activate2FA(currentUserId);
+		return {
+			error: false,
+			status: "success",
+			message: "2FA activated",
+		};
 	}
 
 	@UseGuards(JwtAuthGuard)
 	@Post('deactivate')
-	async deactivate2FA(@Body() twoFACodeDto: TwoFACodeDto, @UserId() currentUserId: number) {
+	async deactivate2FA(
+		@Body() twoFACodeDto: TwoFACodeDto,
+		@UserId() currentUserId: number
+	): Promise<any>
+	{
 		const valid = await this.twoFAService.validate2FASecret(
 			currentUserId,
 			twoFACodeDto.code
@@ -59,23 +75,31 @@ export class twoFAController {
 			throw new UnauthorizedException('Invalid authentication code');
 		}
 		await this.usersService.deactivate2FA(currentUserId);
+		return {
+			error: false,
+			status: "success",
+			message: "2FA deactivated",
+		};
 	}
 	
-	@UseGuards(JwtAuthGuard)
-	@Post('authenticate')
-	async authenticate2FA(@UserId() currentUserId: number, @Body() twoFACodeDto: TwoFACodeDto) {
-		const valid = await this.twoFAService.validate2FASecret(
-			currentUserId,
-			twoFACodeDto.code
-		);
-		if (!valid) {
-			throw new UnauthorizedException('Invalid authentication code');
-		}
-		const user = await this.usersService.getUser(currentUserId);
-		await this.usersService.validate2FA(currentUserId);
-		const accessToken = await this.authService.generateToken({id: user.id, owner: user.name});
-		return {accessToken};
-	}
+	// @UseGuards(JwtAuthGuard)
+	// @Post('authenticate')
+	// async authenticate2FA(
+	// 	@UserId() currentUserId: number,
+	// 	@Body() twoFACodeDto: TwoFACodeDto
+	// ) {
+	// 	const valid = await this.twoFAService.validate2FASecret(
+	// 		currentUserId,
+	// 		twoFACodeDto.code
+	// 	);
+	// 	if (!valid) {
+	// 		throw new UnauthorizedException('Invalid authentication code');
+	// 	}
+	// 	const user = await this.usersService.getUser(currentUserId);
+	// 	await this.usersService.validate2FA(currentUserId);
+	// 	const accessToken = await this.authService.generateToken({id: user.id, owner: user.name});
+	// 	return {accessToken};
+	// }
 
 	@Post('login')
 	async authenticate2FAServer(

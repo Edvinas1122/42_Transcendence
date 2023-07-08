@@ -144,7 +144,7 @@ export class UsersService {
 			return null;
 		}
 		user.twoFactorAuth = true;
-		user.twoFactorAuthenticated = true;
+		// user.twoFactorAuthenticated = true;
 		return await this.userRepository.save(user);
 	}
 

@@ -119,3 +119,31 @@
 	color: #333;
 	font-weight: 600;
 }
+
+.Component input {
+  max-width: 16em;
+}
+
+.Component button, input[type="submit"], input[type="file"] {
+	display: inline-block;
+	padding: 0.5em 1em;
+	margin: 0.5em;
+	border: 1px solid rgb(38, 38, 38);
+	border-radius: 3px;
+	background-color: transparent;
+	color: rgb(43, 43, 43);
+	font-family: 'Roboto', sans-serif;
+	font-size: 1em;
+	font-weight: 300;
+	text-decoration: none;
+	text-align: center;
+	transition: all 0.2s ease-in-out;
+	box-sizing: border-box;
+}
+
+.Component button:hover, input[type="submit"]:hover {
+  background-color: rgb(38, 38, 38);
+  color: #fff;
+  cursor:pointer;
+}
+
