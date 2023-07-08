@@ -18,6 +18,9 @@ COPY app/tsconfig.json ./
 # Create /app/src directory
 RUN mkdir src
 RUN mkdir /uploads
+RUN npm install --save-dev @types/node
+RUN npm install --save bcryptjs && npm uninstall --save bcrypt
+RUN npm i -D @types/bcrypt
 
 # 2FA 
 RUN npm install otplib

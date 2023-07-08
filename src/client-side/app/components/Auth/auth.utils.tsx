@@ -8,9 +8,8 @@ const validateUser: Function = async (endpoint: string): Promise<boolean> => {
 	const token = cookieStore.get('access_token');
 	if (!token) return false;
 	try {
-		console.log("Validating user...");
 		const validity = await serverFetch(endpoint);
-		if (validity.error) throw new Error(validity.message);
+		if (validity.statusCode === 401) throw new Error(validity.message);
 		return true;
 	} catch (error) {
 		return false;

@@ -166,7 +166,7 @@ const AuthPage = () => {
 		}
 	);
 	const intraLink: string = process.env.NEXT_PUBLIC_INTRA_LINL ? process.env.NEXT_PUBLIC_INTRA_LINL : "";
-	const devLink: string = "/api/auth/";
+	const devLink: string = "/api/dev/";
 
 	const searchParams = useSearchParams();
 	const router = useRouter();

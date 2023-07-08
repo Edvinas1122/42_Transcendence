@@ -28,6 +28,9 @@ export class Chat {
 	@Column({ nullable: true })
 	password: string;
 
+	@Column({ nullable: true })
+	salt: string;
+
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
 	createdAt: Date;
 

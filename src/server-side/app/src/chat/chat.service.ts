@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat } from './entities/chat.entity';
@@ -12,6 +12,8 @@ import { ChatEventGateway, RoomEventType } from './chat-event.gateway';
 import { UserId } from '../utils/user-id.decorator';
 import { SanctionService } from './sanction.service';
 import { SanctionType } from './entities/sanction.entity';
+import * as bcrypt from 'bcryptjs';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class ChatService {
@@ -44,7 +46,14 @@ export class ChatService {
 		const chat = new Chat();
 		chat.name = createChatDto.name;
 		chat.private = createChatDto.isPrivate;
-		chat.password = createChatDto.password ? createChatDto.password : "";
+		if (createChatDto.password) {
+			const saltOrRounds = 10;
+			const salt = bcrypt.genSaltSync(saltOrRounds);
+			chat.password = await bcrypt.hash(createChatDto.password, salt);
+			chat.salt = salt;
+		} else {
+			chat.password = "";
+		}
 		chat.ownerID = createChatDto.ownerID;
 		const owner = await this.usersService.findUser(createChatDto.ownerID);
 		if (!owner) {
@@ -133,6 +142,13 @@ export class ChatService {
 		return null;
 	}
 
+	private passwordMatches(chat: Chat, password?: string): boolean {
+		if (!password) {
+			return false;
+		}
+		return bcrypt.compare(password, chat.password);
+	}
+
 	async joinChat(userId: number, chatId: number, password?: string): Promise<boolean>
 	{
 		const chat = await this.chatRepository.findOne({where: {id: chatId}});
@@ -146,12 +162,12 @@ export class ChatService {
 			}
 			await this.roleService.editRole(role, RoleType.Participant);
 		} else {
-			if (chat.password !== "" && chat.password !== password) {
+			if (chat.password !== "" && !this.passwordMatches(chat, password)) {
 				throw new UnauthorizedException('Wrong password');
 			}
 			const user = await this.usersService.findUser(userId);
 			const role = await this.roleService.getRole(chatId, userId);
-			if (role) {
+			if (role || !user) {
 				throw new BadRequestException('User already a participant');
 			}
 			await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);

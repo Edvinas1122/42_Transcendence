@@ -208,10 +208,12 @@ const UserEdit = ({
 				endpoint='/users/edit'
 				method='POST'
 				fields={[
-					{name: "newName", 
-					value: "",
-					placeholder: "Update Username...",
-					type:"text"},
+					{
+						name: "newName", 
+						value: "",
+						placeholder: "Update Username...",
+						type:"text"
+				},
 				]}
 				notify={true}
 				resetAfterSubmit={true}
