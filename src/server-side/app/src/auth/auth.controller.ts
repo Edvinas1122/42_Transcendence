@@ -1,6 +1,6 @@
-import { Controller, Get, UseGuards, Req, Res, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Param, HttpException, HttpStatus, Post, Query } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
+import { AuthService, LoginRegister } from './auth.service';
 import { FourtyTwoGuard } from './guards/42.guard';
 import { Inject } from '@nestjs/common';
 import { TmpTokenStore } from './tmpTokenStore.service';
@@ -18,8 +18,7 @@ export class AuthController
 	constructor(
 		@Inject(UsersService)
 		private readonly usersService: UsersService,
-		@Inject(TmpTokenStore)
-		private tokenStore: TmpTokenStore,
+		@Inject(AuthService)
 		private readonly authService: AuthService,		
 	) {}
 
@@ -113,6 +112,31 @@ export class AuthController
 		res.cookie('access_token', accessToken, { maxAge: 9000000000, httpOnly: false, secure: false });
 		return res.redirect(process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL);
 	}
+
+	@Post('/register')
+	async registerAuthorizedLogin(@Req() req: Request): Promise<any>
+	{
+		const { user, fullName, secret, server_secret } = req.body as LoginRegister;
+		if (server_secret === undefined || server_secret !== process.env.SERVER_SECRET) {
+			throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+		}
+		const {token, userHas2FA} = await this.authService.registerAuthorizedLogin({
+			user: user,
+			fullName : fullName,
+			secret: secret,
+		});
+		return {retrieve: token, HAS_2_FA: userHas2FA};
+	}
+
+	// @Get('login')
+	// async requestToken(
+	// 	@Query('retrieve') retrieve: string,
+	// 	@Req() req: Request,
+	// 	@Res() res: Response
+	// ): Promise<any>
+	// {
+	// 	const token = await this.authService.seeToken(retrieve);
+	// }
 
 	@Get('validate')
 	@UseGuards(JwtAuthGuard)

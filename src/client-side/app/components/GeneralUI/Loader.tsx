@@ -9,6 +9,17 @@ const SpinnerLoader: Function = () => {
 	)
 }
 
+const SpinnerLoader2: Function = () => {
+
+	return (
+		<div className="" style={
+			{display: 'flex'}
+		}>
+			<div className="spinner"></div>
+		</div>
+	)
+}
+
 const SpinnerLoaderSmall: Function = () => {
 	
 	return (
@@ -18,5 +29,5 @@ const SpinnerLoaderSmall: Function = () => {
 	)
 }
 
-export { SpinnerLoaderSmall };
+export { SpinnerLoaderSmall, SpinnerLoader2 };
 export default SpinnerLoader;

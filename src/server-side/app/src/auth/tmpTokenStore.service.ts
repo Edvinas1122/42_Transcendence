@@ -12,13 +12,13 @@ export class TmpTokenStore {
 
 	constructor() {
 		this.startCleanupTask();
-	  }
+	}
 	
-	  private startCleanupTask() {
+	private startCleanupTask() {
 		setInterval(() => {
-		  this.cleanupExpiredKeys();
+			this.cleanupExpiredKeys();
 		}, 60000); // Cleanup task runs every minute (adjust as needed)
-	  }
+	}
 
 	private cleanupExpiredKeys() {
 		const currentTime = Date.now();
@@ -26,11 +26,11 @@ export class TmpTokenStore {
 		  if (currentTime >= tokenData.expiresAt) {
 			this.tokenStore.delete(tokenId);
 			// this.logger.debug(`Token ${tokenId} expired and removed from tokenStore.`);
-		  }
+			}
 		}
-	  }
+	}
 
-	storeTokenLink(link: string, expirationSeconds: number): string {
+	storeTokenLink(link: string, expirationSeconds: number, secret: string): string {
 		const tokenId = uuidv4();
 		const expiresAt = Date.now() + expirationSeconds * 1000;
 
@@ -39,7 +39,7 @@ export class TmpTokenStore {
 			expiresAt,
 		};
 
-		this.tokenStore.set(tokenId, tokenData);
+		this.tokenStore.set(tokenId + "-" + secret, tokenData);
 		return tokenId;
 	}
 

@@ -117,7 +117,7 @@ const UIClientListBox: Function = ({
 		);
 	};
 
-	let restItems = [...Items];
+	let restItems = Array.isArray(Items) ? [...Items] : [];
 	const categorizedItems = categories?.map((category) => {
 		const categoryItems = restItems.filter((item) => category.dependency(item));
 		restItems = restItems.filter((item) => !categoryItems.includes(item)); // Now, this will not cause re-render

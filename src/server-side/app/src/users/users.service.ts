@@ -67,7 +67,7 @@ export class UsersService {
 		return user;
 	}
 
-	async create(user: User): Promise<User | null>
+	async create(user: Partial<User>): Promise<User | null>
 	{
 		if (!user.name) {
 			throw new Error('User name is required');
@@ -128,6 +128,14 @@ export class UsersService {
 		}
 		user.twoFactorAuthSecret = secret;
 		return await this.userRepository.save(user);
+	}
+
+	async has2FA(id: number): Promise<boolean> {
+		let user = await this.getUser(id);
+		if (!user) {
+			return false;
+		}
+		return user.twoFactorAuth? true : false;
 	}
 
 	async activate2FA(id: number): Promise<User | null> {
@@ -215,7 +223,7 @@ export class UsersService {
 		  .getOne();
 	  
 	  
-		if (user === undefined) {
+		if (user === undefined || user === null) {
 		  return 'none';
 		}
 	  
