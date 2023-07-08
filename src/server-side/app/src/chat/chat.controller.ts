@@ -2,7 +2,7 @@ import { Controller, Get, Req, Post, Body, Param, Delete, NotFoundException, Inj
 import { ChatService } from './chat.service';
 import { Chat } from './entities/chat.entity';
 import { UseGuards } from '@nestjs/common';
-import { JwtTwoFactorGuard } from '../auth/guards/jwt-2fa.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto } from './dtos/chat.dtos'; // import DTOs
 import { EventService } from '../events/events.service';
 import { OwnerGuard } from './guards/owner.guard';
@@ -13,7 +13,7 @@ interface EntityUpdateResponse {
 	message: string;
 }
 
-@UseGuards(JwtTwoFactorGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('chat')
 export class ChatController {
 	constructor(
@@ -35,6 +35,7 @@ export class ChatController {
 		@Body(new ValidationPipe({ transform: true })) createChatDto: CreateChatDto
 	): Promise<Chat | null>
 	{
+		console.log('create chat', userId);
 		createChatDto.ownerID = userId;
 		createChatDto.invitedUsersID = createChatDto.invitedUsersID ? [...createChatDto.invitedUsersID, userId] : [userId];
 		const resultChat = await this.chatService.createGroupChat(createChatDto);
