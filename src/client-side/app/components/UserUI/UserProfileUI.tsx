@@ -27,7 +27,13 @@ export const UserInfoBox = ({
 			</div>
 			<div className="ImageDisplay">
 				<div className="ImageFrame" style={{ width: scale || 300, height: scale || 300 }}>
-				{user.avatar && <Image src={user.avatar} alt={`Profile Image for ${user.name}`} width={scale? scale :300} height={scale? scale :300}/>}
+				{user.avatar && 
+					<Image src={user.avatar}
+						alt={`Profile Image for ${user.name}`}
+						width={scale? scale :300}
+						height={scale? scale :300}
+					/>
+				}
 				</div>
 			</div>
 		</div>

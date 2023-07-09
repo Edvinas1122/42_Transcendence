@@ -1,7 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { SocketGateway } from '../socket/socket.gateway';
-import { UsersService } from '../users/users.service';
-import { NotFoundError } from 'rxjs';
 import { MatchService } from './match.service';
 import { Match, Outcome } from './entities/match.entity';
 import { RankService } from './rank.service';
@@ -83,8 +81,6 @@ export class GameService {
 	constructor(
 		@Inject(SocketGateway)
 		private socketGateway: SocketGateway,
-		@Inject(UsersService)
-		private usersService: UsersService,
 		@Inject(MatchService)
 		private matchService: MatchService,
 		@Inject(RankService)
@@ -107,17 +103,17 @@ export class GameService {
 		return true;
 	}
 
-	async inviteToGame(userId1: number, inviteeName: string, gameType: number): Promise<inviteLink>
-	{
-		const user = await this.usersService.findOne(inviteeName);
-		if (user === null) {
-			throw new NotFoundException("User not found")
-		}
-		console.log("User found", user);
-		const userId2 = user.id;
-		const gameKey = this.handleJoinGameQue(userId1, userId2, gameType);
-		return {inviteLink: "http://localhost:3030/game/pong/?key=" + gameKey} as inviteLink;
-	}
+	// async inviteToGame(userId1: number, inviteeName: string, gameType: number): Promise<inviteLink>
+	// {
+	// 	const user = await this.usersService.findOne(inviteeName);
+	// 	if (user === null) {
+	// 		throw new NotFoundException("User not found")
+	// 	}
+	// 	console.log("User found", user);
+	// 	const userId2 = user.id;
+	// 	const gameKey = this.handleJoinGameQue(userId1, userId2, gameType);
+	// 	return {inviteLink: "http://localhost:3030/game/pong/?key=" + gameKey} as inviteLink;
+	// }
 
 	public handleJoinGameQue(userId1: number, userId2:number, gameId:number): string {
 		const GAME_BEGIN_DELAY = 2950;
@@ -139,7 +135,6 @@ export class GameService {
 	}
 
 	handleGameBegin(data: {gameKey: string}): void {
-		console.log('handleGameBegin', data);
 		const { player1ID, player2ID } = this.parseGameKey(data.gameKey);
 		const defaultKey = this.defaultGameKey(player1ID, player2ID);
 		this.liveGameInstancesMap.get(defaultKey)?.Start().then((result) => {
@@ -148,7 +143,6 @@ export class GameService {
 					result
 				).then((match) => {
 					this.rankService.updateRanks(match).then(() => {
-						console.log ("Achievement check")
 						this.achievementService.checkAchievements(match.player1ID);
 						this.achievementService.checkAchievements(match.player2ID);
 					}).then(() => {

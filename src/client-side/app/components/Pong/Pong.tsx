@@ -94,13 +94,12 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 
 	return (
 		<>
-		<div className="pong-container">
-			<div className="pong-player" style={{top: player_pong_position + "vh"}}></div>
-			{/* Show the score only when showScore is true */}
-			{showScore && <div className="pong-score">{displayScore}</div>}
-			<div className="pong-ball" style={{top: ball_position.y + "vh", left: ball_position.x + "vw"}}></div>
-			<div className="pong-player" style={{top: opponent_pong_position + "vh"}}></div>
-		</div>
+			<div className="pong-container">
+				<div className="pong-player" style={{top: player_pong_position + "vh"}}></div>
+				{showScore && <div className="pong-score">{displayScore}</div>}
+				<div className="pong-ball" style={{top: ball_position.y + "vh", left: ball_position.x + "vw"}}></div>
+				<div className="pong-player" style={{top: opponent_pong_position + "vh"}}></div>
+			</div>
 		</>
 	);
 }

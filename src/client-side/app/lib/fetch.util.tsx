@@ -38,7 +38,7 @@ export const serverFetchSerialized = async <T = any>({
 		body: body,
 		cache: 'no-store',
 	};
-	const fullUrl = "http://nest-app:3000" + uri;
+	const fullUrl = process.env.SERVER_NEST_ACCESS + uri;
 	const response = await fetch(fullUrl, options);
 	return await response.json();
 }

@@ -10,9 +10,11 @@ import { AchievementService, ACHIEVEMENT_DEFINITIONS } from "./achievement.servi
 import { MatchService } from "./match.service";
 import { GameController } from "./game.controller";
 import { RankService } from "./rank.service";
+import { InviteService } from "./invite.service";
+import { EventsModule } from "../events/events.module";
 
 @Module({
-	imports: [SocketModule, UsersModule, TypeOrmModule.forFeature([Match, Achievement])],
+	imports: [EventsModule, SocketModule, UsersModule, TypeOrmModule.forFeature([Match, Achievement])],
 	controllers: [GameController],
 	providers: [LiveGameQue, GameService, AchievementService,
 		{
@@ -20,7 +22,8 @@ import { RankService } from "./rank.service";
 			useValue: ACHIEVEMENT_DEFINITIONS,
 		},
 		MatchService,
-		RankService
+		RankService,
+		InviteService
 	],
 	exports: [LiveGameQue, GameService],
 })

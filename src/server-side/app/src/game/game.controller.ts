@@ -4,6 +4,7 @@ import { AchievementService, AchievementRecord } from './achievement.service';
 import { MatchService, MatchHistory } from './match.service';
 import { GameService } from './pongGame.service';
 import { UserId } from '../utils/user-id.decorator';
+import { InviteService } from './invite.service';
 
 interface inviteLink {
 	inviteLink: string;
@@ -17,8 +18,8 @@ export class GameController {
 		private readonly achievementService: AchievementService,
 		@Inject(MatchService)
 		private readonly matchService: MatchService,
-		@Inject(GameService)
-		private readonly gameService: GameService
+		@Inject(InviteService)
+		private readonly inviteService: InviteService,
 	) {}
 
 	@Get('achievements/:userId')
@@ -40,11 +41,11 @@ export class GameController {
 	@Post('invite/')
 	async invitePlayer(
 		@UserId() currentUserId: number,
-		@Body() data: { userName: string }
-
+		@Body() data: { username: string },
 	): Promise<inviteLink>
 	{
-		console.log("User found", data);
-		return await this.gameService.inviteToGame(currentUserId, data.userName, 1);
+		console.log("User found", data.username);
+		const inviteCode = await this.inviteService.createInvite(currentUserId, data.username);
+		return { inviteLink: inviteCode };
 	}
 }

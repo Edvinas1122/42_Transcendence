@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { GameKeyContext } from '@/components/Pong/GameKeyProvider';
 import { serverFetch } from '@/lib/fetch.util';
 import { Oxanium } from 'next/font/google';
+import DisplayPopUp, { NotificationDisplay } from '@/components/EventsInfoUI/EventsInfo';
 import "../Que.css";
 
 interface SocketEvent {
@@ -45,21 +46,23 @@ export const InviteUserInterface: React.FC = () => {
 		}
 
 		try {
-			const response = await serverFetch(`/game/invite/`, "POST", {
-				headers: {
-					'Content-Type': 'application/json'
-				},
-			},{
-				username: username,
-			});
-
+			const response = await serverFetch(`/game/invite/`,
+				"POST",
+				{'Content-Type': 'application/json'},
+				JSON.stringify({
+					username: username,
+				})
+			);
+			
 			console.log(response);
-			// if (response.status !== 200 || ) {
-			// 	throw new Error(`Error: ${response.statusText}`);
-			// }
-
-			setInviteLink(response.inviteLink);
-			setError('');
+			if (response.error) {
+				// setError(response.message);
+				DisplayPopUp(response.error, response.message, 2500, "danger")
+			} else {
+				DisplayPopUp("Invited", "Please wait for the User to join", 5000, "success")
+				setInviteLink(response.inviteLink);
+				setError('');
+			}
 		} catch (err: any) {
 			setError(err.message);
 		}
@@ -109,16 +112,6 @@ const QueInterface: React.FC<QueInterfaceProps> = ({
 	)
 }
 
-// const QueList: React.FC = () => {
-
-
-// 	return (
-// 		<>
-
-// 		</>
-// 	)
-// }
-
 interface GameCommenceData {
 	begin: boolean,
 }
@@ -152,10 +145,8 @@ const Countdown: React.FC<{
 			}, 1500);
 			return;
 		}
-		// setServerResponded(true);
-		// console.log("redirecting, game key here", gameKey);
 		setGameKey(gameKey);
-		router.push(`/game/pong/`);
+		router.replace(`/game/pong/`);
     };
 
     useEffect(() => {
@@ -166,14 +157,8 @@ const Countdown: React.FC<{
         } else if (countdown === 0) {
 			setStarting(true);
 			setTimeout(() => {
-				// if (!serverResponded){
-				// 	setFailure(true);
-				// }
 				setGameKey(gameKey);
-				router.push(`/game/pong/`);
-				// setTimeout(() => {
-				// 	setVisibility(false);
-				// }, 1000);
+				router.replace(`/game/pong/`);
 			}, 900);
 			return;
         }
@@ -182,7 +167,7 @@ const Countdown: React.FC<{
 		}
     }, [gameKey, redirect]);
 
-	// if (failure) return <p>Game Failed to Start</p>
+
 	if (starting) return <p>Game Starting...</p>
 	if (abort) return <p>Game Aborted</p>
     return <p>Game Starts in {countdown}...</p>
@@ -197,7 +182,6 @@ const LiveOnline: React.FC = () => {
     const Socket = useContext(WebSocketContext);
     const [onlineList, setOnlineList] = useState("");
 	const [gameMachKey, setGameMachKey] = useState<null | string>(null);
-	// const { gameKey, setGameKey } = useContext(GameKeyContext);
 
     useEffect(() => {
 		// setGameKey(null);
@@ -208,12 +192,12 @@ const LiveOnline: React.FC = () => {
 			setOnlineList(event);
         };
 
-        const handleMatchMade = (event: MachMakingData) => {
-            console.log("match made", event);
+		const handleMatchMade = (event: MachMakingData) => {
+			console.log("match made", event);
 			if (event?.gameKey !== undefined) {
 				setGameMachKey(event.gameKey);
 			}
-        };
+		};
 
         Socket.on('liveGameQueInfo', handleQueInfoUpdate);
         Socket.on('MachMaking', handleMatchMade);

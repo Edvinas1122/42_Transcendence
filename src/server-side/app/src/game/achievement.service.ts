@@ -26,6 +26,7 @@ class UserAchievement implements AchievementRecord {
 	achievedOn: Date;
 }
 
+
 @Injectable()
 export class AchievementService {
 	constructor(

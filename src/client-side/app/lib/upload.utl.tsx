@@ -8,11 +8,15 @@ const FileUpload = async (formData: FormData): Promise<any> => {
 		console.error("Unauthorised!");
 	} else {
 		try {
-			const response = await axios.post('http://nest-app:3000/drive/upload', formData, {
-				headers: {
-					'Authorization': `Bearer ${cookie}`,
+			const response = await axios.post(
+				`${process.env.SERVER_NEST_ACCESS}/drive/upload`,
+				formData,
+				{
+					headers: {
+						'Authorization': `Bearer ${cookie}`,
+					}
 				}
-			});
+			);
 			return {message: "File uploaded successfully."};
 		} catch (error) {
 			return {message: "Error while uploading file."};

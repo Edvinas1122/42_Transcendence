@@ -1,9 +1,11 @@
 "use client";
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext, AuthContextType } from './authContext';
 import DisplayPopUp, {DisplayComponent} from '../EventsInfoUI/EventsInfo';
 import { Message, User } from '@/lib/DTO/AppData';
+import { ConfirmationContext } from '../confirmationDialog/Confirmation';
+import { useRouter } from 'next/navigation';
 
 // export type EventSourceContextType = EventSource | null;
 export type EventSourceContextType = Message | null;
@@ -31,20 +33,43 @@ interface EventSourceData {
 	retry: number;
 }
 
+type RegisterEventListener = (type: string, listener: (data: any) => void) => void;
+
+interface EventSourceProviderState {
+	eventListeners: { [key: string]: ((data: any) => void)[] };
+	registerEventListener: RegisterEventListener;
+}
+
+export const EventSourceProviderContext = createContext<EventSourceProviderState>({
+	eventListeners: {},
+	registerEventListener: () => {},
+});
+
 export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  {
 
 	const { token } = useContext<AuthContextType>(AuthContext);
 	const [eventSource, setEventSource] = useState<EventSource | null>(null);
 	const [chatEvent, setChatEvent] = useState<ChatEventType | null>(null);
+	const [state, setState] = useState<EventSourceProviderState>({
+		eventListeners: {},
+		registerEventListener: () => {},
+	});
 
+	const registerEventListener = useCallback((type: string, listener: (data: any) => void) => {
+		setState((prevState) => ({
+			...prevState,
+			eventListeners: {
+				...prevState.eventListeners,
+				[type]: [...(prevState.eventListeners[type] || []), listener],
+			},
+		}));
+	}, []);
 
 	useEffect(() => {
 
 		if (!token) {
 			return () => {};
 		}
-		// const url = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/events/sse/?token=${token}`;
-		// const url = `http://localhost:3000/events/sse/?token=${token}`;
 		const url = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/events/sse/?token=${token}`;
 		const es = new EventSource(url);
 		setEventSource(es);
@@ -55,7 +80,7 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 			}
 			const parsedData: EventSourceData = JSON.parse(event.data);
 
-			console.log("received event", event);
+			console.log("received event", parsedData);
 			switch (parsedData.type) {
 				case 'chat':
 					setChatEvent(parsedData.data);
@@ -63,11 +88,30 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 				case 'user':
 					switch (parsedData.data.event) {}
 					break;
+				default:
+					if (state.eventListeners[parsedData.type]) {
+						state.eventListeners[parsedData.type].forEach(listener => listener(parsedData.data));
+					}
+					break;
 			}
 			setTimeout(() => {
 				setChatEvent(null);
 			}, 100);
 		};
+
+		// es.onerror = (event: MessageEvent | null) => {
+		// 	setConfirmation({
+		// 		open: true,
+		// 		title: 'Connection Error',
+		// 		message: `There was an error connecting to the server. Please refresh the page.`,
+		// 		yes: 'Dang it reload.!',
+		// 		no: 'well...',
+		// 		confirm: () => {
+		// 			router.push(`/game/${parsedData.data.data.game.inviteKey}`);
+		// 		},
+		// 		cancel: () => {},
+		// 	});
+		// };
 
 
 	return () => {
@@ -80,8 +124,10 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 
 	return (
 		<ChatSourceContext.Provider value={chatEvent}>
+			<EventSourceProviderContext.Provider value={{...state, registerEventListener}}>
 			<DisplayComponent/>
 			{children}
+			</EventSourceProviderContext.Provider>
 		</ChatSourceContext.Provider>
 	);
 };

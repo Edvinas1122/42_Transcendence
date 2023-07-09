@@ -4,16 +4,19 @@
 import { EventSourceProvider } from './ContextProviders/eventContext';
 import { AuthProvider } from './ContextProviders/authContext';
 import { ConfirmationProvider } from './confirmationDialog/Confirmation';
- 
+import { GameInvite } from './GameInvite';
+
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     // <ThemeProvider>
       	<AuthProvider>
-			<EventSourceProvider>
-				<ConfirmationProvider>
+			<ConfirmationProvider>
+				<EventSourceProvider>
+					<GameInvite/>
 					{children}
-				</ConfirmationProvider>
-			</EventSourceProvider>
+				</EventSourceProvider>
+			</ConfirmationProvider>
 		</AuthProvider>
     // </ThemeProvider>
   )
