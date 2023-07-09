@@ -4,7 +4,7 @@ import { User } from "@/lib/DTO/AppData";
 import { UserInfoBox } from "@/components/UserUI/UserProfileUI";
 
 interface UserBoxProps {
-	item?: User,
+	item: User,
 	childnode: React.ReactNode
 }
 

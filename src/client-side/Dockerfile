@@ -7,6 +7,9 @@ WORKDIR /app
 
 # Copy package.json and package-lock.json (if available)
 COPY app/package*.json ./
+COPY app/next.config.js ./
+COPY app/tailwind.config.js ./
+COPY app/tsconfig.json ./
 
 # Install dependencies
 RUN mkdir app/
@@ -45,7 +48,7 @@ RUN npm run build
 EXPOSE 3030
 
 # Start the Next.js app
-CMD ["npm", "run", "dev"]
+# CMD ["npm", "run", "dev"]
 
 
-# CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start"]

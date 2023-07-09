@@ -2,11 +2,16 @@
 import { User, UserProfile } from "@/lib/DTO/AppData";
 import CurrentUserId from "@/lib/token.util";
 import UserProfileUI from "@/components/UserUI/UserProfileLayout";
+import fetchWithToken from "@/lib/fetch.util";
+
 
 const Users = async () => {
 
+	const id: number = CurrentUserId();
+	const UserInfo: UserProfile = await fetchWithToken<UserProfile>(`/users/profile/${id}`, 10);
+
 	return (
-		<UserProfileUI  isUser={true}/>
+		<UserProfileUI UserInfo={UserInfo} isUser={true}/>
 	);
 };
   

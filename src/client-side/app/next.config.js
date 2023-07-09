@@ -15,6 +15,7 @@
 		env: {
 			developer_mode: process.env.DEV? process.env.DEV : "",
 			intraLink: process.env.INTRA_LINK? process.env.INTRA_LINK : "",
+			next_public_intra_link: process.env.NEXT_PUBLIC_INTRA_LINL? process.env.NEXT_PUBLIC_INTRA_LINL : "",
 		},
 		images: {
 			domains: ['localhost', `${process.env.NEXT_PUBLIC_HOST_NAME}`, "cdn.intra.42.fr"],

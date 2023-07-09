@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from '@/lib/DTO/AppData';
-import UserProfileUI from './UserProfileUI';
+import UserProfileUI from './UserProfileLayout';
 
 interface UserProfileDisplayProps {
 	UserInfo: User;

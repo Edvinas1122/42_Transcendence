@@ -7,8 +7,7 @@ import "./UserProfile.css"
 import SpinnerLoader, { SpinnerLoader2, SpinnerLoaderSmall } from '../GeneralUI/Loader';
 // import { Suspense } from 'react';
 import { UserInfoBox } from './UserProfileUI';
-import fetchWithToken from "@/lib/fetch.util";
-import CurrentUserId from "@/lib/token.util";
+
 
 const GenericAchievement = ({item}: {item: Achievement}) => {
 
@@ -72,18 +71,18 @@ const DummyLoadingUser: UserProfile = {
 	losses: 0
 }
 
-const UserProfileUI: Function = async ({
-	// UserInfo,
+const UserProfileUI: Function = ({
+	UserInfo,
 	isUser,
 	loading
 }: {
-	// UserInfo: UserProfile,
+	UserInfo: UserProfile,
 	isUser: boolean,
 	loading?: boolean
 }) => {
-	const id: number = CurrentUserId();
-	const UserInfo: UserProfile = await fetchWithToken<UserProfile>(`/users/profile/${id}`, 10);
+	
 	const userStatus = isUser ? "user" : UserInfo.friend? UserInfo.friend : "none";
+
 
 	return (
 		<section className="Display UserPage">

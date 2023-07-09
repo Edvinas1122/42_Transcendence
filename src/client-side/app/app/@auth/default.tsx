@@ -1,6 +1,5 @@
 "use client";
-import "@/public/layout.css"
-
+import "@/public/layout.css";
 import { AuthCodeDTO } from "@/lib/DTO/AuthData";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ft_fetch } from "@/lib/fetch.util";
@@ -156,7 +155,7 @@ interface RetrieveCall {
 	id: number;
 }
 
-const AuthPage = () => {
+const AuthPage: React.FC = () => {
 
 	const [loading, setLoading] = useState<boolean | string>(false);
 	const [authorised, setAuthorised] = useState<AuthorizedIntraUser | null>(null);
@@ -168,7 +167,7 @@ const AuthPage = () => {
 			id: 0,
 		}
 	);
-	const intraLink: string = process.env.intraLink? process.env.intraLink : "";
+	const intraLink: string = process.env.NEXT_PUBLIC_INTRA_LINL? process.env.NEXT_PUBLIC_INTRA_LINL : "";
 	const devLink: string = "/api/dev/";
 
 	const searchParams = useSearchParams();
