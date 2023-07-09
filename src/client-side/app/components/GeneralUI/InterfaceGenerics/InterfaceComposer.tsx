@@ -118,7 +118,7 @@ const InterfaceUnit = ({
 
 
 	const onClickFunction = () => {
-		console.log("trigered on clieck ", confirmation, setConfirmation);
+		// console.log("trigered on clieck ", confirmation, setConfirmation);
 	if (confirmation && confirmation.condition(item)) {
 		// Show confirmation dialog
 		setConfirmation({
@@ -161,7 +161,7 @@ const InterfaceUnit = ({
 			  }
 			// setFieldValues(fields?.reduce((acc, field) => ({ ...acc, [field.name]: '' }), {}) || {});
 			try {
-				console.log("endpoint", endpoint, "field Values", fieldValues);
+				// console.log("endpoint", endpoint, "field Values", fieldValues);
 				const response = await serverFetch<Promise<EntityUpdateResponse>>(endpoint, method, { 'Content-Type': 'application/json' }, JSON.stringify(fieldValues));
 				if (response?.error) {
 					throw new Error(JSON.stringify(response));

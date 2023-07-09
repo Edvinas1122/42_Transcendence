@@ -9,19 +9,27 @@ interface OnlineStatusResponse {
 
 interface OnlineStatusProps {
     id: number;
+    loading?: boolean;
 }
 
-export const OnlineStatus: React.FC<OnlineStatusProps> = ({id}) => {
+export const OnlineStatus: React.FC<OnlineStatusProps> = ({
+    id,
+    loading,
+}: OnlineStatusProps
+) => {
     const [online, setOnline] = useState<string>("loading...");
 
 	console.log("user id: ", id);
     const checkOnline = useCallback(async () => {
-        const response = await serverFetch<OnlineStatusResponse>(
-            `/online-status/${id}`,
-            "GET",
-            { 'Content-Type': 'application/json' },
-        );
-        setOnline(response.status);
+		// console.log("checkOnline", loading);
+        if (loading !== true) {
+			const response = await serverFetch<OnlineStatusResponse>(
+				`/online-status/${id}`,
+				"GET",
+				{ 'Content-Type': 'application/json' },
+			);
+			setOnline(response.status);
+        }
     }, [id]);
 
     useEffect(() => {

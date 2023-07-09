@@ -79,7 +79,7 @@ async function fetchWithToken<T = any>(
 		options = { ...options, next: { revalidate: revalidate_interval }  };
 	}
 
-	console.log("fetching with token", options);
+	// console.log("fetching with token", options);
 
 	const response: Response = await fetch(fullUrl, options);
 	return response.json();

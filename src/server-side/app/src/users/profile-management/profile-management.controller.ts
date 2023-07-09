@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Param, Req, Body, UseGuards, HttpException, HttpStatus, ParseIntPipe, Inject } from '@nestjs/common';
 import { ProfileManagementService } from './profile-management.service';
-import { JwtTwoFactorGuard } from '../../auth/guards/jwt-2fa.guard';
 import { FriendApproveGuard, FriendRequestGuard } from './guards/post-relationship.guard';
 import { UserInfo } from '../dtos/user.dto';
 import { Relationship } from './entities/relationship.entity';
 import { UserId } from '../../utils/user-id.decorator';
+import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
 
-@UseGuards(JwtTwoFactorGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('users/manage')
 export class ProfileManagementController {
 	constructor(
