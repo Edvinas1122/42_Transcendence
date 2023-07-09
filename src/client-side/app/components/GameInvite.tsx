@@ -7,6 +7,7 @@ import { EventSourceProviderContext } from './ContextProviders/eventContext';
 interface GameInfo {
 	event: string;
 	message: string;
+	inviteKey: string;
 }
 
 export const GameInvite: React.FC = () => {
@@ -22,10 +23,10 @@ export const GameInvite: React.FC = () => {
 						setConfirmation({
 							title: "You been invited to a game!",
 							message: data.message,
-							confirm: () => {
-								router.replace("/");
+							onConfirm: () => {
+								router.replace(`/game/?join=${data.inviteKey}`);
 							},
-							cancel: () => {},
+							onCancel: () => {},
 							yes: "Let's Ping Gop!",
 							no: "Hard Pass",
 						});

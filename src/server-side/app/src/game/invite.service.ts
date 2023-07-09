@@ -51,6 +51,7 @@ export class InviteService {
 			payload: {
 				event: 'invite',
 				message: `You have been invited to a game by ${player2Name}`,
+				inviteKey: inviteKey,
 			}
 		} as SseMessage)
 		return inviteKey;
