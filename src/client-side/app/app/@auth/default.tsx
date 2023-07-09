@@ -76,9 +76,11 @@ function ActiveLink({href}: {href: string}) {
 	)
   }
 
-const ErrorComponent = () => (
+const ErrorComponent = (
+	{ reason }: { reason?: string }
+) => (
 	<div>
-		<h2>Error: Authorization failed</h2>
+		<h2>{reason? reason : "Error: Authorization failed"}</h2>
 	</div>
 );
 
@@ -158,6 +160,7 @@ const AuthPage = () => {
 
 	const [loading, setLoading] = useState<boolean | string>(false);
 	const [authorised, setAuthorised] = useState<AuthorizedIntraUser | null>(null);
+	const [error, setError] = useState<string | null>(null);
 	const [timer, setTimer] = useState<number>(0);
 	const [codeDisplay, setCodeDisplay] = useState<RetrieveCall>(
 		{
@@ -165,7 +168,7 @@ const AuthPage = () => {
 			id: 0,
 		}
 	);
-	const intraLink: string = process.env.NEXT_PUBLIC_INTRA_LINL ? process.env.NEXT_PUBLIC_INTRA_LINL : "";
+	const intraLink: string = process.env.intraLink? process.env.intraLink : "";
 	const devLink: string = "/api/dev/";
 
 	const searchParams = useSearchParams();
@@ -174,20 +177,21 @@ const AuthPage = () => {
 
 	const authorizedRedirect = () => {
 		setTimer(0);
-		setLoading("redirecting");
+		setError(null);
+		// setLoading("redirecting");
 		window.location.href = "/user";
 	}
 
 	useEffect(() => {
-		let countdown: NodeJS.Timeout; // Declare a variable for countdown interval
-		// Check if 2FA is required and start the countdown
+		let countdown: NodeJS.Timeout;
+
 		if (codeDisplay.retrieve !== "") {
-		setTimer(120); // Set timer to 120 seconds (2 minutes)
+		setTimer(120);
 		countdown = setInterval(() => {
 			setTimer(prev => prev > 0 ? prev - 1 : 0);
-		}, 1000); // Update the timer every second
+		}, 1000);
 		}
-		// Clear the countdown interval when timer runs out or component unmounts
+
 		return () => {
 		if (countdown) {
 			clearInterval(countdown);
@@ -224,8 +228,16 @@ const AuthPage = () => {
 								id: data.id
 							});
 						} else {
-							authorizedRedirect();
+							setTimeout(() => {
+								authorizedRedirect();
+							}, 1000);
 						}
+					} else {
+						setError("Error: " + data.message);
+						router.replace("/");
+						setTimeout(() => {
+							setError(null);
+						}, 2000);
 					}
 				} catch (error) {
 					console.log("Error:", error);
@@ -265,9 +277,13 @@ const AuthPage = () => {
 								)}
 								</div>
 							</>
-						) : (
+						) : ( error ? (
+							<ErrorComponent
+								reason={error}
+							/>
+						): (
 							<Buttons intraLink={intraLink} devLink={devLink} />
-						)
+						))
 					)) : (
 						<ErrorComponent />
 				)}

@@ -82,7 +82,6 @@ async function fetchWithToken<T = any>(
 	console.log("fetching with token", options);
 
 	const response: Response = await fetch(fullUrl, options);
-
 	return response.json();
 }
 

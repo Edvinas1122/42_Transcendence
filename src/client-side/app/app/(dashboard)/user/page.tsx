@@ -6,7 +6,9 @@ import UserProfileUI from "@/components/UserUI/UserProfileUI";
 const Users = async () => {
 
 	const id: number = CurrentUserId();
-	const user: User = await fetchWithToken<User>(`/users/profile/${id}`, );
+	const user: User = await fetchWithToken<User>(`/users/profile/${id}`);
+
+	console.log("user", user);
 
 	return (
 		<UserProfileUI UserInfo={user} isUser={true}/>

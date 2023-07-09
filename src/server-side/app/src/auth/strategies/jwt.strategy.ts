@@ -24,8 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 	async validate(payload: any) {
 		const user = await this.userService.findUser(payload.id);
 		if (!user) {
-			console.log('User not found, Access denied');
-			throw new UnauthorizedException();
+			throw new UnauthorizedException('Access denied');
+		}
+		if (payload?.only2FA == true) {
+			throw new UnauthorizedException('2FA required');
 		}
 		return { name: payload.owner, id: payload.id};
 	}

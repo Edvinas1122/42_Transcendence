@@ -79,7 +79,7 @@ export const CodeFormComponent: React.FC<FormProps> = ({
 				<Loading/>
 			) : (
 				<>
-					{!success && (
+					{!success ? (
 						<form onSubmit={handleSubmit}> 
 							<p>2FA required</p>
 							<input 
@@ -90,8 +90,7 @@ export const CodeFormComponent: React.FC<FormProps> = ({
 							/>
 							<button type="submit">Submit</button>
 						</form>
-					)}
-					{success && (
+					): (
 						<p>Validated</p>
 					)}
 					{error && (

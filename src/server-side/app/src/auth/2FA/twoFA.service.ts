@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { AuthService } from "../auth.service";
 import { authenticator } from 'otplib';
 import { User } from "../../users/entities/user.entity";
@@ -19,7 +19,7 @@ export class TwoFAService {
 ) {
         const user = await this.usersService.getUser(id);
         if (!user) {
-            console.log("no")
+            throw new ConflictException('User not found');
         }
         const secret = authenticator.generateSecret();
         const otpAuthURL = authenticator.keyuri(
@@ -51,7 +51,6 @@ export class TwoFAService {
             })
             return valid;
         } catch (error) {
-            console.log("Validation Error : ", error);
             return false;
         }
     }

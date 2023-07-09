@@ -33,7 +33,8 @@ export async function POST(request: Request) {
 		{
 			method: "POST",
 			headers: {
-				'Content-Type': "application/json"
+				'Content-Type': "application/json",
+				'Authorization': `Bearer ${req.retrieve}`,
 			},
 			body: JSON.stringify(requestToNest)
 		}

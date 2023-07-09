@@ -94,7 +94,7 @@ export async function GET(request: Request) {
 		name: userInfo.first_name + " " + userInfo.last_name,
 		image: userInfo.image.link,
 		micro_image: userInfo.image.versions.micro,
-		retrieve: registerLoginResponse.retrieve + "-" + random_secret,
+		retrieve: registerLoginResponse.retrieve,
 		two_fa: registerLoginResponse.HAS_2_FA,
 		id: registerLoginResponse.id,
 	}

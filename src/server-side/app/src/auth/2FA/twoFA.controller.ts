@@ -3,10 +3,10 @@ import { AuthService } from '../auth.service';
 import { TwoFAService } from './twoFA.service';
 import { Response } from 'express';
 import { JwtAuthGuard }from '../guards/jwt.guard';
-import { UserId } from '../../utils/user-id.decorator';
+import { UserId, UserName } from '../../utils/user-id.decorator';
 import { UsersService } from '../../users/users.service';
 import { TwoFACodeDto } from './twoFA.dto';
-import { TmpTokenStore } from '../tmpTokenStore.service';
+import { JwtTwoFactorGuard } from '../guards/jwt-2fa.guard';
 
 interface TokenRetrieveReq {
     retrieve: string;
@@ -20,10 +20,10 @@ interface TokenRetrieveReq {
 export class twoFAController {
 	constructor(
 		private readonly twoFAService: TwoFAService,
+		@Inject(UsersService)
 		private readonly usersService: UsersService,
+		@Inject(AuthService)
 		private readonly authService: AuthService,
-		@Inject(TmpTokenStore)
-		private readonly tmpTokenStore: TmpTokenStore,
 	){}
 
 	@UseGuards(JwtAuthGuard)
@@ -81,28 +81,12 @@ export class twoFAController {
 			message: "2FA deactivated",
 		};
 	}
-	
-	// @UseGuards(JwtAuthGuard)
-	// @Post('authenticate')
-	// async authenticate2FA(
-	// 	@UserId() currentUserId: number,
-	// 	@Body() twoFACodeDto: TwoFACodeDto
-	// ) {
-	// 	const valid = await this.twoFAService.validate2FASecret(
-	// 		currentUserId,
-	// 		twoFACodeDto.code
-	// 	);
-	// 	if (!valid) {
-	// 		throw new UnauthorizedException('Invalid authentication code');
-	// 	}
-	// 	const user = await this.usersService.getUser(currentUserId);
-	// 	await this.usersService.validate2FA(currentUserId);
-	// 	const accessToken = await this.authService.generateToken({id: user.id, owner: user.name});
-	// 	return {accessToken};
-	// }
 
 	@Post('login')
+	@UseGuards(JwtTwoFactorGuard)
 	async authenticate2FAServer(
+		@UserId() currentUserId: number,
+		@UserName() currentUserName: string,
 		@Body() retrieveReq: TokenRetrieveReq,
 	) {
 		const server_sercet = process.env.SERVER_SECRET;
@@ -110,13 +94,13 @@ export class twoFAController {
 			throw new UnauthorizedException('Unknown accessor');
 		}
 		const valid = await this.twoFAService.validate2FASecret(
-			retrieveReq.id,
+			currentUserId,
 			retrieveReq.code
 		);
 		if (!valid) {
 			throw new UnauthorizedException('Invalid 2FA code');
 		}
-		const accessToken = this.tmpTokenStore.retrieveTokenLink(retrieveReq.retrieve)
+		const accessToken = await this.authService.generateToken({id: currentUserId, owner: "server"});
 		if (!accessToken) {
 			throw new UnauthorizedException('Invalid retrieve request token');
 		}

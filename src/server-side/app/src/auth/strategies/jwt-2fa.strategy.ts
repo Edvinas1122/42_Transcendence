@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Strategy, ExtractJwt } from 'passport-jwt';
@@ -11,7 +11,7 @@ export	const JwtParams = {
 };
 
 @Injectable()
-export class JwtTwoFaStrategy extends PassportStrategy(Strategy, 'jwt-two-factor') {
+export class JwtTwoFaStrategy extends PassportStrategy(Strategy, 'jwt-two-fa') {
     constructor(
         private usersService: UsersService
     ) {
@@ -25,14 +25,11 @@ export class JwtTwoFaStrategy extends PassportStrategy(Strategy, 'jwt-two-factor
     async validate(payload: any) {
         const user = await this.usersService.findUser(payload.id);
         if (!user) {
-            throw new UnauthorizedException()
+            throw new UnauthorizedException('Access denied');
         }
-
-        if (!user.twoFactorAuth) {
-            return { name: payload.owner, id: payload.id};
+        if (!user.twoFactorAuthSecret) {
+            throw new ConflictException('2FA not enabled');
         }
-        if (user.twoFactorAuthenticated) {
-            return { name: payload.owner, id: payload.id};
-        }
+        return { name: payload.owner, id: payload.id};
     }
 }

@@ -29,21 +29,29 @@ export class UsersController {
 	}
 
 	@Get('me')
-	async findCurrentUser(@UserId() currentUser: number): Promise<UserProfileInfo>
+	async findCurrentUser(
+		@UserId() currentUser: number
+	): Promise<UserProfileInfo>
 	{
 		const user = await this.usersService.getUserProfile(currentUser);
 		return user;
 	}
 
 	@Get('profile/:id')
-	async findUser(@UserId() userId: number, @Param('id', new ParseIntPipe()) requesteeId: number): Promise<UserProfileInfo>
+	async findUser(
+		@UserId() userId: number,
+		@Param('id', new ParseIntPipe()) requesteeId: number
+	): Promise<UserProfileInfo>
 	{
+		console.log('requesteeId', requesteeId);
 		const requestee = await this.usersService.getUserProfile(requesteeId);
 		return requestee;
 	}
 
 	@Post('edit')
-	async editUsername(@Body() newName: UpdateUsernameDto, @UserId() userId: number
+	async editUsername(
+		@Body() newName: UpdateUsernameDto,
+		@UserId() userId: number,
 	): Promise<UserUpdateResponse | null>
 	{
 		const resultUser = await this.usersService.updateUserName(userId, newName.newName);

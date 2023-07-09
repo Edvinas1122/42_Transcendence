@@ -56,9 +56,6 @@ export class User {
 	twoFactorAuth?: boolean;
 
 	@Column({nullable: true})
-	twoFactorAuthenticated?: boolean; // WHY ??
-
-	@Column({nullable: true})
 	twoFactorAuthSecret?: string;
 
 	@OneToMany(() => Match, match => match.player1)

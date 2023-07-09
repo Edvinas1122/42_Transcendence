@@ -4,7 +4,7 @@ const UIListBox: Function = ({ Items, BoxComponent, ListStyle, BoxStyle }: { Ite
 
 	return (
 		<div className={"List " + ListStyle}>
-		{Items.map((item: any) => {
+		{Items && Items.map((item: any) => {
 			return (
 				<BoxComponent key={item._id} item={item} style={BoxStyle} />
 			);
