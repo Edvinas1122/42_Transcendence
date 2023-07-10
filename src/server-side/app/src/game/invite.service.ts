@@ -46,7 +46,7 @@ export class InviteService {
 		this.inviteMap.set(inviteKey, inviteData);
 		console.log(`Invite ${inviteKey} created`);
 		console.log("inviteMap size: ", this.inviteMap.size);
-		this.eventService.sendEvent(player1ID.toString(), {
+		this.eventService.sendEvent(player2ID.toString(), {
 			type: EventType.Game,
 			payload: {
 				event: 'invite',
