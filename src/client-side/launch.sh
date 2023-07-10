@@ -1,1 +1,0 @@
-docker run -v $(pwd)/app/app:/app/app -p 3030:3030 trance_front_end

@@ -1,7 +1,6 @@
 import { Controller, Get, UseGuards, Req, Res, Param, HttpException, HttpStatus, Post, Query } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService, LoginRegister } from './auth.service';
-import { FourtyTwoGuard } from './guards/42.guard';
 import { Inject } from '@nestjs/common';
 import { UsersService, User } from '../users/users.service';
 import { randWords } from './utils/rand.words';
@@ -90,21 +89,21 @@ export class AuthController
 			secure: true, // set secure to true
 			sameSite: 'none' // set sameSite to 'none'
 		});
-		return res.redirect(process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL);
+		return res.redirect(process.env.FRONT_END_API);
 	}
 
-	@Get('/redirect')
-	@UseGuards(FourtyTwoGuard)
-	async redirect(@Req() req: Request, @Res() res: Response): Promise<any>
-	{
-		const username = req['user']['profile']['username'];
-		const id = req['user']['profile']['id'];
-		const accessToken = await this.authService.generateToken({id: id, owner: username});
-		// const tokenRetrieveCode = this.tokenStore.storeTokenLink(accessToken, 10);
+	// @Get('/redirect')
+	// @UseGuards(FourtyTwoGuard)
+	// async redirect(@Req() req: Request, @Res() res: Response): Promise<any>
+	// {
+	// 	const username = req['user']['profile']['username'];
+	// 	const id = req['user']['profile']['id'];
+	// 	const accessToken = await this.authService.generateToken({id: id, owner: username});
+	// 	// const tokenRetrieveCode = this.tokenStore.storeTokenLink(accessToken, 10);
 
-		res.cookie('access_token', accessToken, { maxAge: 9000000000, httpOnly: false, secure: false });
-		return res.redirect(process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL);
-	}
+	// 	res.cookie('access_token', accessToken, { maxAge: 9000000000, httpOnly: false, secure: false });
+	// 	return res.redirect(process.env.FRONT_END_API);
+	// }
 
 	@Post('/register')
 	async registerAuthorizedLogin(

@@ -22,7 +22,7 @@ export class DriveController {
 		const fileName = `avatar-${userId}.jpg`;
 		const path = join('/uploads/', fileName);
 		await writeFile(path, file.buffer);
-		const avatar_url = process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL + "/avatar/" + fileName;
+		const avatar_url = process.env.FRONT_END_API + "/avatar/" + fileName;
 		await this.usersService.updateAvatar(userId, avatar_url);
 		return { message: 'File uploaded successfully' };
 	}
