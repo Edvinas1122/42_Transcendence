@@ -8,7 +8,7 @@ export class AppController {
 
   @Get()
   redirectToDev(@Res() res: Response): void {
-    const devLoginUrl = process.env.FRONT_END_API + '/auth/DevUser/';
+    const devLoginUrl = process.env.FRONT_END_API;
     res.redirect(devLoginUrl);
   }
 }

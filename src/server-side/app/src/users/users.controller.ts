@@ -2,7 +2,6 @@ import { Controller, Get, Req, Post, Body, Param, ParseIntPipe, ValidationPipe }
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UseGuards, } from '@nestjs/common';
-import { JwtTwoFactorGuard } from '../auth/guards/jwt-2fa.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { UserProfileInfo, UserInfo, UpdateUsernameDto } from './dtos/user.dto';
 import { UserId } from '../utils/user-id.decorator';

@@ -457,13 +457,14 @@ export class PongGameInstance
 			},
 			end_game: !this.pongGameData.run,
 		};
+		console.log("here: ", gameDataForPlayer);
 		return gameDataForPlayer;
 	}
 
 	private invertBallPosition(data: PongGameDataUserUpdate)
 	{
 		const inverted = {
-			oponent_pong_position: this.pongGameData.player2Id,
+			oponent_pong_position: this.pongGameData.player1Pos,
 			ball_position: {
 				x: data.ball_position.x * -1,
 				y: data.ball_position.y,
@@ -490,28 +491,28 @@ export class PongGameInstance
 		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, gameDataForPlaye2);
 	}
 
-	private invertedGameInstance(gameInstance: PongGameData): PongGameData {
-		const invertedGameInstance: PongGameData = {
-			pausedUnitl: gameInstance.pausedUnitl,
-			player1Id: gameInstance.player2Id,
-			player2Id: gameInstance.player1Id,
-			player1Pos: gameInstance.player2Pos,
-			player2Pos: gameInstance.player1Pos,
-			ballPos: {
-				x: gameInstance.ballPos.x * -1,
-				y: gameInstance.ballPos.y,
-			},
-			ball_movement: {
-				x: -gameInstance.ball_movement.x * -1,
-				y: -gameInstance.ball_movement.y,
-			},
-			score1: gameInstance.score2,
-			score2: gameInstance.score1,
-			run: gameInstance.run,
-			gameId: gameInstance.gameId,
-		};
-		return invertedGameInstance;
-	}
+	// private invertedGameInstance(gameInstance: PongGameData): PongGameData {
+	// 	const invertedGameInstance: PongGameData = {
+	// 		pausedUnitl: gameInstance.pausedUnitl,
+	// 		player1Id: gameInstance.player2Id,
+	// 		player2Id: gameInstance.player1Id,
+	// 		player1Pos: gameInstance.player2Pos,
+	// 		player2Pos: gameInstance.player1Pos,
+	// 		ballPos: {
+	// 			x: gameInstance.ballPos.x * -1,
+	// 			y: gameInstance.ballPos.y,
+	// 		},
+	// 		ball_movement: {
+	// 			x: -gameInstance.ball_movement.x * -1,
+	// 			y: -gameInstance.ball_movement.y,
+	// 		},
+	// 		score1: gameInstance.score2,
+	// 		score2: gameInstance.score1,
+	// 		run: gameInstance.run,
+	// 		gameId: gameInstance.gameId,
+	// 	};
+	// 	return invertedGameInstance;
+	// }
 
 	public updateGameInstance(x: number, currentPlayerId: number) {
 		if (this.pongGameData.player1Id === currentPlayerId) {
