@@ -99,23 +99,12 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 			}, 100);
 		};
 
-		// es.onerror = (event: MessageEvent | null) => {
-		// 	setConfirmation({
-		// 		open: true,
-		// 		title: 'Connection Error',
-		// 		message: `There was an error connecting to the server. Please refresh the page.`,
-		// 		yes: 'Dang it reload.!',
-		// 		no: 'well...',
-		// 		confirm: () => {
-		// 			router.push(`/game/${parsedData.data.data.game.inviteKey}`);
-		// 		},
-		// 		cancel: () => {},
-		// 	});
-		// };
+		es.onerror = (event: MessageEvent | null) => {
+			DisplayPopUp("Error", "Error in EventSource connection");
+		};
 
 
 	return () => {
-		// Close EventSource connection when component unmounts
 		es.close();
 	}
 	}, [token]); // re-run effect when token changes
