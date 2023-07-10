@@ -8,7 +8,7 @@ import fetchWithToken from "@/lib/fetch.util";
 const Users = async () => {
 
 	const id: number = CurrentUserId();
-	const UserInfo: UserProfile = await fetchWithToken<UserProfile>(`/users/profile/${id}`, 10);
+	const UserInfo: UserProfile = await fetchWithToken<UserProfile>(`/users/profile/${id}`);
 
 	return (
 		<UserProfileUI UserInfo={UserInfo} isUser={true}/>

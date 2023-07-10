@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { serverFetch, setToken, serverFetchSerialized } from "@/lib/fetch.util";
 import "./UserProfile.css";
 import DisplayPopUp from "../EventsInfoUI/EventsInfo";
+import { useRouter } from "next/navigation";
 
 const TwoFaUI = ({user2FA}: {user2FA: boolean}) => {
     const [qrCodeURL, setQrCodeURL] = useState("");
@@ -202,6 +203,14 @@ const UserEdit = ({
 }: {
 	user2FA: boolean
 }) => {
+	const router = useRouter();
+
+	const handleImageUpdate = () => {
+		// router.replace("/user"); // soft reload
+		window.location.reload(); // hard reload
+		console.log("image updated----");
+	}
+	// router.reload(window.location.pathname)
 	return (
 		<div className="Component">
 			<GenericForm
@@ -217,6 +226,7 @@ const UserEdit = ({
 				]}
 				notify={true}
 				resetAfterSubmit={true}
+				effectFunction={handleImageUpdate}
 			/>
 			<EditAvatar />
 			<Set2Fa user2FA={user2FA} />
