@@ -70,7 +70,7 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 		if (!token) {
 			return () => {};
 		}
-		const url = `${process.env.FRONT_END_API}/events/sse/?token=${token}`;
+		const url = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/events/sse/?token=${token}`;
 		const es = new EventSource(url);
 		setEventSource(es);
 
