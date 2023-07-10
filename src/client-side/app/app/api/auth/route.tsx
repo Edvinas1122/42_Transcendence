@@ -47,7 +47,8 @@ export async function GET(request: Request) {
 	if (intra_token.access_token === undefined) {
 		return NextResponse.json({ 
 			sucess: false,
-			error: "validation failure"
+			error: "validation failure",
+			message: "Intra authorization failed",
 		});
 	}
 
