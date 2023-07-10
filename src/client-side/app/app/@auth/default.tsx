@@ -167,7 +167,7 @@ const AuthPage: React.FC = () => {
 			id: 0,
 		}
 	);
-	const intraLink: string = process.env.NEXT_PUBLIC_INTRA_LINL? process.env.NEXT_PUBLIC_INTRA_LINL : "";
+	const intraLink: string = process.env.NEXT_PUBLIC_INTRA_LINK? process.env.NEXT_PUBLIC_INTRA_LINK : "";
 	const devLink: string = "/api/dev/";
 
 	const searchParams = useSearchParams();
