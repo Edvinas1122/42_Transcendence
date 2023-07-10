@@ -38,6 +38,23 @@ const AllUsersLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 				displayDependency: (item: User) => true,
 			}
 		)
+		.addButton(
+			{
+				name: "MSG Priv",
+				endpointTemplate: `/chat/messages/user/[id]`,
+				type: "action",
+				fields: [
+					{
+						name: "content",
+						type: "text",
+						dependency: (item: User) => true,
+						autoField: (item: User) => item.name,
+						invisible: true,
+					}
+				],
+				link: {link: "/chat", push: true},
+			}
+		)
 	
 	const UsersLiveDisplay = new UIClientListBoxClassBuilder()
 		.setInitialItems(endpoint)
