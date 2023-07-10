@@ -2,6 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { SocketGateway } from '../socket/socket.gateway'
 import { UsersService } from '../users/users.service'
 import { EventService, SseMessage, EventType } from '../events/events.service';
+import { GameService } from './pongGame.service';
 
 interface InviteData {
 	inviteKey: string,
@@ -21,6 +22,8 @@ export class InviteService {
 		private usersService: UsersService,
 		@Inject(EventService)
 		private eventService: EventService,
+		@Inject(GameService)
+		private gameService: GameService,
 	) {
 		this.socketGateway.registerHandler('joinViaInvite', this.handleJoin.bind(this), 'joinResponse');
 		this.socketGateway.registerDicconnector(this.handleDisconnect.bind(this));
@@ -44,16 +47,9 @@ export class InviteService {
 			date: new Date(),
 		};
 		this.inviteMap.set(inviteKey, inviteData);
-		console.log(`Invite ${inviteKey} created`);
-		console.log("inviteMap size: ", this.inviteMap.size);
-		this.eventService.sendEvent(player2ID.toString(), {
-			type: EventType.Game,
-			payload: {
-				event: 'invite',
-				message: `You have been invited to a game by ${player2Name}`,
-				inviteKey: inviteKey,
-			}
-		} as SseMessage)
+		console.log(`Invite ${inviteKey} created`); // debug
+		console.log("inviteMap size: ", this.inviteMap.size); //  debug
+		this.inviteInviteeToGame(inviteKey, inviteData, player2Name);
 		return inviteKey;
 	}
 
@@ -74,12 +70,20 @@ export class InviteService {
 			inviteData.player1here = true;
 		} else if (inviteData.player2ID === userId) {
 			inviteData.player2here = true;
+			this.callInvitorToGame(joinKey, inviteData);
 		} else {
 			return `User ${userId} is not part of invite ${joinKey}`;
 		}
 		if (inviteData.player1here && inviteData.player2here) {
-			this.socketGateway.sendToUser('MatchMaking', inviteData.player1ID, { gameKey: joinKey });
-			this.socketGateway.sendToUser('MatchMaking', inviteData.player2ID, { gameKey: joinKey });
+			const gameKey = this.gameService.handleJoinGameQue(
+				inviteData.player1ID,
+				inviteData.player2ID,
+				1, // TODO: change to game type
+			);
+			const player1GameKey = gameKey + '-' + inviteData.player1ID;
+			const player2GameKey = gameKey + '-' + inviteData.player2ID;
+			this.socketGateway.sendToUser('MatchMaking', inviteData.player1ID, { gameKey: player1GameKey });
+			this.socketGateway.sendToUser('MatchMaking', inviteData.player2ID, { gameKey: player2GameKey });
 			this.inviteMap.delete(joinKey);
 			return `Invite ${joinKey} is complete`;
 		} else {
@@ -120,5 +124,27 @@ export class InviteService {
 	private keyToUsers(key: string): { player1ID: number, player2ID: number } {
 		const [player1ID, player2ID] = key.split('-');
 		return { player1ID: parseInt(player1ID), player2ID: parseInt(player2ID) };
+	}
+
+	private callInvitorToGame(joinKey: string, inviteData: InviteData): void {
+		this.eventService.sendEvent(inviteData.player1ID.toString(), {
+			type: EventType.Game,
+			payload: {
+				event: 'inviteAccepted',
+				message: `Invite ${joinKey} has been accepted`,
+				inviteKey: joinKey,
+			}
+		} as SseMessage);
+	}
+
+	private inviteInviteeToGame(joinKey: string, inviteData: InviteData, player2Name: string): void {
+		this.eventService.sendEvent(inviteData.player2ID.toString(), {
+			type: EventType.Game,
+			payload: {
+				event: 'invite',
+				message: `You have been invited to a game by ${player2Name}`,
+				inviteKey: inviteData.inviteKey,
+			}
+		} as SseMessage)
 	}
 }

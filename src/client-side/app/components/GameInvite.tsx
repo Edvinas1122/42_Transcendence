@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { ConfirmationContext } from './confirmationDialog/Confirmation';
 import { useRouter } from 'next/navigation';
 import { EventSourceProviderContext } from './ContextProviders/eventContext';
+import DisplayPopUp from './EventsInfoUI/EventsInfo';
 
 
 interface GameInfo {
@@ -31,6 +32,9 @@ export const GameInvite: React.FC = () => {
 							no: "Hard Pass",
 						});
 					break;
+				case "inviteAccepted":
+					router.replace(`/game/?join=${data.inviteKey}`);
+					DisplayPopUp("Invite Accepted", data.message);
 				break;
 			}
 			});

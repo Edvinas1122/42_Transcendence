@@ -22,6 +22,7 @@ export async function GET() {
 		{
 			const cookie = cookies().get('access_token');
 			token = { accessToken: cookie as unknown as string, id: "0" };
+			redirect("/user");
 		}
 	
 		return NextResponse.json(token);
