@@ -75,6 +75,12 @@ class MatchResult implements Partial<Match> {
 	gameEndDate: Date;
 }
 
+interface gameCustomizationRequest {
+	winCondition: 'score' | 'time',
+	winConditionValue: number,
+	ballType: 'simple' | 'speedy' | 'bouncy',
+}
+
 @Injectable()
 export class GameService {
 
@@ -125,10 +131,16 @@ export class GameService {
 		return gameKey;
 	}
 
-	handleGameBegin(data: {gameKey: string}): void {
+	handleGameBegin(data: {
+		gameKey: string,
+		gameCustomization: gameCustomizationRequest,
+	}): void {
 		const { player1ID, player2ID } = this.parseGameKey(data.gameKey);
 		const defaultKey = this.defaultGameKey(player1ID, player2ID);
-		this.liveGameInstancesMap.get(defaultKey)?.Start().then((result) => {
+		const gameInstance = this.liveGameInstancesMap.get(defaultKey);
+		if (!gameInstance) return;
+		gameInstance.CustomiseGame(this.customGameAdapter(data.gameCustomization));
+		gameInstance.Start().then((result) => {
 			if (result) {
 				this.matchService.createRecord(
 					result
@@ -198,6 +210,18 @@ export class GameService {
 	private defaultGameKey(playerId1: number, playerId2: number): string {
 		return `${playerId1}-${playerId2}`;
 	}
+
+	private customGameAdapter(gameCustomization: gameCustomizationRequest): PongMatchCustomisation {
+		console.log("gameCustomization", gameCustomization);
+		const customGame: PongMatchCustomisation = {
+			gameType: gameCustomization.ballType === 'simple' ? 'simple' : 'modified',
+			scoreToWin: gameCustomization.winCondition === 'score'? gameCustomization.winConditionValue : 50,
+			timeLimit: gameCustomization.winCondition === 'time'? gameCustomization.winConditionValue * 60 : 36000,
+			ballSpeed: gameCustomization.ballType === 'simple' || gameCustomization.ballType === 'bouncy' ? 1 : 2,
+			ballFunction: gameCustomization.ballType === 'bouncy' ? 'bouncy' : 'simple',
+		};
+		return customGame;
+	}
 }
 
 interface RunTimeDetails {
@@ -213,6 +237,8 @@ interface PongMatchCustomisation {
 	gameType: string,
 	scoreToWin?: number,
 	timeLimit?: number,
+	ballSpeed: number,
+	ballFunction?: string,
 }
 
 export class PongGameInstance
@@ -240,7 +266,8 @@ export class PongGameInstance
 		gameCustomisation: PongMatchCustomisation = {
 			gameType: "classic",
 			scoreToWin: 5,
-			timeLimit: 36000
+			timeLimit: 36000,
+			ballSpeed: 1,
 		},
 	) {
 		this.gameCustomisation = gameCustomisation;
@@ -280,6 +307,7 @@ export class PongGameInstance
 		if (customisation.timeLimit) {
 			this.gameCustomisation.timeLimit = customisation.timeLimit;
 		}
+		this.gameCustomisation.ballSpeed = customisation.ballSpeed;
 	}
 
 	async Start(): Promise<MatchResult | null> {
@@ -497,9 +525,9 @@ export class PongGameInstance
 		// Update the ball's position based on its current movement vector
 		let newBallPos: BallPosition = {
 			x: gameInstance.ballPos.x + gameInstance.ball_movement.x,
-			y: gameInstance.ballPos.y + gameInstance.ball_movement.y
+			y: gameInstance.ballPos.y + gameInstance.ball_movement.y,
 		};
-		console.log(`player 1: ${gameInstance.player1Pos} player 2: ${gameInstance.player2Pos} ball: ${newBallPos.y}`);
+		// console.log(`player 1: ${gameInstance.player1Pos} player 2: ${gameInstance.player2Pos} ball: ${newBallPos.y}`);
 		// Check for collisions with the game boundaries
 		// Assuming the game field is 100 units in both dimensions
 		const FIELD_SIZE_Y = 50;
@@ -541,8 +569,8 @@ export class PongGameInstance
 		}
 	
 		// Now calculate the new position with the possibly updated movement vector
-		newBallPos.x = gameInstance.ballPos.x + gameInstance.ball_movement.x;
-		newBallPos.y = gameInstance.ballPos.y + gameInstance.ball_movement.y;
+		newBallPos.x = gameInstance.ballPos.x + gameInstance.ball_movement.x * this.gameCustomisation.ballSpeed;
+		newBallPos.y = gameInstance.ballPos.y + gameInstance.ball_movement.y * this.gameCustomisation.ballSpeed;
 	
 		// Update the ball's position in the game instance
 		gameInstance.ballPos = newBallPos;

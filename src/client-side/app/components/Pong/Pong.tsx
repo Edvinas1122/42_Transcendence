@@ -2,8 +2,9 @@
 import WebSocketContex from '../MachMakingUI/GameDataProvider';
 import React, { useEffect, useContext, useState } from 'react';
 import { GameKeyContext } from './GameKeyProvider';
-import { notFound } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
+import { Socket } from 'socket.io-client';
+import GameCustomizationNegotiation from './GameCustomizationNegotiation';
 import "./Pong.css";
 
 
@@ -16,31 +17,38 @@ interface PongGamePlayerUpdate {
 	score2?: number,
 }
 
+interface gameCustomizationRequest {
+	winCondition: 'score' | 'time',
+	winConditionValue: number,
+	ballType: 'simple' | 'speedy' | 'bouncy',
+}
+
 interface BallPosition {
 	x: number,
 	y: number,
 }
 
-interface PongGameData {}
+interface PongGameData {
+	Socket: Socket,
+	gameKey: string,
+	endGame: () => void,
+}
 
 function pixelsToScreenPosition(pixels: number): number {
 	return pixels / window.innerHeight * 100 - 50;
 }
 
-const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
+const PongGameDisplay: React.FC<PongGameData> = ({
+	Socket,
+	gameKey,
+	endGame,
+}: PongGameData) => {
 
 	const [player_pong_position, setPlayerPongPosition] = useState<number>(0);
 	const [opponent_pong_position, setOpponentPongPosition] = useState<number>(0);
 	const [ball_position, setBallPosition] = useState<BallPosition>({x: 0, y: 0});
     const [displayScore, setDisplayScore] = useState<string>("0 - 0");
     const [showScore, setShowScore] = useState<boolean>(false);
-	const router = useRouter();
-	const { gameKey } = useContext(GameKeyContext);
-	const Socket = useContext(WebSocketContex);
-
-	if (!gameKey || !Socket) {
-		notFound();
-	}
 
 	useEffect(() => {
 		const mouseMoveHandler = (event: MouseEvent) => {
@@ -57,31 +65,29 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 		}
 	}, [gameKey, Socket]);
 
-	const endGameHadler	= (data: PongGamePlayerUpdate) => {
-		setTimeout(() => {
-			router.push('/game');
-		}, 2000);
-	}
-
 	useEffect(() => {
 		if (gameKey) {
-			Socket.emit('events', { event: "pongGameBegin", data: {
-				gameKey: gameKey
-			}});
-			Socket.on('pongGamePlayerUpdate', (data: PongGamePlayerUpdate) => {
-				// console.log(data);
-				if (data?.score1)
-				{
-					setDisplayScore(`${data.score1}-${data.score2}`);
-                    setShowScore(true); // Make score visible
 
-                    // After 1 second, make score invisible
+
+			const scoreDisplay = (data: PongGamePlayerUpdate) => {
+				if (data?.score1 || data?.score2) {
+					setDisplayScore(`${data.score1}-${data.score2}`);
+                    setShowScore(true);
                     setTimeout(() => setShowScore(false), 1000);
 				}
+			}
+
+			const manageGameLifecycle = (data: PongGamePlayerUpdate) => {
+				scoreDisplay(data);
 				if (data.end_game) {
 					setDisplayScore(data?.end_game_reason ? data.end_game_reason : "Game Over");
-					endGameHadler(data);
+					endGame();
 				}
+			}
+
+
+			Socket.on('pongGamePlayerUpdate', (data: PongGamePlayerUpdate) => {
+				manageGameLifecycle(data);
 				setOpponentPongPosition(data.oponent_pong_position);
 				setBallPosition(data.ball_position);
 			});
@@ -94,10 +100,10 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 	return (
 		<>
 			<div className="pong-container">
-				<div className="pong-player" style={{top: player_pong_position + "vh"}}></div>
-				{showScore && <div className="pong-score">{displayScore}</div>}
-				<div className="pong-ball" style={{top: ball_position.y + "vh", left: ball_position.x + "vw"}}></div>
-				<div className="pong-player" style={{top: opponent_pong_position + "vh"}}></div>
+			<div className="pong-player" style={{top: player_pong_position + "vh"}}></div>
+			{showScore && <div className="pong-score">{displayScore}</div>}
+			<div className="pong-ball" style={{top: ball_position.y + "vh", left: ball_position.x + "vw"}}></div>
+			<div className="pong-player" style={{top: opponent_pong_position + "vh"}}></div>
 			</div>
 		</>
 	);
@@ -105,10 +111,43 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 
 const PongGame: React.FC = () => {
 
+	const [negotiating, setNegotiating] = useState<boolean>(true);
+	const { gameKey } = useContext(GameKeyContext);
+	const Socket = useContext(WebSocketContex);
+	const router = useRouter();
+
+	if (!gameKey || !Socket) {
+		notFound();
+	}
+
+	const gameBeginInitiative = (
+		gameCustomization: gameCustomizationRequest
+	) => {
+		Socket.emit('events', { event: "pongGameBegin", data: {
+			gameKey: gameKey,
+			gameCustomization: gameCustomization
+		}});
+		setNegotiating(false);
+	}
+
+	const endGameHadler = () => {
+		router.replace('/game');
+	}
+
 	return (
 		<>
 		<div className={"Display PongMain"}>
-			<PongGameDisplay/>
+			{negotiating ? (
+				<GameCustomizationNegotiation
+					startGame={gameBeginInitiative}
+				/>
+			):(
+				<PongGameDisplay
+					Socket={Socket}
+					gameKey={gameKey}
+					endGame={endGameHadler}
+				/>
+			)}
 		</div>
 		</>
 	);

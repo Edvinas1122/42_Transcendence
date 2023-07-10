@@ -43,3 +43,56 @@
     background-color: #1a1a1a;
     /* overflow: hidden; */
 }
+
+.gameCustomizationNegotiation {
+    display: flex;
+    flex-direction: inherit;
+    color: white;
+    /* justify-content: center; */
+    /* width: auto; */
+}
+
+.gameCustomizationNegotiation .Field {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    padding: 1em;
+}
+
+.Field .Options {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    padding: 0.3em;
+    justify-content: space-around;
+}
+
+.Field .Option {
+    padding: 0.2em;
+}
+
+.Negotiation {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    margin: 1em;
+    padding: 1em;
+    background-color: #1a1a1a;
+    border-color: white;
+    border: 1px solid white; 
+    border-radius: 5px;
+}
+
+.Negotiation button {
+    margin: 0.5em;
+    padding: 0.5em;
+    border-radius: 5px;
+    border: 1px solid white;
+    background-color: #1a1a1a;
+    color: white;
+}
+
+.Negotiation button:hover {
+    background-color: white;
+    color: #1a1a1a;
+}
