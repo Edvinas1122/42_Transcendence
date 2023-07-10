@@ -71,41 +71,49 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 			return () => {};
 		}
 		const url = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/events/sse/?token=${token}`;
-		const es = new EventSource(url);
-		setEventSource(es);
+		const connect = () => {
+			const es = new EventSource(url);
 
-		es.onmessage = (event: MessageEvent | null) => {
-			if (!event) {
-				return;
-			}
-			const parsedData: EventSourceData = JSON.parse(event.data);
+			setEventSource(es);
+			es.onopen = () => {
+				DisplayPopUp("Connected", "You are now connected to the server", 3000, "info");
+			};
 
-			console.log("received event", parsedData);
-			switch (parsedData.type) {
-				case 'chat':
-					setChatEvent(parsedData.data);
-					break;
-				case 'user':
-					switch (parsedData.data.event) {}
-					break;
-				default:
-					if (state.eventListeners[parsedData.type]) {
-						state.eventListeners[parsedData.type].forEach(listener => listener(parsedData.data));
-					}
-					break;
-			}
-			setTimeout(() => {
-				setChatEvent(null);
-			}, 100);
+			es.onmessage = (event: MessageEvent | null) => {
+				if (!event) {
+					return;
+				}
+				const parsedData: EventSourceData = JSON.parse(event.data);
+
+				console.log("received event", parsedData);
+				switch (parsedData.type) {
+					case 'chat':
+						setChatEvent(parsedData.data);
+						break;
+					case 'user':
+						switch (parsedData.data.event) {}
+						break;
+					default:
+						if (state.eventListeners[parsedData.type]) {
+							state.eventListeners[parsedData.type].forEach(listener => listener(parsedData.data));
+						}
+						break;
+				}
+				setTimeout(() => {
+					setChatEvent(null);
+				}, 100);
+
+			};
+
+			es.onerror = (event) => {
+				es.close();
+				DisplayPopUp("Connection error", "Reconnecting connection...", 2500, "danger");
+			};
 		};
-
-		es.onerror = (event: MessageEvent | null) => {
-			DisplayPopUp("Error", "Error in EventSource connection");
-		};
-
+		connect();
 
 	return () => {
-		es.close();
+		eventSource && eventSource.close();
 	}
 	}, [token]); // re-run effect when token changes
 

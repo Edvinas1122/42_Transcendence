@@ -9,7 +9,7 @@ const FileUpload = async (formData: FormData): Promise<any> => {
 	} else {
 		try {
 			const response = await axios.post(
-				`${process.env.SERVER_NEST_ACCESS}/drive/upload`,
+				`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/drive/upload`,
 				formData,
 				{
 					headers: {
@@ -19,7 +19,7 @@ const FileUpload = async (formData: FormData): Promise<any> => {
 			);
 			return {message: "File uploaded successfully."};
 		} catch (error) {
-			return {message: "Error while uploading file."};
+			return {error: true, message: "Error while uploading file."};
 		}
 	}
 };

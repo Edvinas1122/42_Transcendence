@@ -38,7 +38,12 @@ const EditAvatar = () => {
 			formData.append('file', selectedFile);
 			FileUpload(formData).then((res) => {
 				console.log(res);
-				DisplayPopUp("Upload", res.message);
+				if (res.error) {
+					DisplayPopUp("Upload failure", res.message, 2000, "danger");
+				}
+				else {
+					DisplayPopUp("Upload", res.message);
+				}
 				setSelectedFile(null);  // Clear the selected file
 				setIsUploaded(true);
 			});
