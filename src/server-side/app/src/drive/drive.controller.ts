@@ -1,12 +1,12 @@
 import { Controller, UseGuards, Req, Post, UploadedFile, UseInterceptors, Inject } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { JwtTwoFactorGuard } from '../auth/guards/jwt-2fa.guard';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { Express } from 'express';
 import { UsersService } from "../users/users.service";
+import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 
-@UseGuards(JwtTwoFactorGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('drive')
 export class DriveController {
 	constructor(
