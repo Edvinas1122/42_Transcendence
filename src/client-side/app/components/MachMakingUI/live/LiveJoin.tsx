@@ -59,9 +59,7 @@ export const JoinOnline: React.FC<JoinOnlineProps> = ({
 				setGameKey(data.gameKey);
 				setWaiting(false);
 				setGameInfo("Game Starting!");
-				setTimeout(() => {
-					redirect();
-				}, 900);
+				setTimeout(() => redirect(), 900);
 			}
 		});
 
