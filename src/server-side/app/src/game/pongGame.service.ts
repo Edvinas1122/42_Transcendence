@@ -103,18 +103,9 @@ export class GameService {
 		return true;
 	}
 
-	// async inviteToGame(userId1: number, inviteeName: string, gameType: number): Promise<inviteLink>
-	// {
-	// 	const user = await this.usersService.findOne(inviteeName);
-	// 	if (user === null) {
-	// 		throw new NotFoundException("User not found")
-	// 	}
-	// 	console.log("User found", user);
-	// 	const userId2 = user.id;
-	// 	const gameKey = this.handleJoinGameQue(userId1, userId2, gameType);
-	// 	return {inviteLink: "http://localhost:3030/game/pong/?key=" + gameKey} as inviteLink;
-	// }
-
+	/*
+		wrong name, ture name -> handleJoinGame 
+	*/
 	public handleJoinGameQue(userId1: number, userId2:number, gameId:number): string {
 		const GAME_BEGIN_DELAY = 2950;
 		const gameKey = this.generateGameKey(userId1, userId2);

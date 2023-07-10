@@ -44,6 +44,7 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 
 	useEffect(() => {
 		const mouseMoveHandler = (event: MouseEvent) => {
+			console.log(event.clientY);
 			setPlayerPongPosition(pixelsToScreenPosition(event.clientY));
 			Socket.emit('events', { event: "pongGamePlayerUpdate", data: {
 				x: pixelsToScreenPosition(event.clientY),
@@ -57,11 +58,9 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 	}, [gameKey, Socket]);
 
 	const endGameHadler	= (data: PongGamePlayerUpdate) => {
-
 		setTimeout(() => {
 			router.push('/game');
 		}, 2000);
-			
 	}
 
 	useEffect(() => {
@@ -70,7 +69,7 @@ const PongGameDisplay: React.FC<PongGameData> = ({}: PongGameData) => {
 				gameKey: gameKey
 			}});
 			Socket.on('pongGamePlayerUpdate', (data: PongGamePlayerUpdate) => {
-				console.log(data);
+				// console.log(data);
 				if (data?.score1)
 				{
 					setDisplayScore(`${data.score1}-${data.score2}`);
