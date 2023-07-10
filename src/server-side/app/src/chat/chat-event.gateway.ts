@@ -48,7 +48,7 @@ export class ChatEventGateway {
 	// 	return true;
 	// }
 
-	async updateParticipantsOfMessageEvent(chat: Chat, message: MessageDto, eventType: MessageEventType = MessageEventType.New): Promise<boolean> {
+	async updateParticipantsOfMessageEvent(chat: Chat, message?: MessageDto, eventType: MessageEventType = MessageEventType.New): Promise<boolean> {
 		const data: MessageEvent = new MessageEvent(chat.id, eventType, message);
 		const users = await this.roleService.getChatRoleRelatives(chat, RoleType.Blocked);
 		

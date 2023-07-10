@@ -30,9 +30,7 @@ export async function GET(request: Request) {
 		code: code,
 		redirect_uri: process.env.INTRA_REDIRECT_URI,
 	}
-
 	console.log("intra_request: ", intra_request);
-
 	const options: RequestInit =
 	{
 		method: "POST",
