@@ -166,6 +166,7 @@ export class UsersService {
 		return await this.userRepository.save(user);
 	}
 
+	// IF anotherUserId(Blockee) is blocked by userId(Blocker)
 	async isBlocked(userId: number, anotherUserId: number): Promise<boolean> {
 		const userWithRelationships = await this.userRepository.findOne({
 			where: { id: userId },
