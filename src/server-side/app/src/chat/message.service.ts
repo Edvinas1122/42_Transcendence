@@ -90,6 +90,22 @@ export class MessageService {
 		return returnedMessage;
 	}
 
+	async createPersonalChat(
+		senderId: number,
+		recipientId: number
+	): Promise<boolean> {
+		const sender = await this.usersService.findUser(senderId);
+		const recipient = await this.usersService.findUser(recipientId);
+		if (!sender || !recipient) {
+			throw new NotFoundException('Sender or recipient not found');
+		}
+		let chat = await this.chatService.findPersonalChat(sender, recipientId);
+		if (!chat) {
+			chat = await this.chatService.createPersonalChat(sender, recipientId);
+		}
+		return true;
+	}
+
 	async sendMessageToUser(
 		content: string,
 		senderId: number,
