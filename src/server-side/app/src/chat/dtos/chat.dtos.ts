@@ -1,8 +1,13 @@
-import { IsArray, IsBoolean, IsInt, IsOptional, IsEnum, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, Length, IsInt, IsOptional, IsEnum, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { RoleType } from '../entities/role.entity';
 import { IsShortField, IsLongField } from '../../utils/formFields.decorator';
 
+export class RecipientParam {
+	@IsString()
+	@Length(1, 20)
+	recipient: string;
+  }
 
 export class CreateChatDto {
 	@IsString()
@@ -37,7 +42,7 @@ export class UpdateChatDto {
 	@IsString()
 	@IsOptional()
 	@IsShortField()
-	password?: string | undefined;
+	password: string | undefined;
 }
 
 export class JoinChatDto {

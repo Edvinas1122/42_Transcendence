@@ -87,10 +87,10 @@ export class ChatService {
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
-		// chat.name = createChatDto.name;
-		// chat.private = createChatDto.isPrivate;
-		chat.password = createChatDto.password ? createChatDto.password : "";
-		// chat.ownerID = createChatDto.ownerID;
+		const saltOrRounds = 10;
+		const salt = bcrypt.genSaltSync(saltOrRounds);
+		chat.password = await bcrypt.hash(createChatDto.password, salt);
+		chat.salt = salt;
 		return await this.chatRepository.save(chat);
 	}
 
@@ -140,6 +140,23 @@ export class ChatService {
 	  
 		return !!chatExists;
 	  }
+
+	async findPersonalChatByName(user1ID: number, user2Name: string): Promise<ChatDto | null> {
+		
+		const user2 = await this.usersService.findOne(user2Name);
+		if (!user2) {
+			throw new NotFoundException('User not found');
+		}
+		const chats = await this.chatRepository.find({where: {personal: true}, relations: ['roles']});
+		for (const chat of chats) {
+			const chatRelatives = await this.roleService.getChatRelatives(chat);
+			if (chatRelatives.length === 2 && chatRelatives.some(relative => relative._id === user1ID) &&
+					chatRelatives.some(relative => relative._id === user2.id)) {
+				return this.makeChatDto(chat, user1ID);
+			}
+		}
+		return null;
+	}
 
 	async findPersonalChat(user1: User, user2Id: number): Promise<Chat | null> {
 
