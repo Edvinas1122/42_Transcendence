@@ -487,8 +487,8 @@ export class PongGameInstance
 	private tellUserstoDisconnect() {
 		const gameDataForPlaye1: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player1Id);
 		const gameDataForPlaye2: PongGameDataUserUpdate = this.prepareUpdateDataForPlayer(this.pongGameData.player2Id);
-		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player1Id, gameDataForPlaye1);
-		this.sendToUser('pongGamePlayerUpdate', this.pongGameData.player2Id, gameDataForPlaye2);
+		this.sendToUser('PongGameLifecycle', this.pongGameData.player1Id, gameDataForPlaye1);
+		this.sendToUser('PongGameLifecycle', this.pongGameData.player2Id, gameDataForPlaye2);
 	}
 
 	// private invertedGameInstance(gameInstance: PongGameData): PongGameData {
