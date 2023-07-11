@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { SpinnerLoader2 } from "@/components/GeneralUI/Loader";
 import { CodeFormComponent } from "@/components/QRAuth/codeSubmit";
 import Image from 'next/image';
+import SetPreferences from "@/components/PreferencesUI/UserPreferences";
 import "./Auth.css";
 
 
