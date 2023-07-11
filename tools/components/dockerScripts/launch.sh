@@ -1,1 +1,0 @@
-docker run -v $(pwd)/app/src:/app/src -p 3000:3000 transcendence
