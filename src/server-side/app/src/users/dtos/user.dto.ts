@@ -3,12 +3,20 @@ import { Outcome } from '../../game/entities/match.entity';
 import { User } from '../entities/user.entity';
 import { Relationship, RelationshipStatus } from '../profile-management/entities/relationship.entity';
 import { IsString, MinLength,} from 'class-validator';
+import { IsShortField } from '../../utils/formFields.decorator';
 
 export class UpdateUsernameDto {
+	@IsString()
+	@IsShortField()
 	newName: string;
 }
-export class UpdateUserDto {
+export class UpdateUserDto { // not used ??
+	@IsString()
+	@IsShortField()
 	name?: string;
+
+	@IsString()
+	@IsShortField()
 	avatar?: string;
 }
 

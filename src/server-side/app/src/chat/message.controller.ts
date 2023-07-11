@@ -60,4 +60,3 @@ export class MessagesController {
 	{
 		return await this.messageService.createPersonalChat(senderId, recipientId);
 	}
-}

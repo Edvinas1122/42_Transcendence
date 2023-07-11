@@ -1,4 +1,9 @@
-IP=$(ifconfig | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" | sed -n '2p')
+if [ -z "$1" ]
+then
+  IP=$(ifconfig | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" | sed -n '2p')
+else
+  IP=$1
+fi
 NEXT_PUBLIC_FRONTEND_API_BASE_URL="http://$IP:3030/"
 NEXT_PUBLIC_BACKEND_API_BASE_URL="http://$IP:3000"
 NEXT_PUBLIC_HOST_NAME="$IP"
