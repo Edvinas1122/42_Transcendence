@@ -1,4 +1,9 @@
 all:
+	bash runProduction.sh
+	docker-compose up --build
+
+dev:
+	bash runDev.sh
 	docker-compose up --build
 
 42:
