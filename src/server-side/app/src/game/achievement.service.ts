@@ -111,18 +111,32 @@ export const ACHIEVEMENT_DEFINITIONS = [
 		'Winning Streak',
 		'Win 5 games in a row',
 		(matches: Match[], playerID: number) => {
-			// Get the last 5 matches
+			if (matches.length < 5) {
+				return false;
+			}
 			const lastMatches = matches.slice(-5);
-
-			// Check if all of them are wins for the player
-			return lastMatches.every(match => (match.player1ID === playerID && match.outcome === Outcome.WON_BY_SCORE) || (match.player2ID === playerID && match.outcome === Outcome.WON_BY_TIME));
+			return lastMatches.every(match => {
+				if (match.player1Score > match.player2Score && match.player1ID === playerID) {
+					return true;
+				} else if (match.player2Score > match.player1Score && match.player2ID === playerID) {
+					return true;
+				}
+				return false;
+			});
 		},
 	),
 
 	new AchievementDefinition(
 		'Underdog',
 		'Win a game with a score difference of at least 10',
-		(matches: Match[], playerID: number) => matches.some(match => Math.abs(match.player1Score - match.player2Score) >= 10),
+		(matches: Match[], playerID: number) => matches.some(match => {
+			if (match.player1ID === playerID && match.player1Score - match.player2Score >= 10) {
+				return true;
+			} else if (match.player2ID === playerID && match.player2Score - match.player1Score >= 10) {
+				return true;
+			}
+			return false;
+		}),
 	),
 
 	new AchievementDefinition(
@@ -135,10 +149,13 @@ export const ACHIEVEMENT_DEFINITIONS = [
 		'First Time Winner',
 		'Win your first game',
 		(matches: Match[], playerID: number) => matches.some(match => {
-			console.log("testting", (match.player1ID === playerID && match.outcome === Outcome.WON_BY_SCORE) ||
-			(match.player2ID === playerID && match.outcome === Outcome.WON_BY_TIME));
-			return (match.player1ID === playerID && match.outcome === Outcome.WON_BY_SCORE) ||
-			(match.player2ID === playerID && match.outcome === Outcome.WON_BY_TIME)
+			return (
+				(match.player1Score > match.player2Score && match.player1ID === playerID) ||
+				(match.player2Score > match.player1Score && match.player2ID === playerID)
+			) && (
+				match.outcome === Outcome.WON_BY_SCORE || 
+				match.outcome === Outcome.WON_BY_TIME
+			);
 		}),
 	),
 ];
