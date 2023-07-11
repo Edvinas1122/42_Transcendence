@@ -32,7 +32,11 @@ export class MessageService {
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
-		const messages = await this.messagesRepository.find({where: { chatID: chat.id }, relations: ['sender']});
+		const messages = await this.messagesRepository.find({ 
+			where: { chatID: chat.id }, 
+			relations: ['sender'],
+			order: { createdAt: 'DESC' }
+		});
 	
 		// Map over the messages and for each one return a promise
 		const promises = messages.map(async message => {

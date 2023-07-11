@@ -1,11 +1,12 @@
 import { IsArray, IsBoolean, IsInt, IsOptional, IsEnum, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { RoleType } from '../entities/role.entity';
+// import { IsShortField } from '../../utils/formFields.decorator';
 
 
 export class CreateChatDto {
 	@IsString()
-	@MinLength(1)
+	// @IsShortField()
 	name: string;
 
 	@IsBoolean()
@@ -62,6 +63,7 @@ export class EditRoleDto {
 import { UserInfo } from '../../users/dtos/user.dto';
 import { MessageDto } from './message.dtos';
 import { Chat } from '../entities/chat.entity';
+import { IsShortField } from '../../utils/formFields.decorator';
 
 export class ChatDto {
 	constructor(chat: Chat, pesonal: boolean, messages?: MessageDto[], amParticipant?: boolean) {
