@@ -41,17 +41,8 @@ const AllUsersLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 		.addButton(
 			{
 				name: "MSG Priv",
-				endpointTemplate: `/chat/messages/user/[id]`,
+				endpointTemplate: `/chat/messages/user/create/[id]`,
 				type: "action",
-				fields: [
-					{
-						name: "content",
-						type: "text",
-						dependency: (item: User) => true,
-						autoField: (item: User) => item.name,
-						invisible: true,
-					}
-				],
 				link: {link: "/chat", push: true},
 			}
 		)
