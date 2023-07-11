@@ -14,12 +14,15 @@ const FileUpload = async (formData: FormData): Promise<any> => {
 				{
 					headers: {
 						'Authorization': `Bearer ${cookie}`,
+						'Content-Type': 'multipart/form-data'
 					}
 				}
 			);
+
 			return {message: "File uploaded successfully."};
 		} catch (error) {
-			return {message: "Error while uploading file."};
+			console.error(error);
+			return {error: true, message: "Error while uploading file."};
 		}
 	}
 };

@@ -4,7 +4,7 @@
   allows api to be accessed from localhost:3030 - frontend
 */
 export const corsConfig = {
-	origin: [process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL, "https://next-app:3030"],
+	origin: [process.env.FRONT_END_API, "https://next-app:3030"],
 	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
 	credentials: true,
   };

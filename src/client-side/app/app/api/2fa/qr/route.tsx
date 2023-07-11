@@ -5,7 +5,7 @@ export async function POST() {
 		"use server";
 	
 		let cookie;
-		if (process.env.NEXT_PUBLIC_DEV === 'true') {
+		if (process.env.DEV === 'true') {
 			cookie = getToken();
 		} else {
 			cookie = getToken();

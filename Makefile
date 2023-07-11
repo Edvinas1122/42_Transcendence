@@ -2,7 +2,7 @@ all:
 	docker-compose up --build
 
 42:
-	bash updateEnvIP.sh
+	bash UpdateIP.sh
 	docker-compose up --build
 
 shell_back:

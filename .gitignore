@@ -1,0 +1,7 @@
+*.pdf
+*.txt
+*.md
+*.env
+*.jpg
+*.png
+.env.bak

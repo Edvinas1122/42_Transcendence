@@ -32,11 +32,13 @@ interface ButtonConfig<T extends HasId> {
 	fields?: FormField[],
 	editEntity?: (item: T) => any,
 	confirmation?: Confirmation,
+	link?: UnitRouter,
 }
 
 interface UnitRouter {
 	link: string,
 	currentActiveOnly?: string,
+	push?: boolean,
 }
 
 interface ToggleUnit {

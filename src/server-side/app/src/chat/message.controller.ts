@@ -45,7 +45,7 @@ export class MessagesController {
 		@UserId() senderId: number,
 		@Param('recipientId', new ParseIntPipe()) recipientId: number,
 		@Body(new ValidationPipe({ transform: true })) message: SendMessageDto
-	): Promise<MessageDto>
+	): Promise<MessageDto | null>
 	{
 		return await this.messageService.sendMessageToUser(
 				message.content, senderId, recipientId);

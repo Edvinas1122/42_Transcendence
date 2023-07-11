@@ -28,11 +28,9 @@ export async function GET(request: Request) {
 		client_id: process.env.INTRA_UID,
 		client_secret: process.env.INTRA_SECRET,
 		code: code,
-		redirect_uri: process.env.INTRA_REDIRECT_URI,
+		redirect_uri: process.env.NEXT_PUBLIC_FRONTEND_API_BASE_URL,
 	}
-
 	console.log("intra_request: ", intra_request);
-
 	const options: RequestInit =
 	{
 		method: "POST",
@@ -49,7 +47,8 @@ export async function GET(request: Request) {
 	if (intra_token.access_token === undefined) {
 		return NextResponse.json({ 
 			sucess: false,
-			error: "validation failure"
+			error: "validation failure",
+			message: "Intra authorization failed",
 		});
 	}
 

@@ -294,6 +294,15 @@ export class ChatService {
 		if (role.type === RoleType.Participant) {
 			throw new BadRequestException('User not an admin');
 		}
+		if (userId === demotee.id){
+			throw new BadRequestException('Can not demote yourself');
+		}
+		const roleofExecutor = await this.roleService.getRole(chatId, userId);
+		if (roleofExecutor?.type === RoleType.Admin){
+			if (role?.type === RoleType.Admin || role?.type === RoleType.Owner){
+				throw new BadRequestException('Can not demote other Admins or owners');
+			}
+		}
 		await this.roleService.editRole(role, RoleType.Participant);
 		this.updateEvent(chat, RoomEventType.Demoted, await this.makeChatDto(chat, userId, demotee.id));
 		return true;

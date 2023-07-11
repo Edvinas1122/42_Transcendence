@@ -74,7 +74,7 @@ export class MessageService {
 		content: string,
 		senderId: number,
 		recipientId: number
-	): Promise<MessageDto> {
+	): Promise<MessageDto | null> {
 	
 		const sender = await this.usersService.findUser(senderId);
 		
@@ -90,10 +90,17 @@ export class MessageService {
 		}
 	
 		// Now we have a chat, either found or newly created, so we can send the message
-		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
-		const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
-		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
-		return returnedMessage;
+		if (content.length)
+		{
+			const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
+			const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
+			await this.updateEvent(chat, MessageEventType.New, returnedMessage);
+			return returnedMessage;
+		}
+		else {
+				await this.updateEvent(chat, MessageEventType.New);
+				return null;
+			}
 	}
 
 	public async updateEvent(

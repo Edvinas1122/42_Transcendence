@@ -16,6 +16,7 @@ export class ChatEventGateway {
 		private roleService: RoleService,
 	) {}
 
+
 	async updateOnlineUsersChatEvent(chat: Chat, eventType: RoomEventType, info?: any): Promise<boolean> {
 		const data: ChatRoomEvent = new ChatRoomEvent(chat.id, eventType, info);
 		const users = await this.roleService.getBlockedChatMembers(chat); // exclude blocked users
@@ -28,6 +29,7 @@ export class ChatEventGateway {
 	// 	return await this.eventService.sendToAll(data as SseMessage);
 	// }
 
+	
 	async updateUserOfRoomEvent(userId: string, chatId: number, eventType: RoomEventType , charName?: string): Promise<boolean> {
 		const data: ChatRoomEvent = new ChatRoomEvent(chatId, RoomEventType.Invite, charName);
 		return await this.eventService.sendStoredEvent(userId, data as SseMessage);
@@ -48,7 +50,7 @@ export class ChatEventGateway {
 	// 	return true;
 	// }
 
-	async updateParticipantsOfMessageEvent(chat: Chat, message: MessageDto, eventType: MessageEventType = MessageEventType.New): Promise<boolean> {
+	async updateParticipantsOfMessageEvent(chat: Chat, message?: MessageDto, eventType: MessageEventType = MessageEventType.New): Promise<boolean> {
 		const data: MessageEvent = new MessageEvent(chat.id, eventType, message);
 		const users = await this.roleService.getChatRoleRelatives(chat, RoleType.Blocked);
 		
@@ -65,6 +67,7 @@ export class ChatEventGateway {
 		}
 		return true;
 	}
+
 }
 
 export { RoomEventType, MessageEventType };

@@ -28,7 +28,6 @@ services:
   next-app:
     build: 
       context: src/client-side/
-      # dockerfile: Dockerfile.next
     env_file:
       - .env
     ports:
@@ -37,7 +36,6 @@ services:
       - ./src/client-side/app/app:/app/app
       - ./src/client-side/app/lib:/app/lib
       - ./src/client-side/app/components:/app/components
-      # - file_storage:/app/public/avatar
       - ./src/client-side/app/public/:/app/public/
     depends_on:
       - nest-app
@@ -45,7 +43,6 @@ services:
   nest-app:
     build: 
       context: src/server-side/
-      # dockerfile: Dockerfile.nest
     env_file:
       - .env
     ports:
@@ -59,10 +56,3 @@ services:
 
 volumes:
   pgadmin_data:
-  # file_storage:
-  #   driver: local
-  #   name: file_storage
-  #   driver_opts:
-  #     o: bind
-  #     type: none
-  #     device: ./src/client-side/app/public/avatar

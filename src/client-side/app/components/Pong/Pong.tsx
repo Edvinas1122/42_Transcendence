@@ -78,19 +78,20 @@ const PongGameDisplay: React.FC<PongGameData> = ({
 			}
 
 			const manageGameLifecycle = (data: PongGamePlayerUpdate) => {
-				scoreDisplay(data);
 				if (data.end_game) {
 					setDisplayScore(data?.end_game_reason ? data.end_game_reason : "Game Over");
 					endGame();
 				}
 			}
-
-
+			
+			
 			Socket.on('pongGamePlayerUpdate', (data: PongGamePlayerUpdate) => {
+				scoreDisplay(data);
 				manageGameLifecycle(data);
 				setOpponentPongPosition(data.oponent_pong_position);
 				setBallPosition(data.ball_position);
 			});
+
 			return () => {
 				Socket.off('pongGamePlayerUpdate');
 			};
@@ -131,8 +132,25 @@ const PongGame: React.FC = () => {
 	}
 
 	const endGameHadler = () => {
-		router.replace('/game');
+		setTimeout(() => {
+			router.replace('/game');
+		}, 1000);
 	}
+
+	const LifeCycleHandle = (data: PongGamePlayerUpdate) => {
+		if (data.end_game) {
+			endGameHadler();
+		}
+	}
+
+	useEffect(() => {
+		if (Socket) {
+			Socket.on('PongGameLifecycle', LifeCycleHandle);
+			return () => {
+				Socket.off('PongGameLifecycle');
+			};
+		}
+	},[Socket]);
 
 	return (
 		<>

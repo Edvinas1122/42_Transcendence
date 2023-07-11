@@ -33,12 +33,3 @@ import { OnlineStatusModule } from './OnlineStatus/onlineStatus.module';
 	providers: [AppService],
 })
 export class AppModule {}
-
-
-// export class AppModule implements NestModule {
-// 	configure(consumer: MiddlewareConsumer) {
-// 	  consumer
-// 		.apply(HttpsRedirectMiddleware)
-// 		.forRoutes('*');
-// 	}
-//   }

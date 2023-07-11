@@ -101,7 +101,8 @@ const InterfaceUnit = ({
 
 	const linkHanlder = () => {
 		if (interfaceUnitLinksTo.length > 0 && routeActivatesLink()) {
-			router.replace(interfaceUnitLinksTo);
+			!link?.push ? router.replace(interfaceUnitLinksTo):
+			router.push(interfaceUnitLinksTo);
 		}
 	};
 	
@@ -315,6 +316,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 				setEntityState={setEntityState}
 				editEntity={button.editEntity}
 				confirmation={button.confirmation}
+				link={button.link}
 			/>
 		);
 
@@ -366,6 +368,7 @@ export function EntityInterfaceBuilder<T extends HasId>(): EntityInterfaceBuilde
 				renderDependency={button.displayDependency}
 				setEntityState={setEntityState}
 				confirmation={button.confirmation}
+				link={button.link}
 			  />
 			);
 
