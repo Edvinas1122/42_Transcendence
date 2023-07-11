@@ -44,6 +44,7 @@ export class LiveGameQue {
 
 		if (!gameQueue) {
 			this.socketGateway.sendToUser('liveGameQueInfo', userId, `Game ${gameId} does not exist`);
+			return null;
 		}
 		if (!gameQueue.has(userId)) {
 			this.socketGateway.sendToUser('liveGameQueInfo', userId, `Game ${gameId} does not exist`);
@@ -65,6 +66,8 @@ export class LiveGameQue {
 
     private AttemptToMatchGame(gameId: number): void {
         const gameQueue = this.liveGameQueMap.get(gameId);
+
+		if (!gameQueue) return;
         if (gameQueue.size >= 2) {
             const playerIds = Array.from(gameQueue);
             const player1Id = playerIds[0];
