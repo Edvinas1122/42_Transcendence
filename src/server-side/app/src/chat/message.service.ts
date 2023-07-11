@@ -56,21 +56,21 @@ export class MessageService {
 		return [...messageDtosFiltered].reverse();
 	}
 
-	async createPersonalChat(
-		senderId: number,
-		recipientId: number
-	): Promise<boolean> {
-		if (senderId === recipientId){
-			throw new BadRequestException('Can not create MSG Priv with yourself');
-		}
-		const sender = await this.usersService.findUser(senderId);
-		const recipient = await this.usersService.findUser(recipientId);
-		if (!sender || !recipient) {
-			throw new NotFoundException('Sender or recipient not found');
-		}
-		const chat = await this.chatService.createPersonalChat(sender, recipient.id);
-		return true;
-	}
+	// async createPersonalChat(
+	// 	senderId: number,
+	// 	recipientId: number
+	// ): Promise<boolean> {
+	// 	if (senderId === recipientId){
+	// 		throw new BadRequestException('Can not create MSG Priv with yourself');
+	// 	}
+	// 	const sender = await this.usersService.findUser(senderId);
+	// 	const recipient = await this.usersService.findUser(recipientId);
+	// 	if (!sender || !recipient) {
+	// 		throw new NotFoundException('Sender or recipient not found');
+	// 	}
+	// 	const chat = await this.chatService.createPersonalChat(sender, recipient.id);
+	// 	return true;
+	// }
 
 	async sendMessageToChat(
 		content: string,
@@ -94,6 +94,9 @@ export class MessageService {
 		senderId: number,
 		recipientId: number
 	): Promise<boolean> {
+		if (senderId === recipientId){
+			throw new BadRequestException('Can not create MSG Priv with yourself');
+		}
 		const sender = await this.usersService.findUser(senderId);
 		const recipient = await this.usersService.findUser(recipientId);
 		if (!sender || !recipient) {

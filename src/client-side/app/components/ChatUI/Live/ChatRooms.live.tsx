@@ -172,7 +172,7 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: string }) => {
 				type: "linkToggle",
 				unitOne: {
 					confirmation: {
-						condition: (item: Chat) => item?.mine? true : false,
+						condition: (item: Chat) => item?.mine || item?.personal ? true : false,
 						title: "Are you sure you want to delete this chat?",
 						question: "This action cannot be undone",
 						yes: "Delete",

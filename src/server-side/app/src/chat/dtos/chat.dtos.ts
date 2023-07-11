@@ -6,7 +6,8 @@ import { IsShortField, IsLongField } from '../../utils/formFields.decorator';
 
 export class CreateChatDto {
 	@IsString()
-	@IsShortField()
+	@IsShortField({message: 'Name too long'})
+	@MinLength(1)
 	name: string;
 
 	@IsBoolean()
@@ -18,7 +19,7 @@ export class CreateChatDto {
 
 	@IsOptional()
 	@IsString()
-	@IsShortField()
+	@IsShortField({message: 'Password too Long'})
 	password?: string;
 
 	@IsOptional()
@@ -47,12 +48,12 @@ export class JoinChatDto {
   }
 export class SendMessageDto {
 	@IsString()
-	@IsLongField()
+	@IsLongField({message: 'Message too long'})
 	content: string;
   
 	@IsString()
 	@IsOptional()
-	@IsShortField()
+	@IsShortField({message: 'Password too long'})
 	password?: string | null;
 }
 
