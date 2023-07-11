@@ -56,6 +56,19 @@ export class MessageService {
 		return [...messageDtosFiltered].reverse();
 	}
 
+	async createPersonalChat(
+		senderId: number,
+		recipientId: number
+	): Promise<Chat> {
+		const sender = await this.usersService.findUser(senderId);
+		const recipient = await this.usersService.findUser(recipientId);
+		if (!sender || !recipient) {
+			throw new NotFoundException('Sender or recipient not found');
+		}
+		const chat = await this.chatService.createPersonalChat(sender, recipient.id);
+		return chat;
+	}
+
 	async sendMessageToChat(
 		content: string,
 		senderId: number,
