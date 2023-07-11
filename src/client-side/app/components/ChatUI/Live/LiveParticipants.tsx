@@ -186,17 +186,17 @@ const LiveParticipants: Function = ({
 		})
 		.addButton({
 			name: "MSG Priv",
-			endpointTemplate: `/chat/messages/user/[id]`,
+			endpointTemplate: `/chat/messages/user/create/[id]`,
 			type: "action",
-			fields: [
-				{
-					name: "content",
-					type: "text",
-					dependency: (item: User) => true,
-					autoField: (item: User) => item.name,
-					invisible: true,
-				}
-			],
+			// fields: [
+			// 	{
+			// 		name: "content",
+			// 		type: "text",
+			// 		dependency: (item: User) => true,
+			// 		autoField: (item: User) => item.name,
+			// 		invisible: true,
+			// 	}
+			// ],
 		})
 
 

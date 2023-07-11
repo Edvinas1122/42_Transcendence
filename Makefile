@@ -6,9 +6,8 @@ dev:
 	bash runDev.sh
 	docker-compose up --build
 
-42:
+updateIP:
 	bash UpdateIP.sh
-	docker-compose up --build
 
 shell_back:
 	docker-compose exec nest-app bash

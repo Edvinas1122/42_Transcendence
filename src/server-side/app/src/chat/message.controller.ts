@@ -50,4 +50,14 @@ export class MessagesController {
 		return await this.messageService.sendMessageToUser(
 				message.content, senderId, recipientId);
 	}
+
+	@Post('user/create/:recipientId')
+	async createChatWithUser(
+		@UserId() senderId: number,
+		@Param('recipientId', new ParseIntPipe()) recipientId: number,
+	): Promise<any>
+	{
+		const created = await this.messageService.createPersonalChat(senderId, recipientId);
+		return {message: "Personal chat created"};
+	}
 }
