@@ -5,6 +5,7 @@ import { MatchService, MatchHistory } from './match.service';
 import { GameService } from './pongGame.service';
 import { UserId } from '../utils/user-id.decorator';
 import { InviteService } from './invite.service';
+import { InviteDto } from './dtos/invite.dto';
 
 interface inviteLink {
 	inviteLink: string;
@@ -41,7 +42,7 @@ export class GameController {
 	@Post('invite/')
 	async invitePlayer(
 		@UserId() currentUserId: number,
-		@Body() data: { username: string },
+		@Body(new ValidationPipe({ transform: true })) data: InviteDto,
 	): Promise<inviteLink>
 	{
 		console.log("User found", data.username);

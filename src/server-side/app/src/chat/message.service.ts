@@ -32,7 +32,11 @@ export class MessageService {
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
-		const messages = await this.messagesRepository.find({where: { chatID: chat.id }, relations: ['sender']});
+		const messages = await this.messagesRepository.find({ 
+			where: { chatID: chat.id }, 
+			relations: ['sender'],
+			order: { createdAt: 'DESC' }
+		});
 	
 		// Map over the messages and for each one return a promise
 		const promises = messages.map(async message => {
@@ -50,6 +54,22 @@ export class MessageService {
 
 		// Reverse the order of the array
 		return [...messageDtosFiltered].reverse();
+	}
+
+	async createPersonalChat(
+		senderId: number,
+		recipientId: number
+	): Promise<boolean> {
+		if (senderId === recipientId){
+			throw new BadRequestException('Can not create MSG Priv with yourself');
+		}
+		const sender = await this.usersService.findUser(senderId);
+		const recipient = await this.usersService.findUser(recipientId);
+		if (!sender || !recipient) {
+			throw new NotFoundException('Sender or recipient not found');
+		}
+		const chat = await this.chatService.createPersonalChat(sender, recipient.id);
+		return true;
 	}
 
 	async sendMessageToChat(

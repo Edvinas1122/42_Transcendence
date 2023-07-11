@@ -108,6 +108,10 @@ export class ChatService {
 		if (!user2) {
 			throw new NotFoundException('User not found');
 		}
+		const doesPersonalChatExist = await this.doesPersonalChatExist(sender.id, user2.id);
+		if (doesPersonalChatExist) {
+			throw new ConflictException('Personal chat already exists');
+		}
 		const chat = new Chat();
 		chat.name = `${sender.name} & ${user2.name}`;
 		chat.private = true;
@@ -123,6 +127,19 @@ export class ChatService {
 
 		return savedChat;
 	}
+
+	private async doesPersonalChatExist(senderId: number, recipientId: number): Promise<boolean> {
+		const chatExists = await this.chatRepository.createQueryBuilder("chat")
+		  .innerJoin("chat.roles", "role")
+		  .innerJoin("role.user", "user")
+		  .where("chat.personal = :personal", { personal: true })
+		  .andWhere("user.id IN (:...userIds)", { userIds: [senderId, recipientId] })
+		  .groupBy("chat.id")
+		  .having("COUNT(chat.id) = :count", { count: 2 })
+		  .getOne();
+	  
+		return !!chatExists;
+	  }
 
 	async findPersonalChat(user1: User, user2Id: number): Promise<Chat | null> {
 
@@ -444,6 +461,7 @@ export class ChatService {
 				});
 			return groupChatDto;
 		} else {
+			if (!isParticipant) return null;
 			console.log('personal chat')
 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
 			console.log(personalChatDto);

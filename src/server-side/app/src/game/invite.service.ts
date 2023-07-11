@@ -36,6 +36,19 @@ export class InviteService {
 		if (!player2User) {
 			throw new NotFoundException(`User ${player2Name} does not exist`);
 		}
+		const isBlocked = await this.usersService.isBlocked(player2User.id, player1ID);
+		if (isBlocked) {
+			throw new NotFoundException(`User ${player2Name} is not online`);
+		}
+		// only online and not in game users can be invited
+		const isOnline = this.eventService.seeIfUserIsOnline(player2User.id.toString());
+		const isInGame = this.gameService.userIsInGame(player2User.id);
+		if (!isOnline) {
+			throw new NotFoundException(`User ${player2Name} is not online`);
+		}
+		if (isInGame) {
+			throw new NotFoundException(`User ${player2Name} is already in game`);
+		}
 		const player2ID = player2User.id;
 		const inviteKey = `${player1ID}-${player2ID}`;
 		const inviteData: InviteData = {
