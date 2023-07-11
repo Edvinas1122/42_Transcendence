@@ -444,6 +444,7 @@ export class ChatService {
 				});
 			return groupChatDto;
 		} else {
+			if (!isParticipant) return null;
 			console.log('personal chat')
 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
 			console.log(personalChatDto);
