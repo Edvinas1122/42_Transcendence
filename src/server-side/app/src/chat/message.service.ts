@@ -88,7 +88,7 @@ export class MessageService {
 		}
 		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
 		const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
-		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
+		await this.updateEvent(chat, MessageEventType.New, returnedMessage, senderId);
 		return returnedMessage;
 	}
 
@@ -135,11 +135,11 @@ export class MessageService {
 		{
 			const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
 			const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
-			await this.updateEvent(chat, MessageEventType.New, returnedMessage);
+			await this.updateEvent(chat, MessageEventType.New, returnedMessage, senderId);
 			return returnedMessage;
 		}
 		else {
-				await this.updateEvent(chat, MessageEventType.New);
+				await this.updateEvent(chat, MessageEventType.New, undefined, senderId);
 				return null;
 			}
 	}
@@ -147,11 +147,12 @@ export class MessageService {
 	public async updateEvent(
 		chat: Chat,
 		eventType: MessageEventType = MessageEventType.New,
-		message?: MessageDto
+		message?: MessageDto,
+		distributor?: number
 	) {
 		// if (chat.personal || chat.private ) {
 		// if (true ) {
-		await this.chatEventGateway.updateParticipantsOfMessageEvent(chat, message, eventType); // who else needs to know? ha ha
+		await this.chatEventGateway.updateParticipantsOfMessageEvent(chat, message, eventType, distributor); // who else needs to know? ha ha
 		// }
 		// else {
 		// 	await this.chatEventGateway.updateOnlineUsersMessageEvent(chat, message, eventType);

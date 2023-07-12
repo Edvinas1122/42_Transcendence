@@ -14,22 +14,38 @@ export class RoleService {
 	constructor(
 		@InjectRepository(Role)
 		private roleRepository: Repository<Role>,
+		@Inject(UsersService)
+		private usersService: UsersService,
 	) {}
 
 	
-	async getChatRelatives(chat: Chat): Promise<UserInfo[]> {
+	async getChatRelatives(chat: Chat, userId?: number): Promise<UserInfo[]> {
 		const relatives = await this.roleRepository.find({
 			where: {
 				chat: { id: chat.id },
 			},
 			relations: ['user'],
 		});
-		return relatives.filter(relative => relative && relative.user).map(relative => new UserInfo(relative.user, relative.type)); // online status not implemented
+		const promises = relatives.map(async relative => {
+			if (userId) {
+				const isBlocked = await this.usersService.isBlocked(relative.user.id, userId);
+				if(!isBlocked){
+					return relative;
+				} else {
+					return null;
+				}
+			}
+			return relative;
+		});
+		const filtered = await Promise.all(promises);
+		return filtered.filter(relative => relative !== null && relative.user).map(relative => new UserInfo(relative.user, relative.type));
+		// return relatives.filter(relative => relative && relative.user).map(relative => new UserInfo(relative.user, relative.type)); // online status not implemented
 	}
 
 	async getChatRoleRelatives(
 		chat: Chat,
 		except: RoleType = RoleType.Blocked,
+		userId?: number
 	): Promise<UserInfo[]> {
 		const relatives = await this.roleRepository.find({
 			where: { 
@@ -38,7 +54,19 @@ export class RoleService {
 			},
 			relations: ['user'],
 		});
-		return relatives.map(relative => new UserInfo(relative.user, relative.type));
+		const promises = relatives.map(async relative => {
+			if (userId) {
+				const isBlocked = await this.usersService.isBlocked(relative.user.id, userId);
+				if(!isBlocked){
+					return relative;
+				} else {
+					return null;
+				}
+			}
+			return relative;
+		});
+		const filtered = await Promise.all(promises);
+		return filtered.filter(relative => relative !== null && relative.user).map(relative => new UserInfo(relative.user, relative.type));
 	}
 
 	async getBlockedChatMembers(chat: Chat): Promise<UserInfo[]> {

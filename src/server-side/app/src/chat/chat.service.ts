@@ -192,6 +192,11 @@ export class ChatService {
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
+		// if chat owner is in a block relationship with userId
+		const isBlocked = await this.usersService.isBlocked(chat.ownerID, userId);
+		if (isBlocked) {
+			throw new ConflictException('Forbiden chat access'); 
+		}
 		if (chat.private) {
 			const role = await this.roleService.getRole(chatId, userId);
 			if (!role || role.type !== RoleType.Invited) {
@@ -471,6 +476,8 @@ export class ChatService {
 			if (chat.private && !isParticipant) {
 				return null;
 			}
+			const isBlocked = await this.usersService.isBlocked(userId, chat.ownerID);
+			if (isBlocked) return null;
 			const owner = await this.usersService.getUserInfo(chat.ownerID);
 			const isOwner = chat.ownerID === userId;
 			const groupChatDto = new GroupChatDto({
