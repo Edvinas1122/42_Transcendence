@@ -61,7 +61,7 @@ export class UsersService {
 		if (!resultUser) {
 			throw new NotFoundException('User not found');
 		}
-		if (await this.isBlocked(userid, id) === true) {
+		if (await this.isBlocked(id, userid) === true) {
 			throw new ForbiddenException('User is blocked');
 		}
 		const relationship = await this.getRelationshipStatus(id);
@@ -171,23 +171,26 @@ export class UsersService {
 
 	// IF anotherUserId(Blockee) is blocked by userId(Blocker)
 	async isBlocked(userId: number, anotherUserId: number): Promise<boolean> {
+		if (userId === anotherUserId) {
+			return false;
+		}
 		const userWithRelationships = await this.userRepository.findOne({
 			where: { id: userId },
-			relations: ['relationshipsInitiated']
+			relations: ['relationshipsInitiated', 'relationshipsReceived']
 		});
 	
-		if (userWithRelationships?.relationshipsInitiated === undefined) {
-			throw new Error('User relationshipsInitiated is undefined');
+		if (!userWithRelationships) {
+			throw new Error('User not found');
 		}
 	
 		const blockedRelationship = userWithRelationships.relationshipsInitiated.find(
 			relationship => relationship.user2ID === anotherUserId && relationship.status === RelationshipStatus.BLOCKED
 		);
-		if (blockedRelationship === undefined) {
-			return false;
-		}
+		const blockedRelationship2 = userWithRelationships.relationshipsReceived.find(
+			relationship => relationship.user1ID === anotherUserId && relationship.status === RelationshipStatus.BLOCKED
+		);
 	
-		return !!blockedRelationship;
+		return !!blockedRelationship || !!blockedRelationship2;
 	}
 
 	async updateUserName(id: number, newName: string): Promise<User | null> {

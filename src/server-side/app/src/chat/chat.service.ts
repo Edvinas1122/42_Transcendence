@@ -192,6 +192,11 @@ export class ChatService {
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
+		// if chat owner is in a block relationship with userId
+		const isBlocked = await this.usersService.isBlocked(chat.ownerID, userId);
+		if (isBlocked) {
+			throw new ConflictException('Forbiden chat access'); 
+		}
 		if (chat.private) {
 			const role = await this.roleService.getRole(chatId, userId);
 			if (!role || role.type !== RoleType.Invited) {
@@ -210,7 +215,10 @@ export class ChatService {
 			}
 			await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);
 		}
-		this.updateEvent(chat, RoomEventType.Join, await this.makeChatDto(chat, userId), true);
+		const chatObject = await this.makeChatDto(chat, userId);
+		if (chatObject !== null) {
+			this.updateEvent(chat, RoomEventType.Join, chatObject, true);
+		}
 		return true;
 	}
 
@@ -468,6 +476,8 @@ export class ChatService {
 			if (chat.private && !isParticipant) {
 				return null;
 			}
+			const isBlocked = await this.usersService.isBlocked(userId, chat.ownerID);
+			if (isBlocked) return null;
 			const owner = await this.usersService.getUserInfo(chat.ownerID);
 			const isOwner = chat.ownerID === userId;
 			const groupChatDto = new GroupChatDto({
@@ -484,6 +494,8 @@ export class ChatService {
 		} else {
 			if (!isParticipant) return null;
 			console.log('personal chat')
+			const isBlocked = await this.usersService.isBlocked(participants[0]._id, participants[1]._id);
+			if (isBlocked) return null;
 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
 			console.log(personalChatDto);
 			return personalChatDto;

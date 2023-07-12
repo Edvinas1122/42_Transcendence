@@ -50,9 +50,14 @@ export class ChatEventGateway {
 	// 	return true;
 	// }
 
-	async updateParticipantsOfMessageEvent(chat: Chat, message?: MessageDto, eventType: MessageEventType = MessageEventType.New): Promise<boolean> {
+	async updateParticipantsOfMessageEvent(
+		chat: Chat,
+		message?: MessageDto,
+		eventType: MessageEventType = MessageEventType.New,
+		distributor?: number
+	): Promise<boolean> {
 		const data: MessageEvent = new MessageEvent(chat.id, eventType, message);
-		const users = await this.roleService.getChatRoleRelatives(chat, RoleType.Blocked);
+		const users = await this.roleService.getChatRoleRelatives(chat, RoleType.Blocked, distributor);
 		
 		await this.distributeEventToUsers(users, data as SseMessage, false); // TODO: store message events if chat has no new events
 		return true;
