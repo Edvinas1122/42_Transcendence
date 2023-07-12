@@ -100,7 +100,9 @@ export class InviteService {
 			const player2GameKey = gameKey + '-' + inviteData.player2ID;
 			this.socketGateway.sendToUser('MatchMaking', inviteData.player1ID, { gameKey: player1GameKey });
 			this.socketGateway.sendToUser('MatchMaking', inviteData.player2ID, { gameKey: player2GameKey });
-			this.inviteMap.delete(joinKey);
+			this.deleteAllInvitesForUser(inviteData.player1ID);
+			this.deleteAllInvitesForUser(inviteData.player2ID);
+			// this.inviteMap.delete(joinKey);
 			return `Invite ${joinKey} is complete`;
 		} else {
 			return `Invite ${joinKey} is not complete`;
@@ -151,6 +153,16 @@ export class InviteService {
 				inviteKey: joinKey,
 			}
 		} as SseMessage);
+	}
+
+	private deleteAllInvitesForUser(userId: number): void {
+		const allKeys = this.inviteMap.keys();
+		for (const key of allKeys) {
+			const { player1ID, player2ID } = this.keyToUsers(key);
+			if (player1ID === userId || player2ID === userId) {
+				this.inviteMap.delete(key);
+			}
+		}
 	}
 
 	private inviteInviteeToGame(joinKey: string, inviteData: InviteData, player2Name: string): void {
