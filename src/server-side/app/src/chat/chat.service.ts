@@ -87,10 +87,10 @@ export class ChatService {
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
-		// chat.name = createChatDto.name;
-		// chat.private = createChatDto.isPrivate;
-		chat.password = createChatDto.password ? createChatDto.password : "";
-		// chat.ownerID = createChatDto.ownerID;
+		const saltOrRounds = 10;
+		const salt = bcrypt.genSaltSync(saltOrRounds);
+		chat.password = await bcrypt.hash(createChatDto.password, salt);
+		chat.salt = salt;
 		return await this.chatRepository.save(chat);
 	}
 
@@ -141,6 +141,23 @@ export class ChatService {
 		return !!chatExists;
 	  }
 
+	async findPersonalChatByName(user1ID: number, user2Name: string): Promise<ChatDto | null> {
+		
+		const user2 = await this.usersService.findOne(user2Name);
+		if (!user2) {
+			throw new NotFoundException('User not found');
+		}
+		const chats = await this.chatRepository.find({where: {personal: true}, relations: ['roles']});
+		for (const chat of chats) {
+			const chatRelatives = await this.roleService.getChatRelatives(chat);
+			if (chatRelatives.length === 2 && chatRelatives.some(relative => relative._id === user1ID) &&
+					chatRelatives.some(relative => relative._id === user2.id)) {
+				return this.makeChatDto(chat, user1ID);
+			}
+		}
+		return null;
+	}
+
 	async findPersonalChat(user1: User, user2Id: number): Promise<Chat | null> {
 
 		const user2 = await this.usersService.findUser(user2Id);
@@ -159,11 +176,11 @@ export class ChatService {
 		return null;
 	}
 
-	private passwordMatches(chat: Chat, password?: string): boolean {
+	private async passwordMatches(chat: Chat, password?: string): Promise<boolean> {
 		if (!password) {
 			return false;
 		}
-		return bcrypt.compare(password, chat.password);
+		return await bcrypt.compare(password, chat.password);
 	}
 
 	async joinChat(userId: number, chatId: number, password?: string): Promise<boolean>
@@ -179,7 +196,7 @@ export class ChatService {
 			}
 			await this.roleService.editRole(role, RoleType.Participant);
 		} else {
-			if (chat.password !== "" && !this.passwordMatches(chat, password)) {
+			if (chat.password !== "" || !await this.passwordMatches(chat, password)) {
 				throw new UnauthorizedException('Wrong password');
 			}
 			const user = await this.usersService.findUser(userId);
