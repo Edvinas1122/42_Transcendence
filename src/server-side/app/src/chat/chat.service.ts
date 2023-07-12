@@ -196,7 +196,8 @@ export class ChatService {
 			}
 			await this.roleService.editRole(role, RoleType.Participant);
 		} else {
-			if (chat.password !== "" || !await this.passwordMatches(chat, password)) {
+			const isCorrectPassword = await this.passwordMatches(chat, password);
+			if (!isCorrectPassword && chat.password !== '') {
 				throw new UnauthorizedException('Wrong password');
 			}
 			const user = await this.usersService.findUser(userId);
