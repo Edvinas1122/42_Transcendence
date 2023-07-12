@@ -1,12 +1,11 @@
 import { UserProfile, MatchHistory, Achievement, User } from '@/lib/DTO/AppData';
 import UIListBox from '../GeneralUI/GenericList';
 import UserInteract from './UserInteract';
-import Image from 'next/image';
-import { OnlineStatus } from './OnlineStatus';
 import "./UserProfile.css"
-import SpinnerLoader, { SpinnerLoader2, SpinnerLoaderSmall } from '../GeneralUI/Loader';
+// import SpinnerLoader, { SpinnerLoader2, SpinnerLoaderSmall } from '../GeneralUI/Loader';
 // import { Suspense } from 'react';
 import { UserInfoBox } from './UserProfileUI';
+
 
 
 const GenericAchievement = ({item}: {item: Achievement}) => {
@@ -85,30 +84,21 @@ const UserProfileUI: Function = ({
 	
 	const userStatus = isUser ? "user" : UserInfo.friend? UserInfo.friend : "none";
 
-
 	return (
 		<section className="Display UserPage">
 			<div className="Segment">
-				{/* <Suspense fallback={<UserInfoBox user={DummyLoadingUser} loading={loading} />}> */}
 				<UserInfoBox user={UserInfo} loading={loading} />
-				{/* </Suspense> */}
 				<div className="Component UserInteract">
-				{/* <Suspense fallback={<SpinnerLoader2/>}> */}
 					<UserInteract userStatus={userStatus} userID={UserInfo._id} user2FA={UserInfo.twoFA}/>
-				{/* </Suspense> */}
 				</div>
 			</div>
 			<div className="Segment">
 				<div className="Component UserStats">
-				{/* <Suspense fallback={<UserStats user={DummyLoadingUser} />}> */}
 					<UserStats user={UserInfo} />
-				{/* </Suspense> */}
 				</div>
 				<div className="Component MatchHistory">
 					<h1 className="Title">Match History</h1>
-				{/* <Suspense fallback={<UIListBox Items={[]} BoxComponent={MatchHistoryBox} />}> */}
 					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} emptyMessage="User has not played any matches"/>
-				{/* </Suspense> */}
 				</div>
 			</div>
 		</section>

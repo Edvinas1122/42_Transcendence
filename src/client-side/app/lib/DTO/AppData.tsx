@@ -38,6 +38,7 @@ interface UserProfile extends User {
 	rank: number;
 	wins: number;
 	losses: number;
+	firstTime?: boolean;
 }
 
 interface Chat extends HasId {
