@@ -76,6 +76,7 @@ const AllUsersLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 			samePage: false,
 			// highlightOnly: true,
 		})
+		.setEmptyMessage("No users")
 		.build();
 
 	return (

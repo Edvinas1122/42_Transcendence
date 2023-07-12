@@ -48,6 +48,7 @@ const LiveMessages: Function = ({ initialMessages, chatID }: { initialMessages: 
 			BoxComponent={MessageBox}
 			ListStyle="MessageList"
 			BoxStyle="MessageArea"
+			emptyMessage="Be the first to write something"
 		/>
 	);
 }

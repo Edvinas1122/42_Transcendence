@@ -225,6 +225,7 @@ const LiveParticipants: Function = ({
 			samePage: false,
 			// highlightOnly: true,
 		})
+		// .setEmptyMessage("No available users in chat")
 		.build();
 
 	return (

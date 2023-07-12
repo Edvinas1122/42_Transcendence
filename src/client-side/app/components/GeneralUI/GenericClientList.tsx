@@ -41,7 +41,8 @@ interface UIClientListBoxProps {
 	editLinkGate?: Function,
 	interfaceBuilder?: any,
 	categories?: CategoryDisisplay[],
-	linkDefinition?: LinkDefinition
+	linkDefinition?: LinkDefinition,
+	emptyMessage?: string,
 }
 
 const UIClientListBox: Function = ({ 
@@ -53,7 +54,8 @@ const UIClientListBox: Function = ({
 	conditionalStyle,
 	interfaceBuilder,
 	categories,
-	linkDefinition
+	linkDefinition, 
+	emptyMessage
 }: UIClientListBoxProps ) => {
 
 	const endOfListRef = useRef<HTMLDivElement | null>(null);
@@ -138,6 +140,9 @@ const UIClientListBox: Function = ({
 				renderGroup(category.items, category.name)
 				)}
 			{restItems.length > 0 && renderGroup(restItems, 'Rest')}
+			{!categories && emptyMessage && Items.length === 0 && (
+					<p>{emptyMessage}</p>
+			)}
 			<div ref={endOfListRef} />
 			</Suspense>
 		</div>
@@ -162,6 +167,7 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 	public conditionalStyle?: Function;
 	public categories?: CategoryDisisplay[];
 	public linkDefinition?: LinkDefinition;
+	public emptyMessage?: string;
 
 	public setInitialItems(initialItems: any[] | string) {
 		this.initialItems = initialItems;
@@ -214,6 +220,11 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 		return this;
 	}
 
+	public setEmptyMessage(emptyMessage: string) {
+		this.emptyMessage = emptyMessage;
+		return this;
+	}
+
 	public build() {
 		return Object.freeze({
 			initialItems: this.initialItems,
@@ -225,6 +236,7 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 			categories: this.categories,
 			conditionalStyle: this.conditionalStyle,
 			linkDefinition: this.linkDefinition,
+			emptyMessage: this.emptyMessage,
 		});
 	}
 }
