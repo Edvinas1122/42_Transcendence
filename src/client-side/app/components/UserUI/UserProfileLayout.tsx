@@ -55,7 +55,7 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 				<UIListBox 
 					Items={user.achievements}
 					BoxComponent={GenericAchievement}
-					emptyMessage="User does not have any achievements"
+					emptyMessage="User does not have any achievements yet"
 				/>
 			</div>
 		</div>
