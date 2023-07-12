@@ -210,7 +210,10 @@ export class ChatService {
 			}
 			await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);
 		}
-		this.updateEvent(chat, RoomEventType.Join, await this.makeChatDto(chat, userId), true);
+		const chatObject = await this.makeChatDto(chat, userId);
+		if (chatObject !== null) {
+			this.updateEvent(chat, RoomEventType.Join, chatObject, true);
+		}
 		return true;
 	}
 
@@ -484,6 +487,8 @@ export class ChatService {
 		} else {
 			if (!isParticipant) return null;
 			console.log('personal chat')
+			const isBlocked = await this.usersService.isBlocked(participants[0]._id, participants[1]._id);
+			if (isBlocked) return null;
 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
 			console.log(personalChatDto);
 			return personalChatDto;

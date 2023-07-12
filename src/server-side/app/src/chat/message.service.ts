@@ -43,6 +43,8 @@ export class MessageService {
 			const isBlocked = await this.usersService.isBlocked(userId, message.sender.id);
 			if(!isBlocked){
 				return new MessageDto(message, userId, message.sender);
+			} else {
+				return null;
 			}
 		});
 		
@@ -50,7 +52,7 @@ export class MessageService {
 		const messageDtos = await Promise.all(promises);
 	
 		// Filter out any undefined values
-		const messageDtosFiltered = messageDtos.filter(message => message !== undefined);
+		const messageDtosFiltered = messageDtos.filter(message => message !== null);
 
 		// Reverse the order of the array
 		return [...messageDtosFiltered].reverse();
