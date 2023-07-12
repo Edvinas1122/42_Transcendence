@@ -5,6 +5,7 @@ import { join } from 'path';
 import { Express } from 'express';
 import { UsersService } from "../users/users.service";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
+import { UserId } from "../utils/user-id.decorator";
 
 @UseGuards(JwtAuthGuard)
 @Controller('drive')
@@ -16,14 +17,18 @@ export class DriveController {
 
 	@Post('upload')
 	@UseInterceptors(FileInterceptor('file'))
-	async uploadAvatar(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
-		const userId = req['user']['id'];
+	async uploadAvatar(
+		@UserId() userId,
+		@UploadedFile() file: Express.Multer.File
+	) {
 		console.log(file.buffer);
 		const fileName = `avatar-${userId}.jpg`;
 		const path = join('/uploads/', fileName);
-		await writeFile(path, file.buffer);
+		const completed = await writeFile(path, file.buffer);
+		console.log(completed);
 		const avatar_url = process.env.FRONT_END_API + "/avatar/" + fileName;
 		await this.usersService.updateAvatar(userId, avatar_url);
+		console.log(file.buffer);
 		return { message: 'File uploaded successfully' };
 	}
 }
