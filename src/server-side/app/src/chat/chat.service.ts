@@ -176,11 +176,11 @@ export class ChatService {
 		return null;
 	}
 
-	private passwordMatches(chat: Chat, password?: string): boolean {
+	private async passwordMatches(chat: Chat, password?: string): Promise<boolean> {
 		if (!password) {
 			return false;
 		}
-		return bcrypt.compare(password, chat.password);
+		return await bcrypt.compare(password, chat.password);
 	}
 
 	async joinChat(userId: number, chatId: number, password?: string): Promise<boolean>
@@ -196,7 +196,7 @@ export class ChatService {
 			}
 			await this.roleService.editRole(role, RoleType.Participant);
 		} else {
-			if (chat.password !== "" && !this.passwordMatches(chat, password)) {
+			if (chat.password !== "" || !await this.passwordMatches(chat, password)) {
 				throw new UnauthorizedException('Wrong password');
 			}
 			const user = await this.usersService.findUser(userId);
