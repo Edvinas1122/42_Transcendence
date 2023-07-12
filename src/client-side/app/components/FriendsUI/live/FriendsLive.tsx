@@ -31,6 +31,7 @@ const FriendsLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 			samePage: false,
 			// highlightOnly: true,
 		})
+		.setEmptyListMessage("No friends added")
 		.build();
 
 	return (
