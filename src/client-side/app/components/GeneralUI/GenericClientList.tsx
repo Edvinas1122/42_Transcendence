@@ -41,7 +41,8 @@ interface UIClientListBoxProps {
 	editLinkGate?: Function,
 	interfaceBuilder?: any,
 	categories?: CategoryDisisplay[],
-	linkDefinition?: LinkDefinition
+	linkDefinition?: LinkDefinition,
+	emptyListMessage?: string,
 }
 
 const UIClientListBox: Function = ({ 
@@ -53,7 +54,8 @@ const UIClientListBox: Function = ({
 	conditionalStyle,
 	interfaceBuilder,
 	categories,
-	linkDefinition
+	linkDefinition,
+	emptyListMessage,
 }: UIClientListBoxProps ) => {
 
 	const endOfListRef = useRef<HTMLDivElement | null>(null);
@@ -133,13 +135,17 @@ const UIClientListBox: Function = ({
 
 	return (
 		<div className={"List " + ListStyle}>
-			<Suspense fallback={<SpinnerLoader />}>
-			{categorizedItems && categorizedItems.map((category, index) => 
-				renderGroup(category.items, category.name)
-				)}
-			{restItems.length > 0 && renderGroup(restItems, 'Rest')}
+			{!Items.length ? (
+				emptyListMessage &&<div className="emptyListMessage"><h2>{emptyListMessage}</h2></div>
+			) : (
+				<>
+					{categorizedItems && categorizedItems.map((category, index) => 
+						renderGroup(category.items, category.name)
+					)}
+					{restItems.length > 0 && renderGroup(restItems, 'Rest')}
+				</>
+			)}
 			<div ref={endOfListRef} />
-			</Suspense>
 		</div>
 	);
 }
@@ -162,6 +168,7 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 	public conditionalStyle?: Function;
 	public categories?: CategoryDisisplay[];
 	public linkDefinition?: LinkDefinition;
+	public emptyListMessage?: string;
 
 	public setInitialItems(initialItems: any[] | string) {
 		this.initialItems = initialItems;
@@ -214,6 +221,11 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 		return this;
 	}
 
+	public setEmptyListMessage(emptyListMessage: string) {
+		this.emptyListMessage = emptyListMessage;
+		return this;
+	}
+
 	public build() {
 		return Object.freeze({
 			initialItems: this.initialItems,
@@ -225,6 +237,7 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 			categories: this.categories,
 			conditionalStyle: this.conditionalStyle,
 			linkDefinition: this.linkDefinition,
+			emptyListMessage: this.emptyListMessage,
 		});
 	}
 }

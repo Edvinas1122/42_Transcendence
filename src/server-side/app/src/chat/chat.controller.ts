@@ -3,7 +3,7 @@ import { ChatService } from './chat.service';
 import { Chat } from './entities/chat.entity';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
-import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto } from './dtos/chat.dtos'; // import DTOs
+import { CreateChatDto, ChatIdDto, ChatDto, UpdateChatDto, JoinChatDto, RecipientParam } from './dtos/chat.dtos'; // import DTOs
 import { EventService } from '../events/events.service';
 import { OwnerGuard } from './guards/owner.guard';
 import { UserId } from '../utils/user-id.decorator';
@@ -28,6 +28,13 @@ export class ChatController {
 		return chats;
 	}
 
+	@Get('personal/:recipient')
+	async findPersonalChat(
+		@UserId() UserId: number,
+		@Param('recipient', new ValidationPipe()) params: RecipientParam
+	): Promise<ChatDto | null> {
+		return await this.chatService.findPersonalChatByName(UserId, params.recipient);
+	}
 
 	@Post('create')
 	async createChat(

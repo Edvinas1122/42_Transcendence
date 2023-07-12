@@ -43,15 +43,6 @@ const AllUsersLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 				name: "MSG Priv",
 				endpointTemplate: `/chat/messages/user/create/[id]`,
 				type: "action",
-				// fields: [
-				// 	{
-				// 		name: "content",
-				// 		type: "text",
-				// 		dependency: (item: User) => true,
-				// 		autoField: (item: User) => item.name,
-				// 		invisible: true,
-				// 	}
-				// ],
 				link: {link: "/chat", push: true},
 			}
 		)
@@ -76,6 +67,7 @@ const AllUsersLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 			samePage: false,
 			// highlightOnly: true,
 		})
+		.setEmptyListMessage("No users")
 		.build();
 
 	return (

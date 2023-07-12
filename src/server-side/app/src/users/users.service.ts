@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, Inject, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRuntimeError, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -49,7 +49,7 @@ export class UsersService {
 		return user;
 	}
 	
-	async getUserProfile(id: number): Promise<UserProfileInfo> {
+	async getUserProfile(id: number, userid: number): Promise<UserProfileInfo> {
 		const resultUser = await this.userRepository.createQueryBuilder("user")
 			.where("user.id = :id", { id: id })
 			.leftJoinAndSelect("user.matchesAsPlayer1", "matchesAsPlayer1")
@@ -60,6 +60,9 @@ export class UsersService {
 			.getOne();
 		if (!resultUser) {
 			throw new NotFoundException('User not found');
+		}
+		if (await this.isBlocked(id, userid) === true) {
+			throw new ForbiddenException('User is blocked');
 		}
 		const relationship = await this.getRelationshipStatus(id);
 		// const onlineStatus = await this.onlineStatusService.getOnlineStatus(id);
@@ -168,23 +171,26 @@ export class UsersService {
 
 	// IF anotherUserId(Blockee) is blocked by userId(Blocker)
 	async isBlocked(userId: number, anotherUserId: number): Promise<boolean> {
+		if (userId === anotherUserId) {
+			return false;
+		}
 		const userWithRelationships = await this.userRepository.findOne({
 			where: { id: userId },
-			relations: ['relationshipsInitiated']
+			relations: ['relationshipsInitiated', 'relationshipsReceived']
 		});
 	
-		if (userWithRelationships?.relationshipsInitiated === undefined) {
-			throw new Error('User relationshipsInitiated is undefined');
+		if (!userWithRelationships) {
+			throw new Error('User not found');
 		}
 	
 		const blockedRelationship = userWithRelationships.relationshipsInitiated.find(
 			relationship => relationship.user2ID === anotherUserId && relationship.status === RelationshipStatus.BLOCKED
 		);
-		if (blockedRelationship === undefined) {
-			return false;
-		}
+		const blockedRelationship2 = userWithRelationships.relationshipsReceived.find(
+			relationship => relationship.user1ID === anotherUserId && relationship.status === RelationshipStatus.BLOCKED
+		);
 	
-		return !!blockedRelationship;
+		return !!blockedRelationship || !!blockedRelationship2;
 	}
 
 	async updateUserName(id: number, newName: string): Promise<User | null> {

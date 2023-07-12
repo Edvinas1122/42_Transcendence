@@ -32,7 +32,7 @@ export class UsersController {
 		@UserId() currentUser: number
 	): Promise<UserProfileInfo>
 	{
-		const user = await this.usersService.getUserProfile(currentUser);
+		const user = await this.usersService.getUserProfile(currentUser, currentUser);
 		return user;
 	}
 
@@ -43,7 +43,7 @@ export class UsersController {
 	): Promise<UserProfileInfo>
 	{
 		console.log('requesteeId', requesteeId);
-		const requestee = await this.usersService.getUserProfile(requesteeId);
+		const requestee = await this.usersService.getUserProfile(requesteeId, userId);
 		return requestee;
 	}
 

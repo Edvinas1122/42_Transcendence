@@ -7,6 +7,7 @@ import { PermitedChatGuard } from './guards/permited.guard';
 import { UserId } from '../utils/user-id.decorator';
 import { ParticipantGuard } from './guards/participant.guard';
 import { MutedSanctionGuard } from './guards/mutedSanction.guard';
+import { ChatService } from './chat.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('chat/messages')
@@ -52,12 +53,11 @@ export class MessagesController {
 	}
 
 	@Post('user/create/:recipientId')
-	async createChatWithUser(
+	async createPersonalChat(
 		@UserId() senderId: number,
 		@Param('recipientId', new ParseIntPipe()) recipientId: number,
-	): Promise<any>
+	): Promise<boolean>
 	{
-		const created = await this.messageService.createPersonalChat(senderId, recipientId);
-		return {message: "Personal chat created"};
+		return await this.messageService.createPersonalChat(senderId, recipientId);
 	}
 }

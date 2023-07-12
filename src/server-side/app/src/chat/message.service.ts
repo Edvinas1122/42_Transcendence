@@ -43,6 +43,8 @@ export class MessageService {
 			const isBlocked = await this.usersService.isBlocked(userId, message.sender.id);
 			if(!isBlocked){
 				return new MessageDto(message, userId, message.sender);
+			} else {
+				return null;
 			}
 		});
 		
@@ -50,27 +52,27 @@ export class MessageService {
 		const messageDtos = await Promise.all(promises);
 	
 		// Filter out any undefined values
-		const messageDtosFiltered = messageDtos.filter(message => message !== undefined);
+		const messageDtosFiltered = messageDtos.filter(message => message !== null);
 
 		// Reverse the order of the array
 		return [...messageDtosFiltered].reverse();
 	}
 
-	async createPersonalChat(
-		senderId: number,
-		recipientId: number
-	): Promise<boolean> {
-		if (senderId === recipientId){
-			throw new BadRequestException('Can not create MSG Priv with yourself');
-		}
-		const sender = await this.usersService.findUser(senderId);
-		const recipient = await this.usersService.findUser(recipientId);
-		if (!sender || !recipient) {
-			throw new NotFoundException('Sender or recipient not found');
-		}
-		const chat = await this.chatService.createPersonalChat(sender, recipient.id);
-		return true;
-	}
+	// async createPersonalChat(
+	// 	senderId: number,
+	// 	recipientId: number
+	// ): Promise<boolean> {
+	// 	if (senderId === recipientId){
+	// 		throw new BadRequestException('Can not create MSG Priv with yourself');
+	// 	}
+	// 	const sender = await this.usersService.findUser(senderId);
+	// 	const recipient = await this.usersService.findUser(recipientId);
+	// 	if (!sender || !recipient) {
+	// 		throw new NotFoundException('Sender or recipient not found');
+	// 	}
+	// 	const chat = await this.chatService.createPersonalChat(sender, recipient.id);
+	// 	return true;
+	// }
 
 	async sendMessageToChat(
 		content: string,
@@ -86,8 +88,27 @@ export class MessageService {
 		}
 		const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
 		const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
-		await this.updateEvent(chat, MessageEventType.New, returnedMessage);
+		await this.updateEvent(chat, MessageEventType.New, returnedMessage, senderId);
 		return returnedMessage;
+	}
+
+	async createPersonalChat(
+		senderId: number,
+		recipientId: number
+	): Promise<boolean> {
+		if (senderId === recipientId){
+			throw new BadRequestException('Can not create MSG Priv with yourself');
+		}
+		const sender = await this.usersService.findUser(senderId);
+		const recipient = await this.usersService.findUser(recipientId);
+		if (!sender || !recipient) {
+			throw new NotFoundException('Sender or recipient not found');
+		}
+		let chat = await this.chatService.findPersonalChat(sender, recipientId);
+		if (!chat) {
+			chat = await this.chatService.createPersonalChat(sender, recipientId);
+		}
+		return true;
 	}
 
 	async sendMessageToUser(
@@ -114,11 +135,11 @@ export class MessageService {
 		{
 			const message = await this.messagesRepository.save({content: content, sender: sender, chat: chat});
 			const returnedMessage: MessageDto = new MessageDto(message, senderId, sender);
-			await this.updateEvent(chat, MessageEventType.New, returnedMessage);
+			await this.updateEvent(chat, MessageEventType.New, returnedMessage, senderId);
 			return returnedMessage;
 		}
 		else {
-				await this.updateEvent(chat, MessageEventType.New);
+				await this.updateEvent(chat, MessageEventType.New, undefined, senderId);
 				return null;
 			}
 	}
@@ -126,11 +147,12 @@ export class MessageService {
 	public async updateEvent(
 		chat: Chat,
 		eventType: MessageEventType = MessageEventType.New,
-		message?: MessageDto
+		message?: MessageDto,
+		distributor?: number
 	) {
 		// if (chat.personal || chat.private ) {
 		// if (true ) {
-		await this.chatEventGateway.updateParticipantsOfMessageEvent(chat, message, eventType); // who else needs to know? ha ha
+		await this.chatEventGateway.updateParticipantsOfMessageEvent(chat, message, eventType, distributor); // who else needs to know? ha ha
 		// }
 		// else {
 		// 	await this.chatEventGateway.updateOnlineUsersMessageEvent(chat, message, eventType);

@@ -31,6 +31,7 @@ const BlockedUsersLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 			samePage: false,
 			// highlightOnly: true,
 		})
+		.setEmptyListMessage("No blocked users")
 		.build();
 
 	return (

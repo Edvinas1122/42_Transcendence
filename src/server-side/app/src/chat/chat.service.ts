@@ -82,15 +82,18 @@ export class ChatService {
 		return true;
 	}
 
-	async editChat(chatId: number, createChatDto: UpdateChatDto): Promise<Chat> {
+	async editChat(chatId: number, createChatDto: UpdateChatDto): Promise<Chat> { // change pass
 		const chat = await this.chatRepository.findOne({where: {id: chatId}});
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
-		// chat.name = createChatDto.name;
-		// chat.private = createChatDto.isPrivate;
-		chat.password = createChatDto.password ? createChatDto.password : "";
-		// chat.ownerID = createChatDto.ownerID;
+		if (chat.personal || chat.private) {
+			throw new ConflictException('Cannot set password on personal or private chats');
+		}
+		const saltOrRounds = 10;
+		const salt = bcrypt.genSaltSync(saltOrRounds);
+		chat.password = await bcrypt.hash(createChatDto.password, salt);
+		chat.salt = salt;
 		return await this.chatRepository.save(chat);
 	}
 
@@ -141,6 +144,23 @@ export class ChatService {
 		return !!chatExists;
 	  }
 
+	async findPersonalChatByName(user1ID: number, user2Name: string): Promise<ChatDto | null> {
+		
+		const user2 = await this.usersService.findOne(user2Name);
+		if (!user2) {
+			throw new NotFoundException('User not found');
+		}
+		const chats = await this.chatRepository.find({where: {personal: true}, relations: ['roles']});
+		for (const chat of chats) {
+			const chatRelatives = await this.roleService.getChatRelatives(chat);
+			if (chatRelatives.length === 2 && chatRelatives.some(relative => relative._id === user1ID) &&
+					chatRelatives.some(relative => relative._id === user2.id)) {
+				return this.makeChatDto(chat, user1ID);
+			}
+		}
+		return null;
+	}
+
 	async findPersonalChat(user1: User, user2Id: number): Promise<Chat | null> {
 
 		const user2 = await this.usersService.findUser(user2Id);
@@ -159,11 +179,11 @@ export class ChatService {
 		return null;
 	}
 
-	private passwordMatches(chat: Chat, password?: string): boolean {
+	private async passwordMatches(chat: Chat, password?: string): Promise<boolean> {
 		if (!password) {
 			return false;
 		}
-		return bcrypt.compare(password, chat.password);
+		return await bcrypt.compare(password, chat.password);
 	}
 
 	async joinChat(userId: number, chatId: number, password?: string): Promise<boolean>
@@ -172,6 +192,11 @@ export class ChatService {
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
 		}
+		// if chat owner is in a block relationship with userId
+		const isBlocked = await this.usersService.isBlocked(chat.ownerID, userId);
+		if (isBlocked) {
+			throw new ConflictException('Forbiden chat access'); 
+		}
 		if (chat.private) {
 			const role = await this.roleService.getRole(chatId, userId);
 			if (!role || role.type !== RoleType.Invited) {
@@ -179,7 +204,8 @@ export class ChatService {
 			}
 			await this.roleService.editRole(role, RoleType.Participant);
 		} else {
-			if (chat.password !== "" && !this.passwordMatches(chat, password)) {
+			const isValid = await this.passwordMatches(chat, password);
+			if (!isValid && chat.password.length) {
 				throw new UnauthorizedException('Wrong password');
 			}
 			const user = await this.usersService.findUser(userId);
@@ -189,7 +215,10 @@ export class ChatService {
 			}
 			await this.roleService.addRelativeToChat(RoleType.Participant, chat, user);
 		}
-		this.updateEvent(chat, RoomEventType.Join, await this.makeChatDto(chat, userId), true);
+		const chatObject = await this.makeChatDto(chat, userId);
+		if (chatObject !== null) {
+			this.updateEvent(chat, RoomEventType.Join, chatObject, true);
+		}
 		return true;
 	}
 
@@ -447,6 +476,8 @@ export class ChatService {
 			if (chat.private && !isParticipant) {
 				return null;
 			}
+			const isBlocked = await this.usersService.isBlocked(userId, chat.ownerID);
+			if (isBlocked) return null;
 			const owner = await this.usersService.getUserInfo(chat.ownerID);
 			const isOwner = chat.ownerID === userId;
 			const groupChatDto = new GroupChatDto({
@@ -463,6 +494,8 @@ export class ChatService {
 		} else {
 			if (!isParticipant) return null;
 			console.log('personal chat')
+			const isBlocked = await this.usersService.isBlocked(participants[0]._id, participants[1]._id);
+			if (isBlocked) return null;
 			const personalChatDto = new PersonalChatDto(chat, participants[0]);
 			console.log(personalChatDto);
 			return personalChatDto;

@@ -113,7 +113,7 @@ export class GameService {
 		wrong name, ture name -> handleJoinGame 
 	*/
 	public handleJoinGameQue(userId1: number, userId2:number, gameId:number): string {
-		const GAME_BEGIN_DELAY = 2950;
+
 		const gameKey = this.generateGameKey(userId1, userId2);
 		if (this.liveGameInstancesMap.has(gameKey)) {
 			this.liveGameInstancesMap.delete(gameKey);

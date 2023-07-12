@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { SocketGateway } from '../socket/socket.gateway'
 import { UsersService } from '../users/users.service'
 import { EventService, SseMessage, EventType } from '../events/events.service';
@@ -35,6 +35,9 @@ export class InviteService {
 		const player2User = await this.usersService.findOne(player2Name);
 		if (!player2User) {
 			throw new NotFoundException(`User ${player2Name} does not exist`);
+		}
+		if (player1ID === player2User?.id) {
+			throw new ConflictException(`User ${player2Name} cannot invite himself`);
 		}
 		const isBlocked = await this.usersService.isBlocked(player2User.id, player1ID);
 		if (isBlocked) {
@@ -97,7 +100,9 @@ export class InviteService {
 			const player2GameKey = gameKey + '-' + inviteData.player2ID;
 			this.socketGateway.sendToUser('MatchMaking', inviteData.player1ID, { gameKey: player1GameKey });
 			this.socketGateway.sendToUser('MatchMaking', inviteData.player2ID, { gameKey: player2GameKey });
-			this.inviteMap.delete(joinKey);
+			this.deleteAllInvitesForUser(inviteData.player1ID);
+			this.deleteAllInvitesForUser(inviteData.player2ID);
+			// this.inviteMap.delete(joinKey);
 			return `Invite ${joinKey} is complete`;
 		} else {
 			return `Invite ${joinKey} is not complete`;
@@ -148,6 +153,16 @@ export class InviteService {
 				inviteKey: joinKey,
 			}
 		} as SseMessage);
+	}
+
+	private deleteAllInvitesForUser(userId: number): void {
+		const allKeys = this.inviteMap.keys();
+		for (const key of allKeys) {
+			const { player1ID, player2ID } = this.keyToUsers(key);
+			if (player1ID === userId || player2ID === userId) {
+				this.inviteMap.delete(key);
+			}
+		}
 	}
 
 	private inviteInviteeToGame(joinKey: string, inviteData: InviteData, player2Name: string): void {

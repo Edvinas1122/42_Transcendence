@@ -10,7 +10,7 @@ return function (object: Record<string, any>, propertyName: string) {
 		options: validationOptions,
 		validator: {
 			validate(value: any) {
-			return typeof value === 'string' && value.length <= 20 && value.length > 0;
+			return typeof value === 'string' && value.length <= 20;
 			},
 		},
 	});
@@ -27,7 +27,7 @@ return function (object: Record<string, any>, propertyName: string) {
 		options: validationOptions,
 		validator: {
 			validate(value: any) {
-			return typeof value === 'string' && value.length <= 1024 && value.length > 0;
+			return typeof value === 'string' && value.length <= 1024;
 			},
 		},
 	});
