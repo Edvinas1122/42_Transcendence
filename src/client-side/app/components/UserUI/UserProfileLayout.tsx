@@ -37,25 +37,25 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 	return (
 		<div className="Segment">
 			<div className="Component">
-				<h1>Rank </h1>
-				{!user.rank ? <p>User not ranked</p> : <h1>#{user?.rank}</h1>}
+				<h2>Rank </h2>
+				{!user.rank ? <p>Not Ranked</p> : <h1>#{user?.rank}</h1>}
 			</div>
 			<section>
 				<div className="Component">
-					<h2>Wins</h2>
+					<h3>Wins</h3>
 					<p>{user.wins}</p>
 				</div>
 				<div className="Component">
-					<h2>Losses</h2>
+					<h3>Losses</h3>
 					<p>{user.losses}</p>
 				</div>
 			</section>
 			<div className="Component">
-				<h1>Achievements</h1>
+				<h2>Achievements</h2>
 				<UIListBox 
 					Items={user.achievements}
 					BoxComponent={GenericAchievement}
-					emptyMessage="User does not have any achievements"
+					emptyMessage="No achievements, yet..."
 				/>
 			</div>
 		</div>
@@ -89,26 +89,18 @@ const UserProfileUI: Function = ({
 	return (
 		<section className="Display UserPage">
 			<div className="Segment">
-				{/* <Suspense fallback={<UserInfoBox user={DummyLoadingUser} loading={loading} />}> */}
 				<UserInfoBox user={UserInfo} loading={loading} />
-				{/* </Suspense> */}
 				<div className="Component UserInteract">
-				{/* <Suspense fallback={<SpinnerLoader2/>}> */}
 					<UserInteract userStatus={userStatus} userID={UserInfo._id} user2FA={UserInfo.twoFA}/>
-				{/* </Suspense> */}
 				</div>
 			</div>
 			<div className="Segment">
 				<div className="Component UserStats">
-				{/* <Suspense fallback={<UserStats user={DummyLoadingUser} />}> */}
 					<UserStats user={UserInfo} />
-				{/* </Suspense> */}
 				</div>
 				<div className="Component MatchHistory">
 					<h1 className="Title">Match History</h1>
-				{/* <Suspense fallback={<UIListBox Items={[]} BoxComponent={MatchHistoryBox} />}> */}
-					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} emptyMessage="User has not played any matches"/>
-				{/* </Suspense> */}
+					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} emptyMessage="No Matches.. yet.."/>
 				</div>
 			</div>
 		</section>

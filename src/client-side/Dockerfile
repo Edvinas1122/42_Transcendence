@@ -18,15 +18,9 @@ RUN mkdir app/
 COPY app/tsconfig.json ./
 
 
-# RUN npm install js-cookie
-# RUN npm install --save @types/js-cookie
-# RUN npm install bufferutil
-# utf-8-validate 
-# bufferutil
 RUN npm install bufferutil utf-8-validate --save-optional
 RUN npm install socket.io-client 
 RUN npm install @types/react @types/react-dom @types/node
-# RUN npm i sharp
 
 #GRAPHICS RELATED modules
 	#functional
@@ -35,7 +29,6 @@ RUN npm install react-notifications-component
 RUN npm install @fortawesome/react-fontawesome @fortawesome/free-solid-svg-icons
 	#File upload 
 RUN npm install axios
-# RUN npm install -D tailwindcss postcss autoprefixer
 
 # Copy the rest of the application
 COPY app/ ./

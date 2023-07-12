@@ -3,7 +3,7 @@ import "@/public/layout.css";
 const UIListBox: Function = ({ Items, BoxComponent, ListStyle, BoxStyle, emptyMessage }: { Items: any[], BoxComponent: Function, ListStyle?: string, BoxStyle?: string, emptyMessage?: string}) => {
 	if (Items.length <= 0 && emptyMessage) {
 		return (
-			<p>{emptyMessage}</p>
+			<div className="emptyListMessage"><h2>{emptyMessage}</h2></div>
 		)
 	} else {
 		return (
