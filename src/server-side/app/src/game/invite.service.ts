@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { SocketGateway } from '../socket/socket.gateway'
 import { UsersService } from '../users/users.service'
 import { EventService, SseMessage, EventType } from '../events/events.service';
@@ -35,6 +35,9 @@ export class InviteService {
 		const player2User = await this.usersService.findOne(player2Name);
 		if (!player2User) {
 			throw new NotFoundException(`User ${player2Name} does not exist`);
+		}
+		if (player1ID === player2User?.id) {
+			throw new ConflictException(`User ${player2Name} cannot invite himself`);
 		}
 		const isBlocked = await this.usersService.isBlocked(player2User.id, player1ID);
 		if (isBlocked) {
