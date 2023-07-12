@@ -41,8 +41,7 @@ interface UIClientListBoxProps {
 	editLinkGate?: Function,
 	interfaceBuilder?: any,
 	categories?: CategoryDisisplay[],
-	linkDefinition?: LinkDefinition,
-	emptyListMessage?: string,
+	linkDefinition?: LinkDefinition
 }
 
 const UIClientListBox: Function = ({ 
@@ -54,7 +53,7 @@ const UIClientListBox: Function = ({
 	conditionalStyle,
 	interfaceBuilder,
 	categories,
-	linkDefinition,
+	linkDefinition
 	emptyListMessage,
 }: UIClientListBoxProps ) => {
 
@@ -168,7 +167,6 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 	public conditionalStyle?: Function;
 	public categories?: CategoryDisisplay[];
 	public linkDefinition?: LinkDefinition;
-	public emptyListMessage?: string;
 
 	public setInitialItems(initialItems: any[] | string) {
 		this.initialItems = initialItems;
@@ -221,11 +219,6 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 		return this;
 	}
 
-	public setEmptyListMessage(emptyListMessage: string) {
-		this.emptyListMessage = emptyListMessage;
-		return this;
-	}
-
 	public build() {
 		return Object.freeze({
 			initialItems: this.initialItems,
@@ -237,7 +230,6 @@ export class UIClientListBoxClassBuilder implements UIClientListBoxProps {
 			categories: this.categories,
 			conditionalStyle: this.conditionalStyle,
 			linkDefinition: this.linkDefinition,
-			emptyListMessage: this.emptyListMessage,
 		});
 	}
 }
