@@ -207,8 +207,6 @@ const LiveParticipants: Function = ({
 		)
 
 
-
-
 	const ParticipantsList = new UIClientListBoxClassBuilder()
 		.setInitialItems(initialParticipants)
 		.setBoxComponent(ParticipantBox)

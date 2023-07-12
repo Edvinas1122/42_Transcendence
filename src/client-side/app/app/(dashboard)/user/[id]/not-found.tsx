@@ -2,7 +2,7 @@ export default async function NotFound() {
 	return (
 	  <div>
 		<h2>Not Found</h2>
-		<p>Could not find requested resource</p>
+		<p>User could not be found or you do not have permission to view users profile</p>
 	  </div>
 	)
   }

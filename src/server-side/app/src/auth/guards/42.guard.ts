@@ -10,3 +10,4 @@ export class FourtyTwoGuard extends AuthGuard("42") {
 		return result;
 	}
 }
+//obsolete

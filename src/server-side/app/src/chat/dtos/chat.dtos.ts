@@ -42,6 +42,7 @@ export class UpdateChatDto {
 	@IsString()
 	@IsOptional()
 	@IsShortField()
+
 	password: string | undefined;
 }
 
