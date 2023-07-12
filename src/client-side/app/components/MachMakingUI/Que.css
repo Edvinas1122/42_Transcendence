@@ -33,13 +33,26 @@ button {
 	box-sizing: border-box;
 }
 
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+		transform: skewX(10deg);
+	}
+	50% {
+		transform: scale(1.01);
+		transform: skewX(15deg);
+	}
+	100% {
+		transform: scale(1);
+		transform: skewX(10deg);
+	}
+}
+
 .SelectGame {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	height: 100%;
-	width: 100%;
 	background-color: #1a1a1a;
 	color: #fff;
 	font-family: 'Roboto', sans-serif;
@@ -49,7 +62,7 @@ button {
 	padding: 1em 1em;
 	box-sizing: border-box;
 	overflow: hidden;
-	transform: skewX(10deg);
+	animation: pulse 10s infinite;
 }
 .InviteUserInterface {
 	display: flex;

@@ -25,7 +25,6 @@ const MachMakingUI: React.FC = () => {
 				</>) : 
 				(<>
 					<div className="SelectGame">
-
 						<h2>Live Que View</h2>
 						<LiveOnline/>
 						<InviteUserInterface/>

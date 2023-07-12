@@ -11,8 +11,8 @@ export class RecipientParam {
 
 export class CreateChatDto {
 	@IsString()
-	@IsShortField({message: 'Name too long'})
-	@MinLength(1)
+	@IsShortField({message: "Chat name has to be between 3 and 20 characters long"})
+	@MinLength(3, {message: "Chat name has to be between 3 and 20 characters long"})
 	name: string;
 
 	@IsBoolean()
@@ -54,13 +54,13 @@ export class JoinChatDto {
   }
 export class SendMessageDto {
 	@IsString()
-	@IsLongField({message: 'Message too long'})
+	@IsLongField({message: 'Can not send message over 1000 characters long'})
 	content: string;
   
 	@IsString()
 	@IsOptional()
 	@IsShortField({message: 'Password too long'})
-	password?: string | null;
+	password?: string | null; // omited, not used
 }
 
 export class DeleteMessageDto {

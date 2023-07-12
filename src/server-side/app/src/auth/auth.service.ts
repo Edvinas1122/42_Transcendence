@@ -17,7 +17,7 @@ export class AuthService {
 	) {}
 
 	async registerAuthorizedLogin(login: LoginRegister): Promise<any> {
-		let user = await this.usersService.findOne(login.user);
+		let user = await this.usersService.findUserByFullName(login.fullName);
 		let firstTime = false;
 
 		if (!user) {

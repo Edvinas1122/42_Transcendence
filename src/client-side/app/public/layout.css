@@ -274,9 +274,9 @@ input[type="number"], input[type="email"]
 }
 
 .POP button, input, textarea, p {
-	padding: 1em 1em;
+	/* padding: 1em 1em;
     margin: 0.5em 4.5em 0.5em 0.5em;
-	border: 1em;
+	border: 1em; */
 }
 
 .backdrop {

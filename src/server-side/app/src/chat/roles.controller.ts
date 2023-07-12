@@ -11,6 +11,7 @@ import { PrivilegedGuard } from './guards/privileged.guard';
 import { UserId } from '../utils/user-id.decorator';
 import { NoSanctionGuard } from './guards/noSanction.guard';
 import { SanctionService } from './sanction.service';
+import { UserNameParam} from './dtos/roles.dtos';
 
 
 @UseGuards(JwtAuthGuard)
@@ -65,10 +66,11 @@ export class RolesController {
 	async inviteUser(
 		@UserId() UserId: number,
 		@Param('chatId', new ParseIntPipe()) chatId,
-		@Body('user') userName: string, // validation pipe
-	): Promise<boolean>
+		@Body('user') input: UserNameParam, // validation pipe
+	): Promise<any>
 	{
-		return await this.chatService.inviteToChat(UserId, chatId, userName);
+		await this.chatService.inviteToChat(UserId, chatId, input.userName);
+		return { success: true, message: 'User invited' };
 	}
 
 	@UseGuards(PrivilegedGuard)  // KICK USER

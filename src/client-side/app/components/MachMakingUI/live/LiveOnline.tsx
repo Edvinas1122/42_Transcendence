@@ -69,12 +69,12 @@ export const InviteUserInterface: React.FC = () => {
 	}
 
 	return (
-		<>
+		<div className="InviteUserInterface">
 			<input type="text" className={oxanium.className} onChange={onChange} value={username} />
 			<button onClick={onClick}>Invite</button>
 			{inviteLink && <div>{inviteLink}</div>}
 			{error && <div style={{ color: 'red' }}>{error}</div>}
-		</>
+		</div>
 	)
 }
 

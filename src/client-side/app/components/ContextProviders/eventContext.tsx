@@ -90,9 +90,9 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 					case 'chat':
 						setChatEvent(parsedData.data);
 						break;
-					case 'user':
-						switch (parsedData.data.event) {}
-						break;
+					// case 'user':
+					// 	switch (parsedData.data.event) {}
+					// 	break;
 					default:
 						if (state.eventListeners[parsedData.type]) {
 							state.eventListeners[parsedData.type].forEach(listener => listener(parsedData.data));

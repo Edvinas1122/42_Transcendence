@@ -1,12 +1,8 @@
-import UIListBox from "../GeneralUI/GenericList";
 import LiveParticipants from "./Live/LiveParticipants";
 import GenericForm from "../GeneralUI/GenericForm";
 import LiveMessages from "./Live/LiveMessages";
-import fetchWithToken from "@/lib/fetch.util";
-import { notFound } from 'next/navigation'
 import "@/public/layout.css";
 import "./Chat.css";
-import UIClientListBox from "../GeneralUI/GenericClientList";
 
 const SendMessageBox: Function = ({id}: {id: string}) => {
 	return (
@@ -55,7 +51,7 @@ const MessangerUI: Function = ({ params }: { params: { id: string } }) => {
 						Particaipants Display
 					</h1>
 					<LiveParticipants initialParticipants={`/chat/roles/${params.id}/Any`} chatID={params.id} />
-					<InviteUserBox id={params.id} /> {/*conditionally render !!!*/}
+					<InviteUserBox id={params.id} />
 				</div>
 			</div>
 	  	</>

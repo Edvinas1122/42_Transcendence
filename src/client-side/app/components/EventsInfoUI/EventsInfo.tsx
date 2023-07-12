@@ -2,6 +2,7 @@
 
 import { ReactNotifications, Store } from 'react-notifications-component';
 import 'react-notifications-component/dist/theme.css';
+// import React, { useEffect, useState } from 'react';
 
 class NotificationDisplay {
 	constructor(title: string, message: string, duration?: number, type?: "success" | "danger" | "info" | "default" | "warning") {
@@ -49,8 +50,11 @@ const DisplayPopUp = (() => {
 })();
 
 const DisplayComponent = () => {
+
 	return (
+		<>
 		<ReactNotifications />
+		</>
 	);
 }
 
