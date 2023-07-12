@@ -221,6 +221,7 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: string }) => {
 			// highlightOnly: true,
 			dependency: (item: Chat): boolean => item?.amParticipant? true : false
 		})
+		.setEmptyListMessage("No chats currently available")
 		.build();
 
 	return (

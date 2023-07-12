@@ -136,7 +136,7 @@ const UIClientListBox: Function = ({
 	return (
 		<div className={"List " + ListStyle}>
 			{!Items.length ? (
-				emptyListMessage &&<div class="emptyListMessage"><h2>{emptyListMessage}</h2></div>
+				emptyListMessage &&<div className="emptyListMessage"><h2>{emptyListMessage}</h2></div>
 			) : (
 				<>
 					{categorizedItems && categorizedItems.map((category, index) => 

@@ -37,7 +37,8 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 	return (
 		<div className="Segment">
 			<div className="Component">
-				<h1>Rank #{user?.rank}</h1>
+				<h1>Rank </h1>
+				{!user.rank ? <p>User not ranked</p> : <h1>#{user?.rank}</h1>}
 			</div>
 			<section>
 				<div className="Component">
@@ -54,6 +55,7 @@ const UserStats = ({ user }: { user: UserProfile }) => {
 				<UIListBox 
 					Items={user.achievements}
 					BoxComponent={GenericAchievement}
+					emptyMessage="User does not have any achievements"
 				/>
 			</div>
 		</div>
@@ -105,7 +107,7 @@ const UserProfileUI: Function = ({
 				<div className="Component MatchHistory">
 					<h1 className="Title">Match History</h1>
 				{/* <Suspense fallback={<UIListBox Items={[]} BoxComponent={MatchHistoryBox} />}> */}
-					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} />
+					<UIListBox Items={UserInfo.MatchHistory} BoxComponent={MatchHistoryBox} emptyMessage="User has not played any matches"/>
 				{/* </Suspense> */}
 				</div>
 			</div>

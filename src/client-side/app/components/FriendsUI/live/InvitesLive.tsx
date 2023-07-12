@@ -39,6 +39,7 @@ const InvitesLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 			samePage: false,
 			// highlightOnly: true,
 		})
+		.setEmptyListMessage("No current invites")
 		.build();
 
 	return (

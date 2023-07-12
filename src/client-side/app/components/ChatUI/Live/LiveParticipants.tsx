@@ -230,6 +230,7 @@ const LiveParticipants: Function = ({
 			samePage: false,
 			// highlightOnly: true,
 		})
+		// .setEmptyListMessage("No available users in chat")
 		.build();
 
 	return (
