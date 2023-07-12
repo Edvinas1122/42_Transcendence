@@ -82,10 +82,13 @@ export class ChatService {
 		return true;
 	}
 
-	async editChat(chatId: number, createChatDto: UpdateChatDto): Promise<Chat> {
+	async editChat(chatId: number, createChatDto: UpdateChatDto): Promise<Chat> { // change pass
 		const chat = await this.chatRepository.findOne({where: {id: chatId}});
 		if (!chat) {
 			throw new NotFoundException('Chat not found');
+		}
+		if (chat.personal || chat.private) {
+			throw new ConflictException('Cannot set password on personal or private chats');
 		}
 		const saltOrRounds = 10;
 		const salt = bcrypt.genSaltSync(saltOrRounds);
@@ -196,7 +199,8 @@ export class ChatService {
 			}
 			await this.roleService.editRole(role, RoleType.Participant);
 		} else {
-			if (chat.password !== "" || !await this.passwordMatches(chat, password)) {
+			const isValid = await this.passwordMatches(chat, password);
+			if (!isValid && chat.password.length) {
 				throw new UnauthorizedException('Wrong password');
 			}
 			const user = await this.usersService.findUser(userId);

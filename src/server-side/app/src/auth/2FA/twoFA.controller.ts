@@ -6,7 +6,7 @@ import { JwtAuthGuard }from '../guards/jwt.guard';
 import { UserId, UserName } from '../../utils/user-id.decorator';
 import { UsersService } from '../../users/users.service';
 import { TwoFACodeDto } from './twoFA.dto';
-import { JwtTwoFactorGuard } from '../guards/jwt-2fa.guard';
+import { PreAuthentificationGuard } from '../guards/preauthentification.guard';
 
 interface TokenRetrieveReq {
     retrieve: string;
@@ -83,7 +83,7 @@ export class twoFAController {
 	}
 
 	@Post('login')
-	@UseGuards(JwtTwoFactorGuard)
+	@UseGuards(PreAuthentificationGuard)
 	async authenticate2FAServer(
 		@UserId() currentUserId: number,
 		@UserName() currentUserName: string,

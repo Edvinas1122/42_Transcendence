@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Relationship, RelationshipStatus } from './entities/relationship.entity';
 import { User } from '../entities/user.entity';
@@ -17,8 +17,9 @@ export class ProfileManagementService {
 	) {}
 
 	async sendFriendRequest(senderId: number, receiverId: number): Promise<Relationship>{
-		if (senderId == receiverId)
+		if (senderId == receiverId){
 			throw new HttpException('You can not send friend request to yourself', HttpStatus.BAD_REQUEST);
+		}
 		const relationship = new Relationship();
 		relationship.user1ID = senderId;
 		relationship.user2ID = receiverId;
@@ -148,6 +149,9 @@ export class ProfileManagementService {
 	}
 
 	async blockUser(userId: number, blockedUserId: number): Promise<Boolean> {
+		if (userId == blockedUserId){
+			throw new HttpException('You can not block yourself', HttpStatus.BAD_REQUEST);
+		}
 		// find the relationship if exists
 		const relationship = await this.relationshipsRepository.findOne({
 			where: [
