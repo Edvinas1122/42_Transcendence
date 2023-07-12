@@ -174,7 +174,7 @@ const ChatRoomsLive: Function = ({ serverChats}: { serverChats: string }) => {
 					confirmation: {
 						condition: (item: Chat) => item?.mine || item?.personal ? true : false,
 						title: "Are you sure you want to delete this chat?",
-						question: "This action cannot be undone",
+						question: "This action can not be undone",
 						yes: "Delete",
 						no: "Cancel",
 					},

@@ -37,7 +37,7 @@ export class InviteService {
 			throw new NotFoundException(`User ${player2Name} does not exist`);
 		}
 		if (player1ID === player2User?.id) {
-			throw new ConflictException(`User ${player2Name} cannot invite himself`);
+			throw new ConflictException(`User ${player2Name} can not invite himself`);
 		}
 		const isBlocked = await this.usersService.isBlocked(player2User.id, player1ID);
 		if (isBlocked) {
