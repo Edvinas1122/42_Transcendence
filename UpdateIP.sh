@@ -26,6 +26,10 @@ echo "INTRA_UID=$INTRA_UID" >> $FILE_LOCATION
 echo "INTRA_SECRET=$INTRA_SECRET" >> $FILE_LOCATION
 echo "Updated .env file with IP address: $IP"
 
+if [[ "$OSTYPE" == "darwin"* ]]; then
 sed -i '' '/^FRONT_END_API/d' .env
+else
+sed -i '/^FRONT_END_API/d' .env
+fi
 echo "FRONT_END_API=http://$IP:3030" >> .env
 echo "Updated .env file with IP address: $IP"

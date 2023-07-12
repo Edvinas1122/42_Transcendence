@@ -1,7 +1,13 @@
-sed -i '' '/^CMD/c\
-CMD ["npm", "run", "start"]
-' src/server-side/Dockerfile
+#!/bin/bash
 
-sed -i '' '/^CMD/c\
-CMD ["npm", "run", "start"]
-' src/client-side/Dockerfile
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # MacOS system
+    sed -i '' '/^CMD/c\
+    CMD ["npm", "run", "start"]
+    ' src/client-side/Dockerfile
+else
+    # Assume Linux
+    sed -i '/^CMD/c\
+    CMD ["npm", "run", "start"]
+    ' src/client-side/Dockerfile
+fi
