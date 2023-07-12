@@ -88,7 +88,7 @@ export class ChatService {
 			throw new NotFoundException('Chat not found');
 		}
 		if (chat.personal || chat.private) {
-			throw new ConflictException('Cannot set password on personal or private chats');
+			throw new ConflictException('Can not set password on personal or private chats');
 		}
 		const saltOrRounds = 10;
 		const salt = bcrypt.genSaltSync(saltOrRounds);
@@ -379,6 +379,13 @@ export class ChatService {
 		}
 		if (role.type === RoleType.Owner) {
 			throw new BadRequestException('User is an Owner');
+		}
+		const roleofExecutor = await this.roleService.getRole(chatId, userId);
+		const roleofExecutee = await this.roleService.getRole(chatId, banned.id);
+		if (roleofExecutor?.type === RoleType.Admin){
+			if (roleofExecutee?.type === RoleType.Admin || roleofExecutee?.type === RoleType.Owner){
+				throw new BadRequestException('Can not mute other Admins or owners');
+			}
 		}
 		await this.roleService.editRole(role, RoleType.Blocked);
 		this.updateEvent(chat, RoomEventType.Banned, await this.makeChatDto(chat, userId, banned.id), true); // ashame to all Online users
