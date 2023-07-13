@@ -49,7 +49,7 @@ export class UsersController {
 
 	@Post('edit')
 	async editUsername(
-		@Body() newName: UpdateUsernameDto,
+		@Body(new ValidationPipe()) newName: UpdateUsernameDto,
 		@UserId() userId: number,
 	): Promise<UserUpdateResponse | null>
 	{

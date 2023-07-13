@@ -36,7 +36,7 @@ services:
       - ./src/client-side/app/app:/app/app
       - ./src/client-side/app/lib:/app/lib
       - ./src/client-side/app/components:/app/components
-      - ./src/client-side/app/public/:/app/public/
+      # - ./src/client-side/app/public/:/app/public/
     depends_on:
       - nest-app
 
@@ -53,6 +53,18 @@ services:
       - ./src/client-side/app/public/avatar/:/uploads
     depends_on:
       - db
+
+  nginx:
+    build:
+      context: src/file-service/
+    restart: always
+    ports:
+      - 10011:10011
+    volumes:
+      - ./src/file-service/conf/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./src/client-side/app/public/avatar/:/usr/share/nginx/uploads
+    depends_on:
+      - next-app
 
 volumes:
   pgadmin_data:

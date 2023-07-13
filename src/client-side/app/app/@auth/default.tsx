@@ -175,11 +175,15 @@ const AuthPage: React.FC = () => {
 	const router = useRouter();
 	const search = searchParams.get('code');
 
-	const authorizedRedirect = () => {
+	const authorizedRedirect = (firstTime?: boolean) => {
 		setTimer(0);
 		setError(null);
 		// setLoading("redirecting");
-		window.location.href = "/user";
+		if (firstTime) {
+			window.location.href = "/user/?firstTime=true";
+		} else {
+			window.location.href = "/user";
+		}
 	}
 
 	useEffect(() => {
@@ -219,6 +223,7 @@ const AuthPage: React.FC = () => {
 					});
 					const data = await response.json();
 					console.log("data", data);
+
 					if (data.sucess) {
 						setAuthorised(data);
 						console.log("2FA", data);
@@ -229,7 +234,7 @@ const AuthPage: React.FC = () => {
 							});
 						} else {
 							setTimeout(() => {
-								authorizedRedirect();
+								authorizedRedirect(data.firstTime);
 							}, 1000);
 						}
 					} else {

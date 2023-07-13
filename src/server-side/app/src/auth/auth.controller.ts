@@ -114,11 +114,11 @@ export class AuthController
 		if (server_secret === undefined || server_secret !== process.env.SERVER_SECRET) {
 			throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
 		}
-		const {token, userHas2FA, id} = await this.authService.registerAuthorizedLogin({
+		const {token, userHas2FA, id, firstTime} = await this.authService.registerAuthorizedLogin({
 			user: user,
 			fullName : fullName,
 		});
-		return {retrieve: token, HAS_2_FA: userHas2FA, id: id};
+		return {retrieve: token, HAS_2_FA: userHas2FA, id: id, firstTime: firstTime};
 	}
 
 	@Get('validate')

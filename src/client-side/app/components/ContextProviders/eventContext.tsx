@@ -90,8 +90,16 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 					case 'chat':
 						setChatEvent(parsedData.data);
 						break;
-					case 'user':
-						switch (parsedData.data.event) {}
+					case 'system':
+						switch (parsedData.data.event) {
+							case 'restart':
+								DisplayPopUp("Reconnecting", "Re-establishing connection", 3000, "warning");
+								es.close();
+								setTimeout(() => {
+									connect();
+								}, 1000);
+								break;
+						}
 						break;
 					default:
 						if (state.eventListeners[parsedData.type]) {
@@ -108,6 +116,9 @@ export const EventSourceProvider = ({ children }: EventSourceProviderProps) =>  
 			es.onerror = (event) => {
 				es.close();
 				DisplayPopUp("Connection error", "Reconnecting connection...", 2500, "danger");
+				setTimeout(() => {
+					connect();
+				}, 4000);
 			};
 		};
 		connect();

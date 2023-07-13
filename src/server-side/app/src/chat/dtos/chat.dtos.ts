@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, Length, IsInt, IsOptional, IsEnum, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, MaxLength, Length, IsInt, IsOptional, IsEnum, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { RoleType } from '../entities/role.entity';
 import { IsShortField, IsLongField } from '../../utils/formFields.decorator';
@@ -11,8 +11,8 @@ export class RecipientParam {
 
 export class CreateChatDto {
 	@IsString()
-	@IsShortField({message: 'Name too long'})
-	@MinLength(1)
+	@IsShortField({message: "Chat name has to be between 3 and 20 characters long"})
+	@MinLength(3, {message: "Chat name has to be between 3 and 20 characters long"})
 	name: string;
 
 	@IsBoolean()
@@ -24,7 +24,7 @@ export class CreateChatDto {
 
 	@IsOptional()
 	@IsString()
-	@IsShortField({message: 'Password too Long'})
+	@MaxLength(20, {message: 'Password too Long'})
 	password?: string;
 
 	@IsOptional()
@@ -41,7 +41,7 @@ export class ChatIdDto {
 export class UpdateChatDto {
 	@IsString()
 	@IsOptional()
-	@IsShortField()
+	@MaxLength(20, {message: 'Password too Long'})
 
 	password: string | undefined;
 }
@@ -54,12 +54,12 @@ export class JoinChatDto {
   }
 export class SendMessageDto {
 	@IsString()
-	@IsLongField({message: 'Message too long'})
+	@IsLongField({message: 'Message over 1000 characters or only spaces'})
 	content: string;
   
 	@IsString()
 	@IsOptional()
-	@IsShortField({message: 'Password too long'})
+	@MaxLength(20, {message: 'Password too long'})
 	password?: string | null;
 }
 

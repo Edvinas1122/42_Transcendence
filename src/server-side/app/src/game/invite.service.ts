@@ -62,10 +62,14 @@ export class InviteService {
 			player2ID: player2ID,
 			date: new Date(),
 		};
+		const player1User = await this.usersService.findUser(player1ID);
+		if (!player1User) {
+			throw new NotFoundException(`User ${player1ID} does not exist`);
+		} // impossible to happen exception
 		this.inviteMap.set(inviteKey, inviteData);
 		console.log(`Invite ${inviteKey} created`); // debug
 		console.log("inviteMap size: ", this.inviteMap.size); //  debug
-		this.inviteInviteeToGame(inviteKey, inviteData, player2Name);
+		this.inviteInviteeToGame(inviteKey, inviteData, player1User.name);
 		return inviteKey;
 	}
 
@@ -165,12 +169,12 @@ export class InviteService {
 		}
 	}
 
-	private inviteInviteeToGame(joinKey: string, inviteData: InviteData, player2Name: string): void {
+	private inviteInviteeToGame(joinKey: string, inviteData: InviteData, InvitorName: string): void {
 		this.eventService.sendEvent(inviteData.player2ID.toString(), {
 			type: EventType.Game,
 			payload: {
 				event: 'invite',
-				message: `You have been invited to a game by ${player2Name}`,
+				message: `You have been invited to a game by ${InvitorName}`,
 				inviteKey: inviteData.inviteKey,
 			}
 		} as SseMessage)

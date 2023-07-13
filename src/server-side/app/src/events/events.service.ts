@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event, EventType } from './entities/event.entity';
 import { SseMessage, MessageEvent } from './events.types';
@@ -8,7 +8,7 @@ import { User } from '../users/entities/user.entity';
 
 
 @Injectable()
-export class EventService {
+export class EventService implements OnModuleDestroy {
 	constructor(
 		@InjectRepository(Event)
 		private eventRepository: Repository<Event>,
@@ -63,7 +63,6 @@ export class EventService {
 			}
 		}
 	}
-	
 
 	async getAllOnlineUsers(): Promise<number[]> {
 		return Array.from(this.eventSubjects.keys()).map(Number);
@@ -76,6 +75,15 @@ export class EventService {
 
 	getUserEventStream(userId: string) {
 		return this.eventSubjects.get(userId)?.asObservable();
+	}
+
+	async onModuleDestroy(): Promise<void> {
+		const shutdownMessage: SseMessage = {
+			type: EventType.System,
+			payload: { event: "restart", message: 'Server is shutting down.'},
+			timestamp: Date.now(),
+		};
+		await this.sendToAll(shutdownMessage);
 	}
 }
 

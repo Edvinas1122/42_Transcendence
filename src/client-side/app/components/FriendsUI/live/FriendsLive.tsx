@@ -25,6 +25,7 @@ const FriendsLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 	const LiveFriendsDisplay = new UIClientListBoxClassBuilder()
 		.setInitialItems(endpoint)
 		.setEntityInterface(LiveFriendsInteface)
+		.setListStyle("FriendsListLive")
 		.setBoxComponent(node)
 		.setLinkDefinition({
 			linktemplate: "/user/[id]",

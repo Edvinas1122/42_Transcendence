@@ -5,6 +5,7 @@ import { EventSourceProvider } from './ContextProviders/eventContext';
 import { AuthProvider } from './ContextProviders/authContext';
 import { ConfirmationProvider } from './confirmationDialog/Confirmation';
 import { GameInvite } from './GameInvite';
+import { ChatEventProvider } from "@/components/ChatUI/ChatEventProvider";
 
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -14,7 +15,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 			<ConfirmationProvider>
 				<EventSourceProvider>
 					<GameInvite/>
+					<ChatEventProvider>
 					{children}
+					</ChatEventProvider>
 				</EventSourceProvider>
 			</ConfirmationProvider>
 		</AuthProvider>

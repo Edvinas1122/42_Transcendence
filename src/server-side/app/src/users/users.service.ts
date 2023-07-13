@@ -44,6 +44,10 @@ export class UsersService {
 		return this.userRepository.findOne({ where: { id } });
 	}
 
+	async findUserByFullName(fullName: string): Promise<User | null> {
+		return this.userRepository.findOne({ where: { FullName: fullName } });
+	}
+
 	private setDefaultAvatar(user: User): User {
 		user.avatar = '/avatar-default.png';
 		return user;

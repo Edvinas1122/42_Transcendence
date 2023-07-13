@@ -51,6 +51,7 @@ const AllUsersLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 		.setInitialItems(endpoint)
 		.setEditItemsCallback(handleEvents)
 		.setEntityInterface(UserInteface)
+		.setListStyle("AllUsersLive")
 		.setBoxComponent(node)
 		.addCategory({
 				name: "Online",

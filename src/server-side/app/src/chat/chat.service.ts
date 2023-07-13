@@ -39,7 +39,7 @@ export class ChatService {
 		return this.chatRepository.findOne({where: {id: chatId}});
 	}
 
-	async createGroupChat(createChatDto: CreateChatDto): Promise<Chat> {
+	async createGroupChat(createChatDto: CreateChatDto, creatorId: number): Promise<Chat> {
 		if (createChatDto.isPrivate == true && createChatDto.password){
 			throw new BadRequestException('Private Chat can not have password');
 		}
@@ -66,7 +66,14 @@ export class ChatService {
 		await this.roleService.addRelativeToChat(RoleType.Owner, savedChat, owner);
 		
 		// send event to all users that are online unless the chat is private then send to participants only
-		await this.updateEvent(savedChat, RoomEventType.NewAvailable, await this.makeChatDto(chat, chat.ownerID));
+		await this.updateEvent(
+			savedChat,
+			RoomEventType.NewAvailable,
+			await this.makeChatDto(chat, chat.ownerID),
+			false,
+			false,
+			creatorId
+		);
 	
 		return savedChat;
 	}
@@ -110,6 +117,10 @@ export class ChatService {
 		const user2 = await this.usersService.findUser(receiverId);
 		if (!user2) {
 			throw new NotFoundException('User not found');
+		}
+		const isBlocked = await this.usersService.isBlocked(sender.id, receiverId);
+		if (isBlocked) {
+			throw new UnauthorizedException('User not found');
 		}
 		const doesPersonalChatExist = await this.doesPersonalChatExist(sender.id, user2.id);
 		if (doesPersonalChatExist) {
@@ -510,9 +521,15 @@ export class ChatService {
 	}
 
 
-	private async updateEvent(chat: Chat, eventType: RoomEventType, chatObject?: any, participantsExclusive: boolean = false, saveEvent: boolean = false): Promise<void> {
+	private async updateEvent(
+		chat: Chat, eventType: RoomEventType, 
+		chatObject?: any, 
+		participantsExclusive: boolean = false, 
+		saveEvent: boolean = false, 
+		distributorId?: number
+	): Promise<void> {
 		if (!participantsExclusive && (!chat.private && !chat.personal)) {
-			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, chatObject);
+			await this.chatEventGateway.updateOnlineUsersChatEvent(chat, eventType, chatObject, distributorId);
 		}
 		else {
 			await this.chatEventGateway.updateParticipantsOfRoomEvent(chat, eventType, saveEvent, chatObject);

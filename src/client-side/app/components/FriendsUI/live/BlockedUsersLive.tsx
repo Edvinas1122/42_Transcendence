@@ -26,6 +26,7 @@ const BlockedUsersLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 		.setInitialItems(endpoint)
 		.setEntityInterface(BlockedUsersInteface)
 		.setBoxComponent(node)
+		.setListStyle("BlockedLiveList")
 		.setLinkDefinition({
 			linktemplate: "/user/[id]",
 			samePage: false,

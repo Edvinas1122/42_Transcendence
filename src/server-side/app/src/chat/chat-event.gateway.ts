@@ -5,6 +5,7 @@ import { ChatRoomEvent, MessageEvent, RoomEventType, MessageEventType, SseMessag
 import { Chat } from "./entities/chat.entity";
 import { UserInfo } from "../users/dtos/user.dto";
 import { MessageDto } from "./dtos/message.dtos";
+import { UsersService } from "../users/users.service";
 
 
 @Injectable()
@@ -14,13 +15,35 @@ export class ChatEventGateway {
 		private eventService: EventService,
 		@Inject(RoleService)
 		private roleService: RoleService,
+		@Inject(UsersService)
+		private usersService: UsersService,
 	) {}
 
 
-	async updateOnlineUsersChatEvent(chat: Chat, eventType: RoomEventType, info?: any): Promise<boolean> {
+	async updateOnlineUsersChatEvent(
+		chat: Chat,
+		eventType: RoomEventType,
+		info?: any,
+		distributorId?: number
+	): Promise<boolean> {
 		const data: ChatRoomEvent = new ChatRoomEvent(chat.id, eventType, info);
 		const users = await this.roleService.getBlockedChatMembers(chat); // exclude blocked users
-		await this.eventService.sendToAll(data as SseMessage, users.map(user => user._id));
+	
+		if (distributorId === undefined) {
+			await this.eventService.sendToAll(data as SseMessage, users.map(user => user._id));
+			return true;
+		}
+		const promise = users.map(async user => {
+			const isBlocked = await this.usersService.isBlocked(user._id, distributorId);
+			if (isBlocked) {
+				return null;
+			}
+			return user;
+		});
+	
+		const usersNotBlocked = await Promise.all(promise);
+		const usersFiltered = usersNotBlocked.filter(user => user !== null);
+		await this.eventService.sendToAll(data as SseMessage, usersFiltered.map(user => user._id));
 		return true;
 	}
 

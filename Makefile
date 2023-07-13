@@ -16,8 +16,8 @@ shell_front:
 	docker-compose exec next-app bash
 
 wipe_db:
-	docker volume rm transcendence_pgadmin_data
-	docker volume rm transcendence_file_storage
+	docker volume rm 42_transcendence_pgadmin_data
+	docker volume rm 42_transcendence_file_storage
 
 stop:
 	docker-compose down

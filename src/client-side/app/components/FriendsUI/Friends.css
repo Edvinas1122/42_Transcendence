@@ -6,10 +6,26 @@
 	height: 40vh !important;
 }
 
-.Friends {
+/* .Friends {
 	height: 70vh;
-}
+} */
 
 .AllUsers {
 	height: 100vh;
+}
+
+.AllUsersLive {
+	height: 100vh;
+}
+
+.BlockedLiveList {
+	height: 25vh;
+}
+
+.InvitesLiveList {
+	height: 25vh;
+}
+
+.FriendsListLive {
+	height: 50vh;
 }

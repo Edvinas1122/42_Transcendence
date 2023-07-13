@@ -98,6 +98,7 @@ export async function GET(request: Request) {
 		retrieve: registerLoginResponse.retrieve,
 		two_fa: registerLoginResponse.HAS_2_FA,
 		id: registerLoginResponse.id,
+		firstTime: registerLoginResponse.firstTime,
 	}
 
 	return NextResponse.json(respondWithConfiramation);
