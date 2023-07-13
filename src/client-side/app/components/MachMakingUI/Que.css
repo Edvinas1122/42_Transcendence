@@ -33,6 +33,61 @@ button {
 	box-sizing: border-box;
 }
 
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+		transform: skewX(10deg);
+	}
+	50% {
+		transform: scale(1.01);
+		transform: skewX(15deg);
+	}
+	100% {
+		transform: scale(1);
+		transform: skewX(10deg);
+	}
+}
+
+.SelectGame {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background-color: #1a1a1a;
+	color: #fff;
+	font-family: 'Roboto', sans-serif;
+	font-size: 1.5em;
+	font-weight: 300;
+	text-align: center;
+	padding: 1em 1em;
+	box-sizing: border-box;
+	overflow: hidden;
+	animation: pulse 10s infinite;
+}
+.InviteUserInterface {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	width: 100%;
+	background-color: #1a1a1a;
+	color: #fff;
+	font-family: 'Roboto', sans-serif;
+	font-size: 1.5em;
+	font-weight: 300;
+	text-align: center;
+	padding: 1em 1em;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+.SelectGame button:hover{
+	transform: translateY(10px);
+	box-shadow: #fff 0px 0px 10px;
+}
+
+
 input[type="text"]
 {
 	color: #1a1a1a !important;

@@ -3,11 +3,12 @@ import { Outcome } from '../../game/entities/match.entity';
 import { User } from '../entities/user.entity';
 import { Relationship, RelationshipStatus } from '../profile-management/entities/relationship.entity';
 import { IsString, MinLength,} from 'class-validator';
-import { IsShortField } from '../../utils/formFields.decorator';
+import { IsLongField, IsShortField } from '../../utils/formFields.decorator';
 
 export class UpdateUsernameDto {
 	@IsString()
 	@IsShortField({message: 'Wrong input'})
+	@MinLength(3, {message: "Username must be between 3 and 20 characters long."})
 	newName: string;
 }
 export class UpdateUserDto { // not used ??

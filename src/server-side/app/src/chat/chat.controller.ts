@@ -45,7 +45,7 @@ export class ChatController {
 		console.log('create chat', userId);
 		createChatDto.ownerID = userId;
 		createChatDto.invitedUsersID = createChatDto.invitedUsersID ? [...createChatDto.invitedUsersID, userId] : [userId];
-		const resultChat = await this.chatService.createGroupChat(createChatDto);
+		const resultChat = await this.chatService.createGroupChat(createChatDto, userId);
 		if (resultChat) {
 			return resultChat;
 		}

@@ -37,7 +37,8 @@ export class ProfileManagementService {
 		// 	throw new HttpException('You are blocked by this user', HttpStatus.FORBIDDEN);
 		const info = await this.relationshipsRepository.save(relationship);
 
-		this.eventsGateway.sendUserRelationshipEvent(receiverId, RelationshipType.Invited, senderId);
+		console.log('sendFriendRequest', info);
+		this.eventsGateway.sendUserRelationshipEvent(receiverId, RelationshipType.Invited, info);
 		return info;
 	}
 

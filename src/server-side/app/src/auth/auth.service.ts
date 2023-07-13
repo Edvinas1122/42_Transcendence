@@ -17,31 +17,36 @@ export class AuthService {
 	) {}
 
 	async registerAuthorizedLogin(login: LoginRegister): Promise<any> {
-		let user = await this.usersService.findOne(login.user);
+		let user = await this.usersService.findUserByFullName(login.fullName);
+		let firstTime = false;
 
 		if (!user) {
 			user = await this.usersService.create({
 				name: login.user,
 				FullName: login.fullName,
 			});
+			firstTime = true;
 		}
 		if (user === null) {
 			throw new BadRequestException('User not found');
 		}
 		const userHas2FA = await this.usersService.has2FA(user.id);
+		// const userHas2FA = false;
 		if (userHas2FA) {
 			const tokenRetrieve = await this.generateToken({
 				id: user.id,
 				owner: login.user,
 				only2FA: true,
 			});
-			return {token: tokenRetrieve, userHas2FA: userHas2FA, id: user.id};
+			return {token: tokenRetrieve, userHas2FA: userHas2FA, id: user.id, firstTime: firstTime};
 		} else {
 			const token = await this.generateToken({
 				id: user.id,
 				owner: login.user,
+				// id: 1,
+				// owner: "test",
 			});
-			return {token, userHas2FA};
+			return {token, userHas2FA, firstTime: firstTime};
 		}
 	}
 
