@@ -7,7 +7,7 @@ import { IsShortField } from '../../utils/formFields.decorator';
 
 export class UpdateUsernameDto {
 	@IsString()
-	@IsShortField()
+	@IsShortField({message: 'Wrong input'})
 	newName: string;
 }
 export class UpdateUserDto { // not used ??
