@@ -68,6 +68,7 @@
 	-ms-overflow-style: none;  /* IE and Edge */
 	/* height: 100vh; */
 	overflow-y: auto;
+	overflow: auto;
 }
 
 .List .emptyListMessage {
