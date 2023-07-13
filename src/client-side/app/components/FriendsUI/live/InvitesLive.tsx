@@ -69,6 +69,7 @@ const InvitesLive: React.FC<{ node: React.FC<UserBoxProps> }> = ({
 		.setEntityInterface(LiveInviteInteface)
 		// .setEditItemsCallback(handleEvents)
 		.setBoxComponent(node)
+		.setListStyle("InvitesLiveList")
 		.setLinkDefinition({
 			linktemplate: "/user/[id]",
 			samePage: false,
