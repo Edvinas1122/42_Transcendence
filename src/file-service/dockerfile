@@ -1,0 +1,9 @@
+# Use an official nginx image as a parent image
+FROM nginx:alpine
+
+# Remove the default nginx configuration file
+RUN rm /etc/nginx/conf.d/default.conf
+RUN mkdir -p /var/www/uploads
+
+# Copy the configuration file from the local directory to the nginx directory in the image
+COPY conf/nginx.conf /etc/nginx/conf.d

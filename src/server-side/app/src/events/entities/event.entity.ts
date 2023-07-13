@@ -6,6 +6,7 @@ export enum EventType {
 	Chat = 'chat',
 	Users = 'users',
 	Game = 'game',
+	System = 'system',
 }
 
 @Entity()

@@ -19,7 +19,7 @@ export class DriveController {
 	async uploadAvatar(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
 		const userId = req['user']['id'];
 		console.log(file.buffer);
-		const fileName = `avatar-${userId}.jpg`;
+		const fileName = `avatar-${userId}-${new Date()}.jpg`;
 		const path = join('/uploads/', fileName);
 		await writeFile(path, file.buffer);
 		const avatar_url = process.env.FRONT_END_API + "/avatar/" + fileName;

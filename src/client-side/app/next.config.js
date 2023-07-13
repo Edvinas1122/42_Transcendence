@@ -1,24 +1,21 @@
 	/** @type {import('next').NextConfig} */
 	const nextConfig = {
-		// async rewrites() {
-		// 	return [
-		// 		{
-		// 			source: '/avatar/',
-		// 			destination: '/avatar/',
-		// 		},
-		// 		{
-		// 			source: '/:any*',
-		// 			destination: '/',
-		// 		}
-		// 	]
-		// },
+		async rewrites() {
+			return [
+				{
+					source: '/avatar/:path*',
+					destination: `${process.env.NEXT_PUBLIC_FILE_SERVICE}/:path*`,
+				},
+			]
+		},
 		env: {
 			developer_mode: process.env.DEV? process.env.DEV : "",
 			intraLink: process.env.INTRA_LINK? process.env.INTRA_LINK : "",
 			next_public_intra_link: process.env.NEXT_PUBLIC_INTRA_LINK? process.env.NEXT_PUBLIC_INTRA_LINK : "",
 		},
 		images: {
-			domains: ['localhost', `${process.env.NEXT_PUBLIC_HOST_NAME}`, "cdn.intra.42.fr"],
+			domains: ['localhost', `${process.env.NEXT_PUBLIC_HOST_NAME}`, "cdn.intra.42.fr", `${process.env.NEXT_PUBLIC_FILE_SERVICE}`],
+			minimumCacheTTL: 3,
 		},
 		experimental: {
 			serverActions: true,
