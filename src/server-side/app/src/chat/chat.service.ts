@@ -294,6 +294,9 @@ export class ChatService {
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}
+		if (user.id === userId) {
+			throw new BadRequestException('Can not invite yourself');
+		}
 		const role = await this.roleService.getRole(chatId, user.id);
 		if (role) {
 			throw new BadRequestException('User already a participant');

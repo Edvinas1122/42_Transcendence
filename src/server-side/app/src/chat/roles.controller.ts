@@ -66,10 +66,10 @@ export class RolesController {
 	async inviteUser(
 		@UserId() UserId: number,
 		@Param('chatId', new ParseIntPipe()) chatId,
-		@Body('user') input: UserNameParam, // validation pipe
+		@Body(new ValidationPipe()) input: UserNameParam, // validation pipe
 	): Promise<any>
 	{
-		await this.chatService.inviteToChat(UserId, chatId, input.userName);
+		await this.chatService.inviteToChat(UserId, chatId, input.user);
 		return { success: true, message: 'User invited' };
 	}
 
