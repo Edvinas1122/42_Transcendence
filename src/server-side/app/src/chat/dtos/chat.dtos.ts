@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, Length, IsInt, IsOptional, IsEnum, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, MaxLength, Length, IsInt, IsOptional, IsEnum, IsString, MinLength, ArrayMinSize, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { RoleType } from '../entities/role.entity';
 import { IsShortField, IsLongField } from '../../utils/formFields.decorator';
@@ -24,7 +24,7 @@ export class CreateChatDto {
 
 	@IsOptional()
 	@IsString()
-	@IsShortField({message: 'Password too Long'})
+	@MaxLength(20, {message: 'Password too Long'})
 	password?: string;
 
 	@IsOptional()
@@ -41,7 +41,7 @@ export class ChatIdDto {
 export class UpdateChatDto {
 	@IsString()
 	@IsOptional()
-	@IsShortField()
+	@MaxLength(20, {message: 'Password too Long'})
 
 	password: string | undefined;
 }
@@ -54,13 +54,13 @@ export class JoinChatDto {
   }
 export class SendMessageDto {
 	@IsString()
-	@IsLongField({message: 'Can not send message over 1000 characters long'})
+	@IsLongField({message: 'Message over 1000 characters or only spaces'})
 	content: string;
   
 	@IsString()
 	@IsOptional()
-	@IsShortField({message: 'Password too long'})
-	password?: string | null; // omited, not used
+	@MaxLength(20, {message: 'Password too long'})
+	password?: string | null;
 }
 
 export class DeleteMessageDto {

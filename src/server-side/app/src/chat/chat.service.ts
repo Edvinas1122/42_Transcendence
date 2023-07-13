@@ -118,6 +118,10 @@ export class ChatService {
 		if (!user2) {
 			throw new NotFoundException('User not found');
 		}
+		const isBlocked = await this.usersService.isBlocked(sender.id, receiverId);
+		if (isBlocked) {
+			throw new UnauthorizedException('User not found');
+		}
 		const doesPersonalChatExist = await this.doesPersonalChatExist(sender.id, user2.id);
 		if (doesPersonalChatExist) {
 			throw new ConflictException('Personal chat already exists');

@@ -94,6 +94,11 @@
     text-align: right; /* Aligns the text to the right */
 }
 
+.ParticipantsList {
+    height: 85vh !important;
+    overflow: auto;
+}
+
 .Participants {
     /* width: 32%; */
     min-width: 350px;

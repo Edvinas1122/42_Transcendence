@@ -7,7 +7,7 @@ import { IsLongField, IsShortField } from '../../utils/formFields.decorator';
 
 export class UpdateUsernameDto {
 	@IsString()
-	@IsShortField({message: "Username must be between 3 and 20 characters long."})
+	@IsShortField({message: 'Wrong input'})
 	@MinLength(3, {message: "Username must be between 3 and 20 characters long."})
 	newName: string;
 }
