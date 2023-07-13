@@ -234,9 +234,9 @@ const LiveParticipants: Function = ({
 		.build();
 
 	return (
-		<UIClientListBox
-			{...ParticipantsList}
-		/>
+		<div>
+		<UIClientListBox {...ParticipantsList} />
+	  </div>
 	);
 }
 
