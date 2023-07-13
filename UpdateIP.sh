@@ -29,7 +29,7 @@ echo "INTRA_UID=$INTRA_UID" >> $FILE_LOCATION
 echo "INTRA_SECRET=$INTRA_SECRET" >> $FILE_LOCATION
 echo "Updated .env file with IP address: $IP"
 
-
+sed -i '' "s/http:\/\/[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\//http:\/\/$IP\//g" src/file-service/conf/nginx.conf
 sed -i '' '/^FRONT_END_API/d' .env
 echo "FRONT_END_API=http://$IP:3030" >> .env
 echo "Updated .env file with IP address: $IP"

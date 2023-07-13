@@ -16,6 +16,7 @@
 		images: {
 			domains: ['localhost', `${process.env.NEXT_PUBLIC_HOST_NAME}`, "cdn.intra.42.fr", `${process.env.NEXT_PUBLIC_FILE_SERVICE}`],
 			minimumCacheTTL: 3,
+			// cache longer
 		},
 		experimental: {
 			serverActions: true,
