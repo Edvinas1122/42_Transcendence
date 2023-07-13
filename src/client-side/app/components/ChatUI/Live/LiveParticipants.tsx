@@ -189,9 +189,10 @@ const LiveParticipants: Function = ({
 			endpointTemplate: `/chat/messages/user/create/[id]`,
 			type: "action",
 		})
+
 		.addButton(
 			{
-				name: "Invite",
+				name: "Lets' Pong Gop!",
 				endpointTemplate: "/game/invite/",
 				type: "action",
 				fields: [
