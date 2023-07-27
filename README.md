@@ -1,5 +1,5 @@
 # 42_Transcendence
-42_Transcendence is a full-featured multiplayer game site, centered around playing ping pong. It's a robust application with a focus on interactivity and real-time functionality.
+42_Transcendence is a full-featured multiplayer game site, centered around playing ping pong. Application focus on interactivity and real-time functionality.
 
 ## About the Project
 This project incorporates a chat system and a multiplayer ping pong game, both leveraging real-time communication technologies for immediate, responsive user experiences. The chat system utilizes Server-Sent Events (SSE) for real-time messaging and notifications, while the multiplayer game is powered by Socket.IO, allowing users to interact, chat, and invite each other for a game of ping pong.
